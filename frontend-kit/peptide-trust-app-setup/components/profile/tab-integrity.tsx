@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ShieldCheck, Clock, Hash, Cpu, CheckCircle2, Copy, Check } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { BitcoinProofForHash } from '@/components/anchor/bitcoin-proof'
 import type { ParticipantProfile } from '@/lib/profile-data'
 
 interface CheckRowProps {
@@ -149,16 +149,8 @@ export function TabIntegrity({ profile }: TabIntegrityProps) {
               {copied ? <Check size={14} /> : <Copy size={14} />}
             </button>
           </div>
-          <div className="mt-3 flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <a
-                href={`https://etherscan.io/search?q=${profile.latest_anchor_hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Посмотреть в блокчейне ↗
-              </a>
-            </Button>
+          <div className="mt-3">
+            <BitcoinProofForHash hash={profile.latest_anchor_hash} />
           </div>
         </div>
       )}

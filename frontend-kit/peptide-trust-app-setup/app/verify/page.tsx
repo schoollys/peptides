@@ -6,11 +6,12 @@ import { Shield, Search, CheckCircle, XCircle, ChevronLeft } from 'lucide-react'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { Button } from '@/components/ui/button'
+import { BitcoinProof, type AnchorProofInfo } from '@/components/anchor/bitcoin-proof'
 
 type AnchorMatch =
-  | { kind: 'score'; anchorHash: string; participantSlug: string; displayName: string; score: number; algoVersion: string; computedAt: string }
-  | { kind: 'coa'; anchorHash: string; participantSlug: string; displayName: string; labName: string | null; createdAt: string }
-  | { kind: 'flag'; anchorHash: string; participantSlug: string; displayName: string; flagType: string; openedAt: string }
+  | { kind: 'score'; anchorHash: string; participantSlug: string; displayName: string; score: number; algoVersion: string; computedAt: string; proof: AnchorProofInfo | null }
+  | { kind: 'coa'; anchorHash: string; participantSlug: string; displayName: string; labName: string | null; createdAt: string; proof: AnchorProofInfo | null }
+  | { kind: 'flag'; anchorHash: string; participantSlug: string; displayName: string; flagType: string; openedAt: string; proof: AnchorProofInfo | null }
 
 const KIND_LABEL: Record<AnchorMatch['kind'], string> = {
   score: 'Снимок Trust Score',
@@ -178,6 +179,12 @@ export default function VerifyPage() {
                           {result.participantSlug}
                         </Link>
                       </div>
+
+                      {result.proof && (
+                        <div className="mt-3">
+                          <BitcoinProof proof={result.proof} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
