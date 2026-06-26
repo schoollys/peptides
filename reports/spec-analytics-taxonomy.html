@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Analytics &amp; Event Taxonomy</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;min-width:250px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.25rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.76rem}
+thead th{background:#1a1917;color:#eee;padding:6px 9px;text-align:left;font-weight:600;font-size:.67rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:6px 9px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917;font-family:ui-monospace,Menlo,monospace;font-size:.72rem}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Analytics Taxonomy<span class="sb-sub">tracking plan</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор и правила</a>
+<a class="nav-link" href="#naming"><span class="nav-num">02</span>Соглашения именования</a>
+<a class="nav-link" href="#north"><span class="nav-num">03</span>North Star и воронка</a>
+<a class="nav-link" href="#events"><span class="nav-num">04</span>Каталог событий</a>
+<a class="nav-link" href="#privacy"><span class="nav-num">05</span>Приватность событий</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Транш A · Analytics &amp; Event Taxonomy</div>
+<h1>Analytics &amp; Event Taxonomy</h1>
+<p class="sec-intro">Tracking plan: какие события собираем, с какими свойствами и на каких триггерах. Привязан к North Star «verified decisions» и KPI фаз (<a href="../reports/wave3-product-specs.html">Волна 3</a>). Цель — чтобы аналитика была заложена с первого коммита, а не «прикручена потом».</p>
+<div class="rec-box"><div class="rec-t">Принципы</div><p>Privacy-by-design: события не содержат ПДн и shielded-идентичности; используем псевдонимные id. Каждое событие имеет владельца-метрику. Серверные события — приоритет над клиентскими для критичных метрик (доверие к данным).</p></div>
+</section>
+
+<section id="naming">
+<div class="sec-badge">02 — Соглашения именования</div>
+<table>
+<thead><tr><th>Правило</th><th>Значение</th></tr></thead>
+<tbody>
+<tr><td>Формат</td><td><code>object_action</code> в snake_case (напр. <code>profile_viewed</code>)</td></tr>
+<tr><td>Общие свойства</td><td>event_id, ts, source(web/api/server), session_id(псевдоним), role_context</td></tr>
+<tr><td>Идентификация</td><td>anon_id (cookieless-friendly), participant_ref (псевдоним), без ПДн</td></tr>
+<tr><td>Версионирование</td><td>schema_version у каждого события; аддитивные изменения без слома</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="north">
+<div class="sec-badge">03 — North Star и продуктовая воронка</div>
+<table>
+<thead><tr><th>Слой</th><th>Метрика</th><th>Из событий</th></tr></thead>
+<tbody>
+<tr><td>North Star</td><td>Verified decisions (просмотр доверия → действие)</td><td>profile_viewed → badge_clicked / outbound_click + verified flag</td></tr>
+<tr><td>Acquisition</td><td>Уник. посетители каталога</td><td>catalog_viewed</td></tr>
+<tr><td>Activation</td><td>Просмотр профиля + проверка</td><td>profile_viewed, integrity_verified</td></tr>
+<tr><td>Engagement</td><td>Встраивания бейджа, повторные визиты</td><td>badge_rendered, return_visit</td></tr>
+<tr><td>Supply</td><td>Claim/онбординг, подачи данных</td><td>claim_started/completed, submission_created</td></tr>
+<tr><td>Revenue (V1)</td><td>B2B-подписки/отчёты</td><td>b2b_subscription_created, due_diligence_purchased</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="events">
+<div class="sec-badge">04 — Каталог событий</div>
+<table>
+<thead><tr><th>Событие</th><th>Триггер</th><th>Ключевые свойства</th><th>Фаза</th></tr></thead>
+<tbody>
+<tr><td>catalog_viewed</td><td>Открыт каталог</td><td>filters{role,tier,factor}, results_count</td><td>MVP</td></tr>
+<tr><td>profile_viewed</td><td>Открыт профиль</td><td>participant_ref, role, tier, dominant_factor</td><td>MVP</td></tr>
+<tr><td>integrity_verified</td><td>Клик «проверить ончейн»</td><td>anchor_hash, verified(bool)</td><td>MVP</td></tr>
+<tr><td>badge_rendered</td><td>Отдан бейдж</td><td>participant_ref, theme, cache_hit</td><td>MVP</td></tr>
+<tr><td>badge_clicked</td><td>Клик по бейджу</td><td>participant_ref, referrer_domain</td><td>MVP</td></tr>
+<tr><td>claim_started / completed</td><td>Старт/итог онбординга</td><td>role, kyb_level, outcome</td><td>MVP</td></tr>
+<tr><td>submission_created</td><td>Подача данных/COA</td><td>kind, factor, has_artifact, source_type</td><td>MVP</td></tr>
+<tr><td>score_updated</td><td>Пересчёт Score</td><td>participant_ref, delta, trigger(event/batch)</td><td>MVP</td></tr>
+<tr><td>flag_opened / resolved</td><td>Штраф открыт/закрыт</td><td>type, severity, outcome</td><td>MVP</td></tr>
+<tr><td>alert_sent</td><td>Алерт контрагенту</td><td>severity, reason</td><td>V1</td></tr>
+<tr><td>propagation_recomputed</td><td>Batch пропагации</td><td>nodes_affected</td><td>V1</td></tr>
+<tr><td>appeal_submitted / decided</td><td>Апелляция</td><td>outcome, panel_size</td><td>V1</td></tr>
+<tr><td>chain_pull_invited / joined</td><td>Реферал</td><td>initiator_ref, outcome</td><td>V1</td></tr>
+<tr><td>b2b_subscription_created</td><td>B2B-подписка</td><td>sku, target_ref</td><td>V1</td></tr>
+<tr><td>due_diligence_purchased</td><td>Покупка отчёта</td><td>target_ref</td><td>V1</td></tr>
+<tr><td>analytics_query_run</td><td>Запрос аналитики</td><td>aggregate_only(true)</td><td>V2</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="privacy">
+<div class="sec-badge">05 — Приватность событий</div>
+<table>
+<thead><tr><th>Правило</th><th>Реализация</th></tr></thead>
+<tbody>
+<tr><td>Без ПДн</td><td>Только псевдонимные id; никаких email/телефонов/имён</td></tr>
+<tr><td>Shielded не раскрывается</td><td>Для shielded-участников — participant_ref без связи с real_identity</td></tr>
+<tr><td>Агрегация для V2-аналитики</td><td>Только агрегаты, защита от реидентификации (k-anonymity)</td></tr>
+<tr><td>Согласия</td><td>Клиентская телеметрия — по согласию; серверные критичные метрики — легитимный интерес</td></tr>
+<tr><td>Хранение</td><td>Сроки по data-protection режиму (утверждает DPO)</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Связка</div><p>События <code>score_updated</code>/<code>flag_opened</code> совпадают по смыслу с доменными событиями <code>event_outbox</code> (см. <a href="../reports/spec-integration-contracts.html">Integration Contracts</a>) — единый источник, разные потребители (аналитика vs B2B-вебхуки).</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Scope Document</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;min-width:240px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:960px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+@media(max-width:700px){.scope-grid{grid-template-columns:1fr}}
+.scope-col{border-radius:10px;padding:.9rem 1.1rem}
+.scope-in{background:#f6faf7;border:1px solid #cfe3d4}
+.scope-out{background:#fbf3f3;border:1px solid #e8cccc}
+.scope-col h4{margin-top:0}
+.scope-in h4{color:#15673f}.scope-out h4{color:#a33}
+.phase{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.7rem;font-weight:700}
+.p-mvp{background:#e7f3ec;color:#15673f}.p-v1{background:#eef0fb;color:#3b4a8c}.p-v2{background:#f7eef8;color:#7a3b7a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Scope Document<span class="sb-sub">In / Out of Scope</span></div>
+<a class="nav-link" href="#purpose"><span class="nav-num">01</span>Назначение</a>
+<a class="nav-link" href="#global"><span class="nav-num">02</span>Глобальный In / Out</a>
+<a class="nav-link" href="#mvp"><span class="nav-num">03</span>Scope MVP</a>
+<a class="nav-link" href="#v1"><span class="nav-num">04</span>Scope V1</a>
+<a class="nav-link" href="#v2"><span class="nav-num">05</span>Scope V2</a>
+<a class="nav-link" href="#excl"><span class="nav-num">06</span>Явные исключения</a>
+<a class="nav-link" href="#change"><span class="nav-num">07</span>Процесс изменения scope</a>
+</nav>
+
+<main class="content">
+
+<section id="purpose">
+<div class="sec-badge">PRD-приложение · Scope Document</div>
+<h1>Scope Document — границы проекта</h1>
+<p class="sec-intro">Якорь против scope creep. Фиксирует, что входит и не входит в продукт в целом и по фазам (MVP / V1 / V2). Любое расширение проходит через процесс изменения scope (§07). Развивает границы из Vision §08 и Roadmap.</p>
+<div class="rec-box">
+<div class="rec-t">Главный принцип scope</div>
+<p>PeptideTrust — <strong>слой доверия</strong>, а не маркетплейс, не эскроу и не медицинский сервис. Всё, что приближает продукт к торговле товаром, удержанию средств или медицинским рекомендациям — вне scope по определению, независимо от фазы.</p>
+</div>
+</section>
+
+<section id="global">
+<div class="sec-badge">02 — Глобальный In / Out</div>
+<h2>Что продукт делает и не делает (вне зависимости от фазы)</h2>
+<div class="scope-grid">
+<div class="scope-col scope-in">
+<h4>✓ В границах (всегда)</h4>
+<ul>
+<li>Открытый публичный реестр доверия и Trust Score</li>
+<li>Агрегация и независимая верификация данных (оракулы, тесты, артефакты)</li>
+<li>Прозрачный алгоритм Score с доминирующим фактором</li>
+<li>Встраиваемый бейдж и публичное read-API</li>
+<li>Идентичность (KYB/KYC), PKI, ончейн-якоря целостности</li>
+<li>Апелляции и управление (Steward-панели)</li>
+<li>B2B-продукты для «решающих» сторон</li>
+</ul>
+</div>
+<div class="scope-col scope-out">
+<h4>✗ Вне границ (всегда)</h4>
+<ul>
+<li>Маркетплейс / продажа товара / листинг цен на продажу</li>
+<li>Эскроу, удержание средств, процессинг платежей за сделки</li>
+<li>Медицинские рекомендации, дозировки, протоколы применения</li>
+<li>Гарантия/страхование качества товара</li>
+<li>Продажа влияния на Score оцениваемой стороне</li>
+<li>Анонимная агрегация без верификации (мы не «ещё один форум»)</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="mvp">
+<div class="sec-badge">03 — Scope MVP</div>
+<h2><span class="phase p-mvp">MVP</span> Доказать ценность для спроса (pull)</h2>
+<div class="scope-grid">
+<div class="scope-col scope-in">
+<h4>✓ В MVP</h4>
+<ul>
+<li>Публичный каталог + профили + Score с доминирующим фактором</li>
+<li>5 якорных ролей (полностью оцениваются): MANUFACTURER (завод-синтез / API-producer, upstream B2B), VENDOR (RUO-вендор — витрина/бренд), LABORATORY, DISTRIBUTOR, RETAILER (buyer-facing, но потолок тира Gold + «источник не верифицирован» до Vᵢ-пропагации V1; см. ADR <code>docs/adr-role-taxonomy.md</code>)</li>
+<li>Сегментация по ролям, фильтры, сравнение в сегменте</li>
+<li>Встраиваемый подписанный SVG/PNG бейдж + аналитика кликов</li>
+<li>Публичное read-API (профиль, история, верификация anchor_hash)</li>
+<li>Claim-profile + KYB/KYC (L0–L2) + waitlist-онбординг</li>
+<li>New/Provisional fast-track (KYB + 1 blind-тест)</li>
+<li>Независимые тесты (оракулы) + базовый Vᵢ + COA с PKI</li>
+<li>Ончейн-якоря целостности (L2)</li>
+<li>Unclaimed-профили (нейтральные факты, политика P0)</li>
+<li>Базовые Pₛ-флаги и decay (Dᵢ)</li>
+</ul>
+</div>
+<div class="scope-col scope-out">
+<h4>✗ Не в MVP (позже)</h4>
+<ul>
+<li>Trust-пропагация Vᵢ между контрагентами → V1</li>
+<li>Chain Pull-механика → V1</li>
+<li>Полный апелляционный процесс + Steward-панели → V1</li>
+<li>B2B-SKU (due-diligence, мониторинг) → V1</li>
+<li>Lot-QR chain-of-custody (полная) → V1</li>
+<li>ZK/shielded assertion → V2</li>
+<li>Локализация (не-английский) → V2</li>
+</ul>
+</div>
+</div>
+<div class="warn">
+<div class="warn-t">MVP exit criteria (из Волны 3)</div>
+<p>Переход к V1 — по достижению KPI фазы MVP (рост North Star «проверенные решения», доля профилей с ≥1 независимым подтверждением, активные податели данных), а не по календарю.</p>
+</div>
+</section>
+
+<section id="v1">
+<div class="sec-badge">04 — Scope V1</div>
+<h2><span class="phase p-v1">V1</span> Запустить маховик доверия и первую выручку</h2>
+<div class="scope-grid">
+<div class="scope-col scope-in">
+<h4>✓ В V1</h4>
+<ul>
+<li>Trust-пропагация Vᵢ (одношаговая, λ_blind, агрегация, потолок)</li>
+<li>Алерты по контрагентам + демпфер с отменой буфера</li>
+<li>Chain Pull (втягивание контрагентов, кредиты)</li>
+<li>Апелляции + Steward-панели (VRF-отбор, conflict-screening, chair-оракул)</li>
+<li>B2B-SKU: due-diligence отчёты + мониторинг-API/вебхуки</li>
+<li>Lot-QR chain-of-custody + анти-reuse артефактов</li>
+<li>Расширенная анти-gaming (collusion-detector, cyclic-ban)</li>
+<li>Transparent Affiliate, Verified Curator, Verified-Legal сегмент</li>
+</ul>
+</div>
+<div class="scope-col scope-out">
+<h4>✗ Не в V1</h4>
+<ul>
+<li>Полный ZK (используется shielded assertion) → V2</li>
+<li>Аналитика-SKU и VaaS → V2</li>
+<li>Расширение на новые категории/регионы → V2</li>
+<li>Опциональный инфра-модуль процессингов → V2</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="v2">
+<div class="sec-badge">05 — Scope V2</div>
+<h2><span class="phase p-v2">V2</span> Устойчивость, охват, продвинутая приватность</h2>
+<div class="scope-grid">
+<div class="scope-col scope-in">
+<h4>✓ В V2</h4>
+<ul>
+<li>Полноценный ZK-раскрытие (замена shielded assertion)</li>
+<li>Аналитика-SKU (агрегированные тренды) + VaaS (интеграция в чужие платформы)</li>
+<li>Расширение категорий/регионов; локализация (i18n)</li>
+<li>Опциональный модуль инфра-надёжности процессингов</li>
+<li>Оптимизация юнит-экономики, снижение CAC</li>
+</ul>
+</div>
+<div class="scope-col scope-out">
+<h4>✗ По-прежнему вне границ</h4>
+<ul>
+<li>Маркетплейс / эскроу / платежи за сделки</li>
+<li>Медицина / дозировки</li>
+<li>Платная позиция/влияние на Score</li>
+</ul>
+</div>
+</div>
+</section>
+
+<section id="excl">
+<div class="sec-badge">06 — Явные исключения с обоснованием</div>
+<h2>Почему этого нет — чтобы не возвращаться к спорам</h2>
+<table>
+<thead><tr><th>Исключено</th><th>Почему</th></tr></thead>
+<tbody>
+<tr><td>Эскроу / удержание средств</td><td>Юридический и операционный риск (финрегулирование); прямое решение пользователя — доверие держится на репутации GB-организаторов, не на эскроу</td></tr>
+<tr><td>Маркетплейс / продажи</td><td>Нарушает нейтралитет (мы бы стали стороной сделки); смешивает trust-layer с торговлей</td></tr>
+<tr><td>Медицинские рекомендации</td><td>RUO-позиционирование; регуляторный риск; вне компетенции</td></tr>
+<tr><td>Платная позиция в каталоге / влияние на Score</td><td>Уничтожает доверие (конфликт интересов как у платных рейтингов); платит «решающий», не оцениваемый</td></tr>
+<tr><td>Полный Trust Score для неформальных продавцов</td><td>Нет верифицируемых данных; остаются как репутационная заметка</td></tr>
+<tr><td>Процессинги в core-Score</td><td>Нет механизма оценки в рамках доверия к товару; вынесены в опциональный инфра-модуль</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="change">
+<div class="sec-badge">07 — Процесс изменения scope</div>
+<h2>Как scope может меняться</h2>
+<ol>
+<li><strong>Предложение:</strong> любое расширение оформляется как запрос с обоснованием ценности и фазой.</li>
+<li><strong>Проверка границ:</strong> не нарушает ли «всегда вне границ» (§02, §06). Если нарушает — отклоняется без обсуждения деталей.</li>
+<li><strong>Влияние:</strong> оценка на North Star/KPI, юнит-экономику, безопасность, нейтралитет.</li>
+<li><strong>Решение и версия:</strong> принятое изменение фиксируется с обновлением версии Scope Document и, при необходимости, algo_version/Roadmap.</li>
+<li><strong>Реестр:</strong> отклонённые/отложенные — в backlog с пометкой фазы.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Зачем формальный процесс</div>
+<p>Без явного фильтра «всегда вне границ» проект расползётся под давлением частных запросов ролей (это видно из <a href="../artifacts/v2-peptide-trust-registry.html#roles">оценки 22 ролей рынка</a> — у каждой роли свои хотелки). Процесс защищает нейтралитет и фокус MVP.</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

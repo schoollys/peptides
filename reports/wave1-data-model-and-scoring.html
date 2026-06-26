@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Волна 1: модель данных и нормализация Fᵢ</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:780px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.fbox{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:#e8935a;line-height:1.7;overflow-x:auto}
+.fbox .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ex{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.ex-t{font-size:.74rem;font-weight:800;color:#5b78a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ex p{font-size:.82rem;margin-bottom:.3rem}
+.val{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.72rem;font-weight:700;background:#fef3e8;color:#c06a1a;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Волна 1 — спека ядра<span class="sb-sub">модель данных + нормализация Fᵢ</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">00</span>Контекст и параметры</a>
+<a class="nav-link" href="#fvd"><span class="nav-num">01</span>Fᵢ / Vᵢ / Dᵢ — разделение ролей</a>
+<a class="nav-link" href="#model"><span class="nav-num">02</span>Модель данных</a>
+<a class="nav-link" href="#norm"><span class="nav-num">03</span>Принципы нормализации</a>
+<a class="nav-link" href="#qef"><span class="nav-num">04</span>QEF — качество</a>
+<a class="nav-link" href="#cvf"><span class="nav-num">05</span>CVF — отзывы</a>
+<a class="nav-link" href="#trf"><span class="nav-num">06</span>TRF — достоверность</a>
+<a class="nav-link" href="#rest"><span class="nav-num">07</span>Остальные 6 факторов</a>
+<a class="nav-link" href="#matrix"><span class="nav-num">08</span>Матрица весов 22×9</a>
+<a class="nav-link" href="#example"><span class="nav-num">09</span>Сквозной пример TS</a>
+<a class="nav-link" href="#next"><span class="nav-num">10</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">00 — Контекст и принятые параметры</div>
+<h1>Волна 1: модель данных и нормализация Fᵢ</h1>
+<p class="sec-intro">Это инженерная спека ядра доверия — то, без чего Score нельзя вычислить в коде. Документ закрывает §05 (модель данных) и §04 (нормализация Fᵢ) из отчёта о пробелах. Решения Волны 0 учтены.</p>
+<table>
+<thead><tr><th>Параметр Волны 1</th><th>Принятое решение</th></tr></thead>
+<tbody>
+<tr><td>Глубина</td><td>Все 9 факторов детально (входы + формула + банды + пример)</td></tr>
+<tr><td>Постура данных</td><td>Гибрид: числа где есть, иначе частичный кредит по наличию артефактов</td></tr>
+<tr><td>Калибровка</td><td>Абсолютные фиксированные пороги (прозрачно, не геймится)</td></tr>
+<tr><td>Эталоны</td><td>Разумные дефолты, помеченные «под валидацию химиком»</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">⚠️ О числовых порогах</div>
+<p>Все числовые пороги ниже (проценты чистоты, баллы банд) — <strong>инженерные дефолты для старта</strong>, помеченные <span class="val">под валидацию</span>. Их обязан подтвердить аналитический химик / Параметрический комитет (Волна 0) до продакшена. Сами формулы и структура от конкретных чисел не зависят.</p>
+</div>
+</section>
+
+<section id="fvd">
+<div class="sec-badge">01 — Разделение ролей Fᵢ / Vᵢ / Dᵢ</div>
+<h2>Чтобы не путать «насколько хорошо» с «насколько верим»</h2>
+<p>Ключевой принцип, который делает нормализацию чистой: каждая ось отвечает за своё и не дублирует другую.</p>
+<table>
+<thead><tr><th>Множитель</th><th>Отвечает на вопрос</th><th>Источник</th></tr></thead>
+<tbody>
+<tr><td>Fᵢ (0–100)</td><td>Насколько <em>хорош</em> сам результат по фактору (чистота, удовлетворённость, достоверность)</td><td>Содержание данных — эта спека</td></tr>
+<tr><td>Vᵢ (0.40–1.00)</td><td>Насколько <em>можно верить источнику</em> этого результата (независимость образца, тип оракула)</td><td>Оракульная сеть (раздел 02 v2)</td></tr>
+<tr><td>Dᵢ (0.10–1.00)</td><td>Насколько результат <em>свежий</em></td><td>Возраст данных (раздел 03 v2)</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Следствие для нормализации</div>
+<p>Fᵢ кодирует <strong>только качество измеренного</strong>. Доверие к источнику в Fᵢ не подмешиваем — это делает Vᵢ. Поэтому, например, чистота 99% по тесту вендора и по blind-тесту дают <strong>одинаковый Fᵢ</strong>, но разный итоговый вклад из-за Vᵢ (0.70 против 1.00). Это убирает двойной учёт доверия.</p>
+</div>
+</section>
+
+<section id="model">
+<div class="sec-badge">02 — Модель данных</div>
+<h2>Сущности, атрибуты, связи</h2>
+<p class="sec-intro">Минимально достаточная схема для расчёта Score, аудита и приватности. Чувствительные поля (идентичности, имена контрагентов) хранятся off-chain с правом удаления; on-chain уходят только хеши событий.</p>
+
+<h3>Ключевые сущности</h3>
+<table>
+<thead><tr><th>Сущность</th><th>Ключевые атрибуты</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td>Participant</td><td>id, pseudonymous_id, identity_level (pseudonymous / KYB-light / KYB-full), role_codes[], region, channel (RUO / Verified-Legal), status (active / new_provisional / under_watch), created_at</td><td>Любой участник рынка</td></tr>
+<tr><td>Profile</td><td>participant_id, factor_subscores{code→0..100}, TS, tier, dominant_factor, completeness%</td><td>Вычисляемое состояние участника</td></tr>
+<tr><td>Role</td><td>code, name, category</td><td>Одна из 22 ролей</td></tr>
+<tr><td>FactorWeight</td><td>role_code, factor_code, weight (ΣW=1.0 по роли)</td><td>Матрица весов роль×фактор</td></tr>
+<tr><td>Lot</td><td>lot_id, producer_id, product, qr_pubkey, qr_signature, created_at</td><td>Конкретная партия товара</td></tr>
+<tr><td>COA / Test</td><td>id, lot_id, oracle_id, sample_origin (independent / vendor), measurements{purity, identity_pass, net_content, impurities, endotoxin, sterility…}, issued_at, signature, onchain_hash</td><td>Результат лабораторного анализа</td></tr>
+<tr><td>Disclosure (Link)</td><td>id, downstream_id, upstream_ref (id или blind-proof), factor_relevance, lot_id, coa_ref, level (public / blind / closed), verified_by, created_at</td><td>Связь контрагентов на уровне партии (для перетекания Vᵢ)</td></tr>
+<tr><td>Review</td><td>id, author_ref, subject_id, lot_id?, artifact_id?, verified_buyer (bool), rating, text, weight, created_at, frozen (bool)</td><td>Отзыв покупателя/контрибьютора</td></tr>
+<tr><td>PurchaseArtifact</td><td>id, type (tracking / qr / photo), value_hash, carrier?, verified (bool), verified_at</td><td>Доказательство покупки для verified-отзыва</td></tr>
+<tr><td>Oracle</td><td>id, type (lab / iot / processor), accreditation, pubkey, status (active / revoked), since</td><td>Источник с весом Vᵢ</td></tr>
+<tr><td>Incident / Penalty</td><td>id, participant_id, type, p_value, severity (INFO / WARNING / CRITICAL), tier_cap?, evidence_ref, start_at, expiry_at, status</td><td>Подтверждённое нарушение → вклад в Pₛ</td></tr>
+<tr><td>Appeal</td><td>id, participant_id, target (factor / review / incident), level (1/2/3), panel_ref?, status, resolution, public_log_ref</td><td>Оспаривание (раздел 07)</td></tr>
+<tr><td>ScoreEvent</td><td>id, participant_id, trigger, prev_TS, new_TS, input_hashes[], created_at, onchain_tx</td><td>Аудит-трейл пересчёта (хеш on-chain)</td></tr>
+<tr><td>Alert</td><td>id, participant_id, type (decay / counterparty_drop), t0, severity, status</td><td>Уведомления и окно реакции</td></tr>
+</tbody>
+</table>
+
+<h3>Основные связи (кардинальность)</h3>
+<ul>
+<li><code>Participant 1—N Profile-history</code> (текущий профиль + история ScoreEvent).</li>
+<li><code>Participant N—M Role</code> через назначенные роли; <code>Role 1—N FactorWeight</code>.</li>
+<li><code>Participant(producer) 1—N Lot</code>; <code>Lot 1—N COA/Test</code>; <code>Lot 1—N Disclosure</code>.</li>
+<li><code>Disclosure N—1 upstream Participant</code> (или blind-proof без участника) — ребро графа поставок, по которому течёт Vᵢ.</li>
+<li><code>Review N—1 subject Participant</code>, <code>Review 0..1—1 PurchaseArtifact</code>, <code>Review 0..1—1 Lot</code>.</li>
+<li><code>Oracle 1—N COA/Test</code>; <code>Incident N—1 Participant</code>; <code>Appeal N—1 Participant</code>.</li>
+</ul>
+
+<div class="warn">
+<div class="warn-t">⚠️ Приватность и удаление</div>
+<p>Поля идентичности и <code>upstream_ref</code> в Disclosure хранятся off-chain с правом удаления. On-chain — только <code>onchain_hash</code>/<code>onchain_tx</code> из COA и ScoreEvent. При удалении связи участником: ребро исключается из расчёта (Vᵢ откатывается к базовым 0.40 по затронутым партиям), но хеши прошлых ScoreEvent остаются — аудит «что и когда считалось» сохраняется без раскрытия удалённого содержимого. Точную политику ретеншена доспецифицировать в PRD (§05/§09).</p>
+</div>
+</section>
+
+<section id="norm">
+<div class="sec-badge">03 — Принципы нормализации Fᵢ</div>
+<h2>Общие правила для всех 9 факторов</h2>
+
+<h4>1. Абсолютные банды</h4>
+<p>Каждый фактор задаётся кусочной функцией с фиксированными порогами (банды), а не перцентилями. Балл одного участника не зависит от других — это прозрачно и не геймится «утоплением» конкурентов.</p>
+
+<h4>2. Гибридная постура и «уверенность данных»</h4>
+<p>Если по фактору есть структурированные числа (например, чистота из COA) — считаем по бандам. Если есть только факт наличия артефакта без чисел (например, «COA приложен, но не распарсен») — даём <strong>частичный кредит с потолком</strong> до подтверждения. Важно: «уверенность в источнике» в основном несёт Vᵢ; потолок здесь — про <em>неполноту самого содержания</em>, а не про доверие.</p>
+<div class="fbox">Fᵢ = clamp(0, 100, band(raw_value))   <span class="c">// если есть число</span>
+Fᵢ = min(band_floor_partial, presence_credit)   <span class="c">// если только артефакт без чисел</span></div>
+
+<h4>3. Отсутствие данных = 0 (но не «плохо»)</h4>
+<p>Незаполненный фактор входит в формулу как 0 (согласовано с разделом 05 v2: пустой фактор — упущенный потенциал). Чтобы новички не выглядели как нарушители, действует статус New/Provisional (раздел 03 v2) — отдельная вкладка, а не низ выдачи.</p>
+
+<h4>4. Мульти-оракульный потолок (факторы с весом ≥20%)</h4>
+<p>Если фактор весит ≥20% в роли, но подтверждён лишь одним источником, его Fᵢ ограничивается потолком до появления второго независимого сигнала. Это формализует требование из раздела 06 v2.</p>
+<div class="fbox">if W(factor) ≥ 0.20 and independent_sources &lt; 2:
+    Fᵢ = min(Fᵢ, 60)   <span class="c">// потолок до второго источника — под валидацию</span></div>
+<p style="font-size:.78rem;color:#888">«Независимый источник» = другой оракул или verified-сигнал, не связанный с первым (другая лаборатория, verified-покупатель, кросс-claim контрагента).</p>
+</section>
+
+<section id="qef">
+<div class="sec-badge">04 — QEF: Quality &amp; Efficacy</div>
+<h2>Качество продукта из COA/теста</h2>
+<p class="sec-intro">Самый «числовой» фактор: на входе — измеримые величины анализа. Identity — это жёсткий гейт (не тот пептид → качество = 0), остальное — взвешенная смесь.</p>
+
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>Identity</strong> (MS/MS-подтверждение, что это заявленный пептид) — pass/fail гейт.</li>
+<li><strong>Purity</strong> (HPLC, %) — основной непрерывный сигнал.</li>
+<li><strong>Net peptide content / label accuracy</strong> (соответствие заявленной массе/дозе, %).</li>
+<li><strong>Impurities / endotoxin / sterility</strong> (для инъекционного применения) — штрафной/гейтовый компонент.</li>
+</ul>
+
+<h4>Банды чистоты (purity → балл) <span class="val">под валидацию</span></h4>
+<table>
+<thead><tr><th>Чистота HPLC</th><th>Балл компонента purity</th></tr></thead>
+<tbody>
+<tr><td>≥ 99.0%</td><td>100</td></tr>
+<tr><td>98.0–98.99%</td><td>90</td></tr>
+<tr><td>95.0–97.99%</td><td>75</td></tr>
+<tr><td>90.0–94.99%</td><td>55</td></tr>
+<tr><td>80.0–89.99%</td><td>30</td></tr>
+<tr><td>&lt; 80% или identity fail</td><td>0 (+ триггер Pₛ, если заявлено иное)</td></tr>
+</tbody>
+</table>
+
+<h4>Сборка QEF</h4>
+<div class="fbox">if identity == fail: QEF = 0   <span class="c">// жёсткий гейт</span>
+else:
+  QEF = 0.60·purity_band
+      + 0.25·label_accuracy_band
+      + 0.15·safety_band            <span class="c">// endotoxin/sterility/impurities</span>
+  QEF = QEF × multi_oracle_cap_factor   <span class="c">// см. §03.4</span></div>
+<p style="font-size:.78rem;color:#888">Веса компонентов (0.60/0.25/0.15) и банды label_accuracy/safety — дефолты под валидацию. Для неинъекционных RUO safety_band может быть нерелевантен → его вес перераспределяется на purity.</p>
+
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Вендор: blind-тест показывает purity 98.4%, identity pass, label accuracy 97% (≈100 балл), endotoxin в норме (safety 90).</p>
+<p>QEF = 0.60·90 + 0.25·100 + 0.15·90 = 54 + 25 + 13.5 = <strong>92.5</strong>.</p>
+<p>Источник — blind-тест (Vᵢ=1.0), данные свежие (Dᵢ=1.0). Если бы тот же результат был по образцу вендора — QEF тот же 92.5, но Vᵢ=0.70 снизит итоговый вклад.</p>
+</div>
+</section>
+
+<section id="cvf">
+<div class="sec-badge">05 — CVF: Customer Verification</div>
+<h2>Качество и объём верифицированных отзывов</h2>
+<p class="sec-intro">Не «сколько звёзд», а «сколько <em>проверяемых</em> довольных покупателей и нет ли нерешённых жалоб». Объём даёт уверенность, но с насыщением — чтобы 1000 отзывов не были в 1000 раз весомее 10.</p>
+
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>N_verified</strong> — число отзывов с подтверждённым артефактом покупки (verified-buyer).</li>
+<li><strong>satisfaction</strong> — средняя удовлетворённость по verified-отзывам (0–1).</li>
+<li><strong>verified_ratio</strong> — доля verified среди всех отзывов (защита от накрутки безартефактными).</li>
+<li><strong>unresolved_complaints</strong> — подтверждённые нерешённые жалобы (штраф).</li>
+</ul>
+
+<h4>Формула</h4>
+<div class="fbox">confidence(N) = N / (N + k)          <span class="c">// насыщение, k≈5 — под валидацию</span>
+CVF_base = 100 · satisfaction · confidence(N_verified)
+CVF = CVF_base · (0.5 + 0.5·verified_ratio)   <span class="c">// демпфер за безартефактные</span>
+        − complaint_penalty                  <span class="c">// напр. −12 за каждую нерешённую</span>
+CVF = clamp(0, 100, CVF)</div>
+<p style="font-size:.78rem;color:#888">k (точка насыщения), коэффициент verified_ratio и величина complaint_penalty — дефолты под валидацию. Всплеск отзывов 3× замораживается анти-аномалийным детектором (раздел 06 v2) до проверки — frozen-отзывы в N не входят.</p>
+
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Вендор: 20 verified-отзывов, средняя удовлетворённость 0.9, verified_ratio 0.8, 1 нерешённая жалоба.</p>
+<p>confidence = 20/25 = 0.8 → CVF_base = 100·0.9·0.8 = 72 → ×(0.5+0.5·0.8)=×0.9 → 64.8 → −12 = <strong>52.8</strong>.</p>
+</div>
+</section>
+
+<section id="trf">
+<div class="sec-badge">06 — TRF: Truthfulness / Claim Reliability</div>
+<h2>Достоверность заявлений и честность раскрытия</h2>
+<p class="sec-intro">Измеряет, подтверждаются ли заявления участника (о заводе-источнике, цепочке, партнёрствах) и не ловили ли его на противоречиях. Здесь доминирует не число, а доля подтверждённого и история опровержений.</p>
+
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>verified_claims / total_claims</strong> — доля кросс-подтверждённых заявлений.</li>
+<li><strong>completeness</strong> — полнота раскрытия на уровне партий (не «один Gold-источник, остальное скрыто»).</li>
+<li><strong>contradictions</strong> — заявления, опровергнутые контрагентом/оракулом (жёсткий удар).</li>
+<li><strong>nondisclosure_flags</strong> — нераскрытые платные связи (для Transparent Affiliate и т.п.).</li>
+</ul>
+
+<h4>Формула</h4>
+<div class="fbox">TRF_base = 100 · (verified_claims / total_claims) · completeness
+TRF = TRF_base − 25·contradictions − 15·nondisclosure_flags
+TRF = clamp(0, 100, TRF)
+<span class="c">// подтверждённая ложь о происхождении → также Pₛ + потолок тира (раздел 03 v2)</span></div>
+<p style="font-size:.78rem;color:#888">Штрафы за противоречие (−25) и нераскрытие (−15) — дефолты под валидацию. Опровергнутое заявление — это не только удар по TRF, но и инцидент Pₛ; двойной учёт разведён: TRF отражает «насколько верить словам», Pₛ — наказание за доказанный обман.</p>
+
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Трейдер: 8 из 10 claim подтверждены, completeness 0.9, 0 противоречий, 0 нераскрытий.</p>
+<p>TRF = 100·0.8·0.9 = <strong>72</strong>. Появись одно опровергнутое заявление → 72 − 25 = 47 + отдельный инцидент Pₛ.</p>
+</div>
+</section>
+
+<section id="rest">
+<div class="sec-badge">07 — Остальные 6 факторов (глубина MVP-3)</div>
+<h2>PCF, SCIF, FRF, CCF, CVF-B, RF — входы, формулы, банды, примеры</h2>
+<p class="sec-intro">Доведены до того же уровня детализации, что QEF/CVF/TRF: входные сигналы → формула → пороги → пример. Все числовые банды и веса компонентов — инженерные дефолты под валидацию SME/Параметрического комитета; структура от конкретных чисел не зависит.</p>
+
+<h3 style="margin-top:1.6rem">07.1 — PCF: Process &amp; Compliance</h3>
+<p>Зрелость производственного/складского процесса: сертификации, валидация процесса, целостность упаковки. Доминирует у фасовки (CDMO), компаундинга, аптек, лабораторий, B2B-логистов.</p>
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>cert_tier</strong> — высшая релевантная действующая сертификация (GMP/GDP/ISO) и кем выдана.</li>
+<li><strong>process_validation</strong> — задокументирована ли валидация процесса (асептика, лиофилизация, SOP).</li>
+<li><strong>integrity</strong> — tamper-evident упаковка и отсутствие инцидентов целостности.</li>
+<li><strong>recalls</strong> — отзывы партий / нарушения комплаенса в окне (штраф).</li>
+</ul>
+<h4>Банды сертификации (cert_band) <span class="val">под валидацию</span></h4>
+<table>
+<thead><tr><th>Статус</th><th>cert_band</th></tr></thead>
+<tbody>
+<tr><td>Действующий GMP, аудит признанным органом</td><td>100</td></tr>
+<tr><td>Действующий GMP, второй-стороной / self-audit</td><td>75</td></tr>
+<tr><td>GDP / ISO 9001 действующий</td><td>60</td></tr>
+<tr><td>SOP задокументированы, без сторонней сертификации</td><td>35</td></tr>
+<tr><td>Нет / просрочено</td><td>0</td></tr>
+</tbody>
+</table>
+<h4>Сборка PCF</h4>
+<div class="fbox">PCF = 0.45·cert_band + 0.30·process_band + 0.25·integrity_band
+      − 20·recalls_in_window        <span class="c">// отзыв партии: также инцидент Pₛ</span>
+PCF = clamp(0, 100, PCF)
+<span class="c">// просроченный сертификат → cert_band×0.5 (актуальность дублирует Dᵢ)</span></div>
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>CDMO: действующий GMP (second-party, 75), валидация процесса полная (process_band 100), tamper-evident + чисто (integrity 100), 0 отзывов.</p>
+<p>PCF = 0.45·75 + 0.30·100 + 0.25·100 = 33.75 + 30 + 25 = <strong>88.75</strong>.</p>
+</div>
+
+<h3 style="margin-top:1.6rem">07.2 — SCIF: Supply Chain Integrity</h3>
+<p>Насколько раскрыта и верифицирована цепочка поставок. Доминирует у дистрибьюторов, telehealth, оптовиков, заводов. Blind-раскрытие (раздел 02 v2) засчитывается как валидное.</p>
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>disclosed_ratio</strong> — доля партий с раскрытым и верифицированным (в т.ч. blind) источником.</li>
+<li><strong>depth_factor</strong> = min(1, verified_hops / target_hops) — глубина прослеженной цепочки (target ≈ 2 хопа до производителя).</li>
+<li><strong>broken_chain</strong> — партии с разорванной/противоречивой провенансой (также бьёт TRF/Pₛ).</li>
+</ul>
+<h4>Формула</h4>
+<div class="fbox">SCIF_base = 100 · disclosed_ratio · (0.6 + 0.4·depth_factor)
+SCIF = clamp(0, 100, SCIF_base − 15·broken_chain_share·100)</div>
+<p style="font-size:.78rem;color:#888">Коэффициент 0.6/0.4 (база/глубина) и target_hops — дефолты под валидацию. Blind-источник входит в disclosed_ratio; пониженная доверенность отражается отдельно через Vᵢ (λ_blind=0.85), не в Fᵢ.</p>
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Оптовик: 90% партий с верифицированным источником, прослежен 1 хоп из 2 (depth_factor 0.5), broken_chain 0.</p>
+<p>SCIF = 100·0.9·(0.6+0.4·0.5) = 90·0.8 = <strong>72</strong>.</p>
+</div>
+
+<h3 style="margin-top:1.6rem">07.3 — FRF: Fulfillment Reliability</h3>
+<p>Надёжность исполнения обязательств: завершённость сделок, сроки, пропажи. Доминирует у таможенных брокеров, GB-организаторов, дропшипперов, аптек.</p>
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>completed_ratio</strong> — доля успешно завершённых поставок/сделок (для customs — успешные растаможки, для GB — завершённые закупки).</li>
+<li><strong>on_time_ratio</strong> — доля в срок.</li>
+<li><strong>lost_funds</strong> — подтверждённые пропажи средств/товара (для GB; также Pₛ + потолок тира).</li>
+</ul>
+<h4>Банды по completed_ratio → base <span class="val">под валидацию</span></h4>
+<table>
+<thead><tr><th>completed_ratio</th><th>base</th></tr></thead>
+<tbody>
+<tr><td>≥ 0.98</td><td>100</td></tr>
+<tr><td>0.95–0.98</td><td>85</td></tr>
+<tr><td>0.90–0.95</td><td>70</td></tr>
+<tr><td>0.80–0.90</td><td>45</td></tr>
+<tr><td>&lt; 0.80</td><td>20</td></tr>
+</tbody>
+</table>
+<div class="fbox">FRF = base · (0.7 + 0.3·on_time_ratio) − 25·lost_funds_incidents
+FRF = clamp(0, 100, FRF)</div>
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>GB-организатор: completed 0.96 (base 85), on_time 0.9, 0 пропаж средств.</p>
+<p>FRF = 85·(0.7+0.3·0.9) = 85·0.97 = <strong>82.5</strong>. Одна подтверждённая пропажа средств → −25 + инцидент Pₛ.</p>
+</div>
+
+<h3 style="margin-top:1.6rem">07.4 — CCF: Cold Chain</h3>
+<p>Соблюдение холодовой цепи. Доминирует у курьеров последней мили и B2B-логистов; присутствует у RUO и аптек.</p>
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>in_spec_ratio</strong> — доля поставок без температурных эксцессов (по мониторингу).</li>
+<li><strong>iot_coverage</strong> — доля поставок с IoT/датчик-логами (немониторимое = непроверяемо → дисконт).</li>
+<li><strong>breaches</strong> — нарушения цепочки с влиянием на продукт (также Pₛ при отрицании).</li>
+</ul>
+<h4>Формула</h4>
+<div class="fbox">CCF_base = 100 · in_spec_ratio
+CCF = CCF_base · (0.5 + 0.5·iot_coverage) − 15·breaches_with_impact
+CCF = clamp(0, 100, CCF)</div>
+<p style="font-size:.78rem;color:#888">Самодекларация без IoT → iot_coverage низок → Fᵢ занижен; дополнительно Vᵢ=0.40 для self-declared (раздел 02 v2). Двойной демпфер намеренный: непроверяемая холодовая цепь почти не повышает Score.</p>
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Курьер последней мили: in_spec 0.95, iot_coverage 0.7, 0 нарушений.</p>
+<p>CCF = 95·(0.5+0.5·0.7) = 95·0.85 = <strong>80.75</strong>.</p>
+</div>
+
+<h3 style="margin-top:1.6rem">07.5 — CVF-B: Counterparty Verification (B2B)</h3>
+<p>B2B-аналог CVF: широта и подтверждённость верифицированных деловых связей. Доминирует у экспортных брокеров, таможенных брокеров, оптовиков, logистов, telehealth.</p>
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>N_partners</strong> — число верифицированных B2B-контрагентов (с подтверждённой сделкой).</li>
+<li><strong>avg_partner_subscore</strong> — средний релевантный субскор партнёров (0–100).</li>
+<li><strong>partner_disputes</strong> — открытые споры с контрагентами (штраф).</li>
+</ul>
+<h4>Формула</h4>
+<div class="fbox">confidence(N) = N / (N + k_b)        <span class="c">// k_b ≈ 3 — под валидацию</span>
+CVF_B = avg_partner_subscore · confidence(N_partners) − 12·partner_disputes
+CVF_B = clamp(0, 100, CVF_B)</div>
+<p style="font-size:.78rem;color:#888"><strong>Разведение с пропагацией:</strong> CVF-B — это <em>фактор</em> (широта/подтверждённость вашей B2B-сети). Перетекание доверия (раздел 05 v2) действует отдельно через Vᵢ. Чтобы не было двойного учёта: CVF-B считает «с кем вы верифицированно работаете», propagation — «насколько верить вашим данным от субскора контрагента».</p>
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Экспортный брокер: 8 верифицированных партнёров, средний субскор 78, k_b=3, 0 споров.</p>
+<p>confidence = 8/11 = 0.73 → CVF-B = 78·0.73 = <strong>56.9</strong>.</p>
+</div>
+
+<h3 style="margin-top:1.6rem">07.6 — RF: Responsiveness &amp; Resolution</h3>
+<p>Скорость реакции и доля разрешённых инцидентов. Доминирует у таможенных брокеров, курьеров, инфлюенсеров; присутствует у лабораторий и логистов.</p>
+<h4>Входные сигналы</h4>
+<ul>
+<li><strong>response_time</strong> — медианное время ответа на запрос/жалобу.</li>
+<li><strong>resolution_ratio</strong> — доля разрешённых инцидентов от всех.</li>
+<li><strong>reopened</strong> — повторно открытые («ложно закрытые») инциденты (штраф).</li>
+</ul>
+<h4>Банды <span class="val">под валидацию</span></h4>
+<table>
+<thead><tr><th>response_time → response_band</th><th>resolution_ratio → resolution_band</th></tr></thead>
+<tbody>
+<tr><td>≤ 24 ч → 100</td><td>≥ 0.95 → 100</td></tr>
+<tr><td>≤ 72 ч → 80</td><td>0.85–0.95 → 80</td></tr>
+<tr><td>≤ 7 дн → 55</td><td>0.70–0.85 → 55</td></tr>
+<tr><td>&gt; 7 дн → 25</td><td>&lt; 0.70 → 30</td></tr>
+</tbody>
+</table>
+<div class="fbox">RF = 0.4·response_band + 0.6·resolution_band − 10·reopened
+RF = clamp(0, 100, RF)</div>
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Таможенный брокер: медиана ответа 48 ч (band 80), resolution_ratio 0.9 (band 80), 0 reopened.</p>
+<p>RF = 0.4·80 + 0.6·80 = <strong>80</strong>.</p>
+</div>
+
+<div class="rec-box">
+<div class="rec-t">Все 9 факторов — на одном уровне детализации</div>
+<p>QEF, CVF, TRF (§04–06) + PCF, SCIF, FRF, CCF, CVF-B, RF (§07) теперь имеют входные сигналы, формулу, банды и пример. Любой Fᵢ для любой из 17 скорящихся ролей вычислим по матрице §08 и собирается в TS по формуле §09.</p>
+</div>
+</section>
+
+<section id="matrix">
+<div class="sec-badge">08 — Матрица весов 22×9</div>
+<h2>Wᵢ по всем ролям (ΣW = 1.0 проверено)</h2>
+<p class="sec-intro">Единая матрица «роль × фактор» из карточек раздела 04 v2, сведённая и провалидированная: каждая строка суммируется ровно в 100%. Скоринг есть у 17 ролей; 5 ролей не имеют полного Trust Score (см. ниже). Веса утверждает и меняет Параметрический комитет (Волна 0) с публичным changelog.</p>
+<table>
+<thead><tr><th>Роль</th><th>QEF</th><th>PCF</th><th>SCIF</th><th>TRF</th><th>FRF</th><th>CCF</th><th>CVF</th><th>CVF-B</th><th>RF</th><th>Σ</th></tr></thead>
+<tbody>
+<tr><td>I. Заводы-производители API</td><td>40</td><td>25</td><td>20</td><td>—</td><td>—</td><td>—</td><td>—</td><td>15</td><td>—</td><td>100</td></tr>
+<tr><td>II. Экспортные брокеры / агенты</td><td>—</td><td>—</td><td>15</td><td>35</td><td>25</td><td>—</td><td>—</td><td>25</td><td>—</td><td>100</td></tr>
+<tr><td>III. Розлив и лиофилизация (CDMO)</td><td>35</td><td>30</td><td>20</td><td>—</td><td>—</td><td>—</td><td>—</td><td>15</td><td>—</td><td>100</td></tr>
+<tr><td>III. Компаундирующие аптеки</td><td>30</td><td>30</td><td>25</td><td>—</td><td>—</td><td>—</td><td>—</td><td>15</td><td>—</td><td>100</td></tr>
+<tr><td>IV. Владельцы брендов / private label</td><td>30</td><td>—</td><td>15</td><td>35</td><td>—</td><td>—</td><td>20</td><td>—</td><td>—</td><td>100</td></tr>
+<tr><td>V. Независимые лаборатории</td><td>40</td><td>30</td><td>—</td><td>—</td><td>—</td><td>—</td><td>20</td><td>—</td><td>10</td><td>100</td></tr>
+<tr><td>VI. B2B биофарм-логисты</td><td>—</td><td>25</td><td>—</td><td>—</td><td>—</td><td>45</td><td>—</td><td>20</td><td>10</td><td>100</td></tr>
+<tr><td>VI. Серые таможенные брокеры</td><td>—</td><td>—</td><td>—</td><td>—</td><td>40</td><td>—</td><td>—</td><td>30</td><td>30</td><td>100</td></tr>
+<tr><td>VI. Курьеры последней мили</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>50</td><td>25</td><td>—</td><td>25</td><td>100</td></tr>
+<tr><td>VII. Оптовые дистрибьюторы</td><td>30</td><td>—</td><td>30</td><td>—</td><td>20</td><td>—</td><td>—</td><td>20</td><td>—</td><td>100</td></tr>
+<tr><td>VII. Организаторы групповых закупок</td><td>35</td><td>—</td><td>—</td><td>—</td><td>35</td><td>—</td><td>30</td><td>—</td><td>—</td><td>100</td></tr>
+<tr><td>VIII. Розничные RUO-магазины</td><td>40</td><td>—</td><td>—</td><td>8</td><td>15</td><td>12</td><td>25</td><td>—</td><td>—</td><td>100</td></tr>
+<tr><td>VIII. Дропшипперы</td><td>—</td><td>—</td><td>—</td><td>45</td><td>25</td><td>—</td><td>30</td><td>—</td><td>—</td><td>100</td></tr>
+<tr><td>VIII. Рецептурные аптеки (retail)</td><td>—</td><td>35</td><td>—</td><td>—</td><td>30</td><td>35</td><td>—</td><td>—</td><td>—</td><td>100</td></tr>
+<tr><td>VIII. Telehealth-прескрайберы</td><td>30</td><td>—</td><td>35</td><td>—</td><td>15</td><td>—</td><td>—</td><td>20</td><td>—</td><td>100</td></tr>
+<tr><td>IX. Клиники анти-эйдж / превентивные</td><td>30</td><td>—</td><td>30</td><td>—</td><td>15</td><td>—</td><td>25</td><td>—</td><td>—</td><td>100</td></tr>
+<tr><td>X. Аффилиаты / инфлюенсеры</td><td>—</td><td>—</td><td>—</td><td>30</td><td>—</td><td>—</td><td>50</td><td>—</td><td>20</td><td>100</td></tr>
+</tbody>
+</table>
+
+<h4>Роли без полного Trust Score (5)</h4>
+<p>У них факторных весов нет — действуют отдельные плашки (раздел 03 v2):</p>
+<ul>
+<li><strong>VIII. Неформальные продавцы</strong> — «репутационная заметка (Unclaimed)».</li>
+<li><strong>X. Модераторы форумов</strong> — «источник community-сигнала».</li>
+<li><strong>XI. Пациенты / Биохакеры / Спортсмены</strong> — «профиль потребителя».</li>
+</ul>
+
+<div class="rec-box">
+<div class="rec-t">Наблюдения по матрице</div>
+<p>9 факторов реально задействованы. <strong>QEF</strong> и <strong>CVF</strong> — самые «сквозные» (встречаются у большинства ролей), что подтверждает их выбор в MVP-3 вместе с <strong>TRF</strong> (доминирует у посредников: брокеры, бренды, дропшипперы, инфлюенсеры). PCF и CCF — узкоспециализированы (производство и логистика). Это валидирует приоритет MVP-факторов.</p>
+</div>
+</section>
+
+<section id="example">
+<div class="sec-badge">09 — Сквозной пример TS</div>
+<h2>«Золотой тест»: от сырых данных до Score</h2>
+<p class="sec-intro">Полный расчёт для одной роли — эталон для разработки и QA. Берём RUO-вендора (веса: QEF 40, CVF 25, FRF 15, CCF 12, TRF 8). Fᵢ — из нормализации (§04–06), Vᵢ — из оракульной сети (раздел 02 v2), Dᵢ — из распада (раздел 03 v2).</p>
+
+<table>
+<thead><tr><th>Фактор</th><th>Источник Fᵢ</th><th>Fᵢ</th><th>Wᵢ</th><th>Dᵢ</th><th>Vᵢ</th><th>Вклад = Fᵢ·Wᵢ·Dᵢ·Vᵢ</th></tr></thead>
+<tbody>
+<tr><td>QEF</td><td>blind-тест: purity 98.4%, identity pass, label 97%, safety ок</td><td>92.5</td><td>0.40</td><td>1.00</td><td>1.00</td><td>37.00</td></tr>
+<tr><td>CVF</td><td>20 verified-отзывов, satisfaction 0.9, 1 жалоба</td><td>52.8</td><td>0.25</td><td>1.00</td><td>0.75</td><td>9.90</td></tr>
+<tr><td>FRF</td><td>трекинг-артефакты доставок</td><td>70.0</td><td>0.15</td><td>1.00</td><td>0.75</td><td>7.88</td></tr>
+<tr><td>CCF</td><td>самодекларация холодовой цепи, данные 31–90 дн.</td><td>60.0</td><td>0.12</td><td>0.85</td><td>0.40</td><td>2.45</td></tr>
+<tr><td>TRF</td><td>8/10 claim подтверждены, completeness 0.9</td><td>72.0</td><td>0.08</td><td>1.00</td><td>0.65</td><td>3.74</td></tr>
+</tbody>
+</table>
+
+<div class="fbox">Σ вкладов = 37.00 + 9.90 + 7.88 + 2.45 + 3.74 = <strong>60.97</strong>
+Pₛ = 0 (нет подтверждённых нарушений)
+TS = 60.97 × (1 − 0) ≈ <strong>61</strong></div>
+
+<p><strong>Доминирующий фактор</strong> (по фактическому вкладу): QEF = 37.0 — явный лидер (следующий CVF = 9.9). Подпись: <span class="val">«61 — преимущественно качество»</span>. <strong>Тир:</strong> Silver (по порогам раздела 03 v2).</p>
+
+<div class="ex">
+<div class="ex-t">Что показывает пример</div>
+<p>Идеальные 100 достижимы только при Fᵢ=100, Vᵢ=1, Dᵢ=1 по всем факторам — то есть лишь при blind-тестах и свежих данных везде. Реалистичный потолок ниже by design: <strong>Vᵢ и Dᵢ — это «налог на непроверяемость и несвежесть»</strong>. Самодекларация (CCF, Vᵢ=0.40) почти не двигает Score — ровно как задумано.</p>
+</div>
+
+<div class="ex">
+<div class="ex-t">Вариант со штрафом (для контраста)</div>
+<p>Если у того же вендора подтверждён sample-swap (p=0.30, <code>PK_SAMPLE_SWAP</code> из Parameters Registry): TS = 60.97 × (1 − 0.30) ≈ <strong>42.7</strong> + жёсткий потолок тира Bronze (раздел 03 v2). Один доказанный обман обнуляет преимущество качества — обман не «растворяется» в хороших факторах.</p>
+</div>
+</section>
+
+<section id="next">
+<div class="sec-badge">10 — Что дальше</div>
+<h2>Статус Волны 1 и переход к Волне 2</h2>
+<ol>
+<li><strong>Матрица весов 22×9</strong> (§08) — <strong>готово:</strong> единая таблица Wᵢ по 17 скорящимся ролям, ΣW=1.0 провалидировано, 5 ролей без полного TS вынесены отдельно.</li>
+<li><strong>Сквозной worked example TS</strong> (§09) — <strong>готово:</strong> полный расчёт RUO-вендора от сырых данных до Score=61 «преимущественно качество» + контраст со штрафом — «золотой тест» для разработки и QA.</li>
+<li><strong>Углубление 6 факторов</strong> (PCF, SCIF, FRF, CCF, CVF-B, RF) до уровня MVP-3 (§07) — <strong>готово:</strong> у всех входы, формула, банды и пример.</li>
+<li>Переход к <strong>Волне 2</strong>: идентичность/верификация артефактов, ончейн/PKI оракулов на основе этой модели данных.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Статус Волны 1 — закрыта</div>
+<p>Закрыты: §05 (модель данных), §04–07 (нормализация всех 9 факторов: входы + формула + банды + пример у каждого), §08 (матрица весов 22×9, ΣW=1.0), §09 (сквозной пример TS). Все числовые пороги помечены «под валидацию химиком/комитетом» — структура и формулы от конкретных чисел не зависят. Волна 1 завершена; следующий блок — Волна 2.</p>
+</div>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Числовые значения — инженерные дефолты для старта, подлежат подтверждению профильным специалистом до продакшена.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

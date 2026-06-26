@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — User Stories &amp; Acceptance Criteria</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;min-width:250px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-sec{color:#e8935a;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.8rem 1.1rem .25rem}
+.nav-link{color:#999;font-size:.76rem;padding:.38rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.64rem;min-width:30px}
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.35rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.phase-h{display:flex;align-items:center;gap:.6rem;margin:2rem 0 .6rem;padding-bottom:.4rem;border-bottom:2px solid #1a1917}
+.phase{display:inline-block;padding:2px 10px;border-radius:10px;font-size:.72rem;font-weight:800}
+.p-mvp{background:#e7f3ec;color:#15673f}.p-v1{background:#eef0fb;color:#3b4a8c}.p-v2{background:#f7eef8;color:#7a3b7a}
+.story{background:#fff;border:1px solid #e4e2dc;border-radius:12px;padding:1rem 1.2rem;margin:1rem 0}
+.story-id{font-size:.7rem;font-weight:800;color:#c06a1a;background:#fef3e8;padding:2px 8px;border-radius:8px;letter-spacing:.04em}
+.story-title{font-size:.95rem;font-weight:700;color:#0f0e0d;margin:.5rem 0 .3rem}
+.story-as{font-size:.84rem;color:#2e3a4d;background:#f4f6fa;border-left:3px solid #5b78a8;border-radius:0 8px 8px 0;padding:.5rem .8rem;margin:.5rem 0;font-style:italic}
+.ac-t{font-size:.72rem;font-weight:800;color:#15673f;text-transform:uppercase;letter-spacing:.05em;margin:.7rem 0 .3rem}
+.ac{list-style:none;margin:0;padding:0}
+.ac li{font-size:.82rem;color:#3a3935;margin-bottom:.4rem;padding-left:1.1rem;position:relative;line-height:1.55}
+.ac li::before{content:"✓";position:absolute;left:0;color:#15673f;font-weight:700}
+.gwt{font-family:ui-monospace,Menlo,monospace;font-size:.78rem}
+.gwt b{color:#7a3b12;font-weight:700}
+.epic{font-size:1.05rem;font-weight:800;color:#1a1917;margin:1.5rem 0 .3rem}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>User Stories &amp; AC<span class="sb-sub">Given / When / Then</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">00</span>Формат и легенда</a>
+<div class="nav-sec">MVP</div>
+<a class="nav-link" href="#e-catalog"><span class="nav-num">E1</span>Каталог и профиль</a>
+<a class="nav-link" href="#e-score"><span class="nav-num">E2</span>Score и доминир. фактор</a>
+<a class="nav-link" href="#e-badge"><span class="nav-num">E3</span>Бейдж и API</a>
+<a class="nav-link" href="#e-onboard"><span class="nav-num">E4</span>Онбординг и идентичность</a>
+<a class="nav-link" href="#e-oracle"><span class="nav-num">E5</span>Тесты, оракулы, ончейн</a>
+<div class="nav-sec">V1</div>
+<a class="nav-link" href="#e-prop"><span class="nav-num">E6</span>Пропагация и алерты</a>
+<a class="nav-link" href="#e-pull"><span class="nav-num">E7</span>Chain Pull</a>
+<a class="nav-link" href="#e-appeal"><span class="nav-num">E8</span>Апелляции и Steward</a>
+<a class="nav-link" href="#e-b2b"><span class="nav-num">E9</span>B2B-продукты</a>
+<a class="nav-link" href="#e-custody"><span class="nav-num">E10</span>Lot-QR и custody</a>
+<div class="nav-sec">V2</div>
+<a class="nav-link" href="#e-zk"><span class="nav-num">E11</span>ZK и приватность</a>
+<a class="nav-link" href="#e-scale"><span class="nav-num">E12</span>Аналитика, VaaS, охват</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">PRD-приложение · User Stories &amp; Use Cases</div>
+<h1>User Stories и Acceptance Criteria</h1>
+<p class="sec-intro">Истории сгруппированы по эпикам и фазам (MVP / V1 / V2). Каждая история — формат «Как &lt;роль&gt;, я хочу &lt;цель&gt;, чтобы &lt;ценность&gt;» с критериями приёмки (AC) в стиле Given/When/Then. Покрытие — все фазы; MVP детально, V1/V2 — ключевые истории каждого эпика. Персоны из Vision §03.</p>
+<p style="font-size:.78rem;color:#888">Числовые пороги в AC (N подтверждений, тайминги, лимиты) — провизорные, ссылаются на чек-лист SME (P0-closure) и каталог бизнес-правил.</p>
+</section>
+
+<!-- ================= MVP ================= -->
+<div class="phase-h"><span class="phase p-mvp">MVP</span><span style="font-weight:800;font-size:1.1rem">Доказать ценность для спроса</span></div>
+
+<section id="e-catalog">
+<div class="epic">E1 — Каталог и просмотр профиля</div>
+
+<div class="story">
+<span class="story-id">US-1.1</span>
+<div class="story-title">Проверка поставщика перед сделкой</div>
+<div class="story-as">Как покупатель, я хочу за минуту найти поставщика и увидеть его доверие, чтобы не рисковать здоровьем и деньгами.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> я открыл каталог без регистрации, <b>When</b> ищу поставщика по имени/домену, <b>Then</b> вижу его профиль со Score и доминирующим фактором.</li>
+<li class="gwt"><b>Given</b> поставщик не зарегистрирован, <b>When</b> я его ищу, <b>Then</b> вижу либо Unclaimed-профиль (нейтральные факты), либо явное «нет данных».</li>
+<li>Загрузка профиля p95 &lt; 300 мс; каталог доступен анонимно.</li>
+</ul>
+</div>
+
+<div class="story">
+<span class="story-id">US-1.2</span>
+<div class="story-title">Сравнение в сегменте</div>
+<div class="story-as">Как покупатель, я хочу сравнить нескольких поставщиков одной роли, чтобы выбрать наиболее проверенного.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> сегмент «вендоры RUO», <b>When</b> применяю фильтры (тир, доминирующий фактор), <b>Then</b> список сортируется по Score с тай-брейком по покрытию Vᵢ.</li>
+<li class="gwt"><b>Given</b> равный Score, <b>When</b> вижу порядок, <b>Then</b> выше тот, у кого больше независимых подтверждений (см. бизнес-правила BR-RANK).</li>
+<li>Verified-Legal каналы отделены фильтром.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-score">
+<div class="epic">E2 — Score и доминирующий фактор</div>
+<div class="story">
+<span class="story-id">US-2.1</span>
+<div class="story-title">Понятный Score с контекстом</div>
+<div class="story-as">Как покупатель, я хочу видеть не абстрактное число, а по какому измерению участник силён, чтобы правильно интерпретировать балл.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> профиль со Score 82, <b>When</b> смотрю карточку, <b>Then</b> вижу «82 — преимущественно качество (QEF)» с доминирующим фактором.</li>
+<li class="gwt"><b>Given</b> сбалансированный профиль, <b>When</b> нет явного лидера, <b>Then</b> подпись «сбалансированный профиль» (см. BR-DOMFACTOR).</li>
+<li class="gwt"><b>Given</b> роль без полного TS, <b>When</b> смотрю, <b>Then</b> вижу репутационную заметку без числового Score.</li>
+<li>Доминирующий фактор = max вклад (Fᵢ·Wᵢ·Dᵢ·Vᵢ); глоссарий из 9 факторов доступен.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-badge">
+<div class="epic">E3 — Бейдж и публичное API</div>
+<div class="story">
+<span class="story-id">US-3.1</span>
+<div class="story-title">Встраиваемый бейдж на сайт</div>
+<div class="story-as">Как вендор, я хочу встроить бейдж со своим Score, чтобы повысить конверсию доверием.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> у меня есть профиль, <b>When</b> копирую сниппет бейджа, <b>Then</b> на моём сайте отображается актуальный подписанный SVG/PNG без JS.</li>
+<li class="gwt"><b>Given</b> бейдж встроен, <b>When</b> кто-то кликает, <b>Then</b> ведёт на профиль и фиксируется клик-аналитика.</li>
+<li class="gwt"><b>Given</b> попытка подделать значение в бейдже, <b>When</b> рендер запрашивается, <b>Then</b> подпись эндпоинта не проходит верификацию → бейдж невалиден.</li>
+<li>Рендер бейджа p95 &lt; 150 мс (кэшируемый); tier-gating визуала по тиру.</li>
+</ul>
+</div>
+<div class="story">
+<span class="story-id">US-3.2</span>
+<div class="story-title">Публичное read-API</div>
+<div class="story-as">Как платформа/разработчик, я хочу читать Score через API, чтобы интегрировать проверку у себя.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> публичный эндпоинт, <b>When</b> запрашиваю <code>GET /v1/participants/{id}</code>, <b>Then</b> получаю Score, доминирующий фактор, статус, флаги.</li>
+<li class="gwt"><b>Given</b> anchor_hash, <b>When</b> вызываю <code>GET /v1/verify/{hash}</code>, <b>Then</b> подтверждается целостность ончейн-записи.</li>
+<li>Версионирование <code>/v1</code>; rate-limit; ответы кэшируемы.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-onboard">
+<div class="epic">E4 — Онбординг и идентичность</div>
+<div class="story">
+<span class="story-id">US-4.1</span>
+<div class="story-title">Claim профиля</div>
+<div class="story-as">Как вендор, я хочу заявить и верифицировать свой профиль, чтобы управлять данными и получить полноценный Score.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> существует Unclaimed-профиль, <b>When</b> я подаю claim + прохожу KYB, <b>Then</b> профиль переходит в управляемый и получает статус New/Provisional.</li>
+<li class="gwt"><b>Given</b> моя юрисдикция не поддерживает KYB, <b>When</b> прохожу fallback L1 (KYC), <b>Then</b> получаю профиль с потолком доверия и упором на blind-тесты (BR-KYB-FALLBACK).</li>
+<li class="gwt"><b>Given</b> claim на чужой профиль, <b>When</b> не прохожу верификацию владения, <b>Then</b> claim отклоняется.</li>
+</ul>
+</div>
+<div class="story">
+<span class="story-id">US-4.2</span>
+<div class="story-title">Fast-track для новичка</div>
+<div class="story-as">Как новый вендор, я хочу быстро стартовать, чтобы не ждать месяцами накопления репутации.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> прошёл KYB + 1 blind-тест, <b>When</b> завершаю онбординг, <b>Then</b> получаю статус Provisional с видимостью в каталоге.</li>
+<li class="gwt"><b>Given</b> накопил KYB + N независимых подтверждений, <b>When</b> порог достигнут, <b>Then</b> перехожу в полный Trust Score (BR-PROVISIONAL, по доказательствам, не календарю).</li>
+</ul>
+</div>
+<div class="story">
+<span class="story-id">US-4.3</span>
+<div class="story-title">Анти-Sybil на L0</div>
+<div class="story-as">Как система, я хочу ограничить массовую накрутку аккаунтов, чтобы L0-сигналы не подделывались дёшево.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> регистрация L0, <b>When</b> создаётся аккаунт, <b>Then</b> требуется уникальный телефон + device/CAPTCHA-проверка.</li>
+<li class="gwt"><b>Given</b> аномальный паттерн мультиаккаунтов, <b>When</b> детектор срабатывает, <b>Then</b> аккаунты помечаются для ревью.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-oracle">
+<div class="epic">E5 — Тесты, оракулы, ончейн</div>
+<div class="story">
+<span class="story-id">US-5.1</span>
+<div class="story-title">Подписанный COA от оракула</div>
+<div class="story-as">Как лаборатория-оракул, я хочу выдавать неподделываемые заключения, чтобы защитить репутацию и получать заказы.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> я аккредитованный оракул, <b>When</b> публикую COA, <b>Then</b> он подписан моим PKI-ключом и привязан к партии.</li>
+<li class="gwt"><b>Given</b> независимый отбор образца (custody полна), <b>When</b> COA принят, <b>Then</b> фактор получает Vᵢ=1.0.</li>
+<li class="gwt"><b>Given</b> образец предоставлен вендором, <b>When</b> COA принят, <b>Then</b> Vᵢ ≤ 0.70 (vendor-grade), не 1.0.</li>
+</ul>
+</div>
+<div class="story">
+<span class="story-id">US-5.2</span>
+<div class="story-title">Ончейн-якорь целостности</div>
+<div class="story-as">Как покупатель/аудитор, я хочу проверить, что данные не подменены задним числом, чтобы доверять истории.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> событие Score/COA/custody, <b>When</b> оно зафиксировано, <b>Then</b> хеш анкорится в L2 с algo_version.</li>
+<li class="gwt"><b>Given</b> попытка изменить историю, <b>When</b> сверяю с ончейн-хешем, <b>Then</b> расхождение обнаруживается.</li>
+<li>В ончейн идут только анонимные хеши (соль, без идентификаторов).</li>
+</ul>
+</div>
+</section>
+
+<!-- ================= V1 ================= -->
+<div class="phase-h"><span class="phase p-v1">V1</span><span style="font-weight:800;font-size:1.1rem">Маховик доверия и первая выручка</span></div>
+
+<section id="e-prop">
+<div class="epic">E6 — Trust-пропагация и алерты</div>
+<div class="story">
+<span class="story-id">US-6.1</span>
+<div class="story-title">Влияние контрагентов на доверие</div>
+<div class="story-as">Как покупатель, я хочу, чтобы доверие учитывало надёжность контрагентов участника, чтобы видеть системный риск.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> участник работает с контрагентами, <b>When</b> считается Vᵢ, <b>Then</b> применяется одношаговая пропагация профильного субскора (не всего TS) с λ_blind для blind-связей.</li>
+<li class="gwt"><b>Given</b> концентрация источников (top_share &gt; 0.60), <b>When</b> агрегируется V_prop, <b>Then</b> применяется штраф за концентрацию и потолок 0.85 (BR-PROP).</li>
+<li class="gwt"><b>Given</b> циклическая связь, <b>When</b> считается пропагация, <b>Then</b> цикл исключается.</li>
+</ul>
+</div>
+<div class="story">
+<span class="story-id">US-6.2</span>
+<div class="story-title">Алерт и демпфер</div>
+<div class="story-as">Как вендор, я хочу получать алерт о падении контрагента и буфер на реакцию, чтобы успеть среагировать.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> резкое падение субскора контрагента, <b>When</b> событие зафиксировано, <b>Then</b> я получаю алерт, а влияние сглаживается 30-дневным средним.</li>
+<li class="gwt"><b>Given</b> я получил алерт, <b>When</b> продолжаю новое сорсинг у flagged-контрагента, <b>Then</b> 30-дневный буфер отменяется и Score пересчитывается вниз сразу (BR-DAMPER).</li>
+</ul>
+</div>
+</section>
+
+<section id="e-pull">
+<div class="epic">E7 — Chain Pull</div>
+<div class="story">
+<span class="story-id">US-7.1</span>
+<div class="story-title">Втягивание контрагентов</div>
+<div class="story-as">Как участник, я хочу пригласить контрагентов в реестр, чтобы повысить проверенность своих связей и получить кредит.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> я приглашаю контрагента, <b>When</b> он регистрируется и верифицируется, <b>Then</b> мне начисляется Chain Pull-кредит, а связь становится верифицируемой.</li>
+<li class="gwt"><b>Given</b> контрагент не в реестре, <b>When</b> покупатель смотрит мой профиль, <b>Then</b> отсутствие связей-подтверждений видно как сниженное покрытие Vᵢ.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-appeal">
+<div class="epic">E8 — Апелляции и Steward-панели</div>
+<div class="story">
+<span class="story-id">US-8.1</span>
+<div class="story-title">Оспаривание спорного решения</div>
+<div class="story-as">Как участник, я хочу оспорить несправедливый флаг/отзыв, чтобы защититься от ошибок и атак.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> я не согласен с флагом, <b>When</b> подаю апелляцию, <b>Then</b> формируется cross-segment панель Steward'ов через VRF-жеребьёвку с conflict-screening.</li>
+<li class="gwt"><b>Given</b> панель собрана, <b>When</b> есть конфликт интересов у кандидата, <b>Then</b> он отсеивается графовым скринингом; председатель — Verified Oracle.</li>
+<li class="gwt"><b>Given</b> решение вынесено, <b>When</b> оно опубликовано, <b>Then</b> оно обязательно в рамках реестра; издержки по loser-pays с защитой добросовестности; правовой путь сохранён.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-b2b">
+<div class="epic">E9 — B2B-продукты</div>
+<div class="story">
+<span class="story-id">US-9.1</span>
+<div class="story-title">Due-diligence отчёт</div>
+<div class="story-as">Как клиника/дистрибьютор, я хочу глубокий отчёт о поставщике, чтобы снизить риск закупки.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> я B2B-клиент, <b>When</b> заказываю due-diligence по поставщику, <b>Then</b> получаю историю факторов, цепочку, флаги, динамику.</li>
+<li class="gwt"><b>Given</b> оцениваемый поставщик, <b>When</b> он хочет заплатить за влияние на отчёт, <b>Then</b> это невозможно (BR-NEUTRALITY).</li>
+</ul>
+</div>
+<div class="story">
+<span class="story-id">US-9.2</span>
+<div class="story-title">Мониторинг-API</div>
+<div class="story-as">Как B2B-клиент, я хочу подписаться на изменения Score контрагентов, чтобы реагировать вовремя.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> подписка на контрагента, <b>When</b> его Score/флаг меняется, <b>Then</b> приходит webhook с событием.</li>
+<li>Write/protected эндпоинты — API-key + payload-подпись.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-custody">
+<div class="epic">E10 — Lot-QR и chain-of-custody</div>
+<div class="story">
+<span class="story-id">US-10.1</span>
+<div class="story-title">Привязка теста к партии</div>
+<div class="story-as">Как покупатель, я хочу убедиться, что COA относится именно к этой партии, чтобы не доверять «общему» сертификату.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> партия с lot-QR, <b>When</b> сканирую/проверяю, <b>Then</b> вижу привязанные к лоту COA и custody-цепочку.</li>
+<li class="gwt"><b>Given</b> разрыв подписи на шаге custody, <b>When</b> тест оценивается, <b>Then</b> он не получает Vᵢ=1.0 (BR-CUSTODY).</li>
+<li class="gwt"><b>Given</b> попытка повторного использования артефакта, <b>When</b> он подаётся снова, <b>Then</b> анти-reuse детект отклоняет.</li>
+</ul>
+</div>
+</section>
+
+<!-- ================= V2 ================= -->
+<div class="phase-h"><span class="phase p-v2">V2</span><span style="font-weight:800;font-size:1.1rem">Устойчивость, охват, приватность</span></div>
+
+<section id="e-zk">
+<div class="epic">E11 — ZK и приватность</div>
+<div class="story">
+<span class="story-id">US-11.1</span>
+<div class="story-title">Доказательство без раскрытия</div>
+<div class="story-as">Как посредник, я хочу доказать надёжность апстрима без раскрытия его личности, чтобы сохранить коммерческую тайну.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> blind-связь, <b>When</b> формируется доказательство, <b>Then</b> ZK-доказательство подтверждает факт без раскрытия идентичности (замена shielded assertion MVP).</li>
+<li class="gwt"><b>Given</b> downstream-сторона, <b>When</b> управляет видимостью, <b>Then</b> контролирует раскрытие своих связей.</li>
+</ul>
+</div>
+</section>
+
+<section id="e-scale">
+<div class="epic">E12 — Аналитика, VaaS, охват</div>
+<div class="story">
+<span class="story-id">US-12.1</span>
+<div class="story-title">Рыночная аналитика</div>
+<div class="story-as">Как исследователь/инвестор, я хочу агрегированные тренды ниши, чтобы принимать решения по рынку.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> аналитика-SKU, <b>When</b> запрашиваю тренды, <b>Then</b> получаю только агрегированные данные (без продажи влияния на конкретный Score).</li>
+</ul>
+</div>
+<div class="story">
+<span class="story-id">US-12.2</span>
+<div class="story-title">Verification-as-a-service</div>
+<div class="story-as">Как сторонняя платформа, я хочу встроить проверку/бейдж к себе, чтобы дать пользователям доверие.</div>
+<div class="ac-t">Acceptance Criteria</div>
+<ul class="ac">
+<li class="gwt"><b>Given</b> VaaS-интеграция, <b>When</b> подключаю SDK/API, <b>Then</b> могу показывать верифицированный Score у себя с сохранением нейтралитета и подписи.</li>
+</ul>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

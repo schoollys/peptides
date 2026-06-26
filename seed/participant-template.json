@@ -1,0 +1,152 @@
+{
+  "field_guide": {
+    "_note": "Импортируйте массив из ключа .participants. Поля совпадают с интерфейсом Participant (lib/participants.ts). Поля из блока system_generated НЕ заполняйте вручную — они выводятся/проставляются при импорте.",
+    "enums": {
+      "role_code": ["MANUFACTURER", "VENDOR", "DISTRIBUTOR", "LABORATORY", "RETAILER", "CONSULTANT", "IMPORTER"],
+      "role_code_meaning": {
+        "MANUFACTURER": "Завод-синтез / API-producer: upstream B2B-источник качества, не buyer-facing (anchor MVP)",
+        "VENDOR": "RUO-вендор: витрина/бренд, у которого покупают (не обязательно завод-синтез) (anchor MVP)",
+        "LABORATORY": "Лаборатория-оракул (anchor MVP)",
+        "DISTRIBUTOR": "GB-организатор / дистрибьютор (anchor MVP)",
+        "RETAILER": "Ритейлер/реселлер: точка покупки (anchor MVP), но потолок тира Gold + источник не верифицирован до Vᵢ-пропагации (V1)",
+        "CONSULTANT": "Консультант (non-anchor)",
+        "IMPORTER": "Импортёр (non-anchor)"
+      },
+      "status": ["ACTIVE", "PROVISIONAL", "SUSPENDED"],
+      "kyb_level": ["L0", "L1", "L2", "L3"],
+      "tier": ["Platinum", "Gold", "Silver", "Bronze", "Watch"],
+      "dominant_factor": ["QEF", "PCF", "SCIF", "TRF", "FRF", "CCF", "CVF", "CVF_B", "RF", null],
+      "factor_labels": {
+        "QEF": "Качество энзимов",
+        "PCF": "Протокол чистоты",
+        "SCIF": "Стабильность цепочек",
+        "TRF": "Тепловая резистентность",
+        "FRF": "Поглощение фрагментов",
+        "CCF": "Контроль концентрации",
+        "CVF": "Валидация компонентов",
+        "CVF_B": "Валидация компонентов B",
+        "RF": "Поглощающая фракция"
+      },
+      "di_class": ["A (<=7д)", "B (<=30д)", "C (<=90д)", "D (>90д)"]
+    },
+    "derivation_rules": {
+      "tier": "из score: >=88 Platinum, >=72 Gold, >=55 Silver, >=35 Bronze, иначе Watch. score=null -> Watch.",
+      "factors[].label": "из factor_labels по code.",
+      "factors[].di_class": "из freshness_di: <=7 A, <=30 B, <=90 C, иначе D.",
+      "factors[].contribution": "round(value * v_i * 10) / 10.",
+      "isAnchorRole": "true, если role_code in [MANUFACTURER, VENDOR, LABORATORY, DISTRIBUTOR, RETAILER].",
+      "is_balanced": "true, если нет выраженного доминирующего фактора (dominant_factor=null)."
+    },
+    "system_generated": ["id", "algo_version", "latest_anchor_hash", "score_events", "flags[].anchor_hash"],
+    "value_ranges": {
+      "score": "0–100, один знак после запятой, или null для PROVISIONAL",
+      "factors[].value": "0–100",
+      "factors[].v_i": "0–1 (множитель верификации)",
+      "factors[].freshness_di": "дней с последнего измерения",
+      "trust_ceiling": "макс. оценка до полной проверки (L1≈65–80, L2≈80–90, L3=100)"
+    }
+  },
+  "participants": [
+    {
+      "id": "",
+      "display_name": "Example Peptides GmbH",
+      "role_code": "VENDOR",
+      "status": "ACTIVE",
+      "jurisdiction": "Германия (DE)",
+      "domain": "example-peptides.eu",
+      "verified_legal": true,
+      "kyb_level": "L2",
+      "score": 82.4,
+      "tier": "Gold",
+      "dominant_factor": "QEF",
+      "is_balanced": false,
+      "trust_ceiling": 90,
+      "tests_count": 18,
+      "updated_days_ago": 5,
+      "algo_version": "",
+      "latest_anchor_hash": "",
+      "factors": [
+        { "code": "QEF", "label": "Качество энзимов", "value": 88, "v_i": 0.93, "freshness_di": 6, "di_class": "A", "contribution": 81.8 },
+        { "code": "PCF", "label": "Протокол чистоты", "value": 80, "v_i": 0.85, "freshness_di": 10, "di_class": "B", "contribution": 68.0 },
+        { "code": "SCIF", "label": "Стабильность цепочек", "value": 75, "v_i": 0.80, "freshness_di": 14, "di_class": "B", "contribution": 60.0 }
+      ],
+      "flags": [],
+      "score_events": [],
+      "isAnchorRole": true,
+      "contacts": {
+        "website": "https://example-peptides.eu",
+        "email": "sales@example-peptides.eu",
+        "telegram": "@examplepeptides"
+      },
+      "_research": {
+        "source_url": "https://example-peptides.eu/about",
+        "data_completeness": 78,
+        "confidence": "medium",
+        "notes": "GMP + публичные COA; найдено через каталог X. Поле _research не входит в модель — удалить перед импортом или игнорировать."
+      }
+    },
+    {
+      "id": "",
+      "display_name": "Example Analytics Ltd",
+      "role_code": "LABORATORY",
+      "status": "PROVISIONAL",
+      "jurisdiction": "Нидерланды (NL)",
+      "domain": "example-analytics.eu",
+      "verified_legal": true,
+      "kyb_level": "L1",
+      "score": null,
+      "tier": "Watch",
+      "dominant_factor": null,
+      "is_balanced": false,
+      "trust_ceiling": 80,
+      "tests_count": 3,
+      "updated_days_ago": 6,
+      "algo_version": "",
+      "latest_anchor_hash": "",
+      "provisional_reason": "Накопление данных: необходимо >= 5 независимых тестов. Сейчас 3.",
+      "factors": [
+        { "code": "QEF", "label": "Качество энзимов", "value": 55, "v_i": 0.60, "freshness_di": 7, "di_class": "A", "contribution": 33.0 },
+        { "code": "PCF", "label": "Протокол чистоты", "value": 50, "v_i": 0.55, "freshness_di": 7, "di_class": "A", "contribution": 27.5 }
+      ],
+      "flags": [],
+      "score_events": [],
+      "isAnchorRole": true,
+      "contacts": {
+        "website": "https://example-analytics.eu",
+        "email": "contact@example-analytics.eu"
+      },
+      "_research": {
+        "source_url": "https://example-analytics.eu",
+        "data_completeness": 52,
+        "confidence": "low",
+        "notes": "ISO/IEC 17025 заявлено, аккредитацию не подтвердил."
+      }
+    },
+    {
+      "id": "",
+      "display_name": "",
+      "role_code": "",
+      "status": "PROVISIONAL",
+      "jurisdiction": "",
+      "domain": "",
+      "verified_legal": false,
+      "kyb_level": "L0",
+      "score": null,
+      "tier": "Watch",
+      "dominant_factor": null,
+      "is_balanced": false,
+      "trust_ceiling": 60,
+      "tests_count": 0,
+      "updated_days_ago": 0,
+      "algo_version": "",
+      "latest_anchor_hash": "",
+      "provisional_reason": "",
+      "factors": [],
+      "flags": [],
+      "score_events": [],
+      "isAnchorRole": false,
+      "contacts": { "website": "", "email": "", "telegram": "" },
+      "_research": { "source_url": "", "data_completeness": 0, "confidence": "low", "notes": "" }
+    }
+  ]
+}

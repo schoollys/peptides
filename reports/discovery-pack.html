@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>PeptideTrust — Discovery-пакет</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #0d1b2a; --muted: #5b6b7d; --faint: #8a97a6;
+    --line: #e3e8ee; --accent: #533afd; --green: #1f7a4d; --green-bg: #e8f6ee;
+    --red: #b3261e; --red-bg: #fdecea; --amber: #8a6000; --amber-bg: #fff3df;
+    --info-bg: #eef1fe; --code-bg: #f1f3f7; --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1116; --card: #171b22; --ink: #e8edf3; --muted: #9aa7b4; --faint: #6b7785;
+      --line: #262c35; --accent: #8f7bff; --green: #5fd197; --green-bg: #16271f;
+      --red: #ff8a80; --red-bg: #2a1816; --amber: #e0b56b; --amber-bg: #2a2316;
+      --info-bg: #191b2e; --code-bg: #1f242c;
+    }
+  }
+  * { box-sizing: border-box; -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5; font-size: 16px;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 0 16px calc(48px + env(safe-area-inset-bottom)); }
+  header.page { padding: max(16px, env(safe-area-inset-top)) 0 8px; }
+  .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); font-weight: 700; }
+  h1 { font-size: 24px; line-height: 1.25; margin: 6px 0 8px; letter-spacing: -.02em; }
+  .lead { color: var(--muted); font-size: 15px; margin: 0 0 12px; }
+  h2 { font-size: 20px; margin: 24px 0 4px; letter-spacing: -.01em; }
+  h3 { font-size: 15px; margin: 16px 0 4px; }
+  p { margin: 6px 0; }
+  .role-goal { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+
+  /* sticky nav */
+  nav.tabs {
+    position: sticky; top: 0; z-index: 20; background: var(--bg);
+    padding: 8px 0; display: flex; gap: 6px; border-bottom: 1px solid var(--line);
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  nav.tabs label {
+    -webkit-appearance: none; appearance: none; white-space: nowrap; display: inline-flex; align-items: center;
+    border: 1px solid var(--line); background: var(--card); color: var(--muted);
+    font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 999px; cursor: pointer; min-height: 38px;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  /* CSS-only tabs: radios live before .wrap; no JavaScript required (works in iOS Safari / Quick Look). */
+  input.tabradio { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  section.panel { display: none; }
+  #t-map:checked    ~ .wrap #map,
+  #t-guides:checked ~ .wrap #guides,
+  #t-mail:checked   ~ .wrap #mail { display: block; }
+  #t-map:checked    ~ .wrap label[for="t-map"],
+  #t-guides:checked ~ .wrap label[for="t-guides"],
+  #t-mail:checked   ~ .wrap label[for="t-mail"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 12px 0; }
+  ul { margin: 6px 0; padding-left: 18px; }
+  li { font-size: 14px; margin: 4px 0; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 5px; font-size: 13px; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  @media (min-width: 560px){ .stats { grid-template-columns: repeat(4,1fr); } }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .stat .v { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  .stat .l { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .stat.red .v { color: var(--red); } .stat.amber .v { color: var(--amber); }
+  .stat.green .v { color: var(--green); } .stat.info .v { color: var(--accent); }
+
+  /* callouts */
+  .callout { border-radius: 12px; padding: 12px 14px; margin: 12px 0; font-size: 14px; border: 1px solid transparent; }
+  .callout b.title { display:block; margin-bottom: 5px; }
+  .callout.info { background: var(--info-bg); border-color: rgba(83,58,253,.25); }
+  .callout.info b.title { color: var(--accent); }
+  .callout.warning { background: var(--amber-bg); border-color: rgba(138,96,0,.3); }
+  .callout.warning b.title { color: var(--amber); }
+  .callout.danger { background: var(--red-bg); border-color: rgba(179,38,30,.3); }
+  .callout.danger b.title { color: var(--red); }
+  .callout.success { background: var(--green-bg); border-color: rgba(31,122,77,.3); }
+  .callout.success b.title { color: var(--green); }
+  .callout.neutral { background: var(--code-bg); border-color: var(--line); }
+
+  /* tables */
+  .scrollx { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 9px 11px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--faint); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; font-weight: 700; background: var(--card); position: sticky; top: 0; }
+  tr.p0 td { background: var(--red-bg); }
+  tr.p1 td { background: var(--amber-bg); }
+  td .sub { color: var(--muted); }
+  td em { color: var(--muted); }
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .pill.p0 { background: var(--red); color: #fff; } .pill.p1 { background: var(--amber); color: #fff; } .pill.p2 { background: var(--code-bg); color: var(--muted); }
+
+  /* details (guides) */
+  details.guide { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin: 12px 0; overflow: hidden; }
+  details.guide > summary { list-style: none; cursor: pointer; padding: 14px 16px; font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+  details.guide > summary::-webkit-details-marker { display: none; }
+  details.guide > summary::after { content: "▸"; color: var(--faint); margin-left: auto; }
+  details.guide[open] > summary::after { content: "▾"; }
+  .guide-body { padding: 0 16px 16px; }
+  .label { font-size: 12px; color: var(--faint); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 14px 0 4px; }
+  .two { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 600px){ .two { grid-template-columns: 1fr 1fr; } }
+  ol.q { margin: 4px 0; padding-left: 20px; } ol.q li { margin: 5px 0; }
+  .signals { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 10px 0; }
+  @media (min-width: 560px){ .signals { grid-template-columns: 1fr 1fr; } }
+  .signal { border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+  .signal.g { background: var(--green-bg); color: var(--green); } .signal.r { background: var(--red-bg); color: var(--red); }
+  .signal b { display:block; margin-bottom: 3px; }
+
+  /* emails */
+  .email { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 12px 0; }
+  .email-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: var(--code-bg); color: var(--muted); }
+  .tag.cold { background: rgba(83,58,253,.12); color: var(--accent); }
+  .tag.nudge { background: var(--amber-bg); color: var(--amber); }
+  .tag.after { background: var(--green-bg); color: var(--green); }
+  .when { font-size: 12px; color: var(--faint); margin-left: auto; }
+  .subject { font-size: 14px; margin: 2px 0 10px; }
+  .subject span { color: var(--muted); }
+  .body { white-space: pre-wrap; word-wrap: break-word; font-size: 15px; background: var(--code-bg); border-radius: 10px; padding: 12px 13px; margin: 0 0 10px; }
+  .copy { -webkit-appearance: none; appearance: none; border: 1px solid var(--line); background: var(--card); color: var(--accent); font-weight: 600; font-size: 14px; padding: 9px 14px; border-radius: 10px; cursor: pointer; min-height: 40px; width: 100%; }
+  .copy:active { background: var(--code-bg); } .copy.done { color: var(--green); border-color: var(--green); }
+
+  footer { color: var(--faint); font-size: 12.5px; margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+</head>
+<body>
+<input class="tabradio" type="radio" name="tab" id="t-map" checked>
+<input class="tabradio" type="radio" name="tab" id="t-guides">
+<input class="tabradio" type="radio" name="tab" id="t-mail">
+<div class="wrap">
+  <header class="page">
+    <div class="eyebrow">PeptideTrust · Discovery-пакет</div>
+    <h1>Валидация концепции: что и как проверить</h1>
+    <p class="lead">Один файл для телефона: карта допущений и план валидации, гайды проблемных интервью по ролям и готовые письма для набора респондентов. Принцип — The Mom Test: спрашиваем про прошлое и конкретику, не про идею.</p>
+  </header>
+
+  <nav class="tabs">
+    <label for="t-map">Карта валидации</label>
+    <label for="t-guides">Гайды интервью</label>
+    <label for="t-mail">Письма</label>
+  </nav>
+
+  <section class="panel" id="map">
+    <div class="callout warning">
+      <b class="title">Главный риск — не UI, а desirability и жизнеспособность</b>
+      Это многосторонняя trust-сеть. Самая дорогая ошибка — несовпадение нашей гипотезы ценности с реальной болью ролей, плюс две ловушки модели: cold-start (реестр пуст → бесполезен → никто не приходит) и скоринг компаний без согласия (для вендора это может быть угроза, не ценность).
+    </div>
+
+    <div class="stats">
+      <div class="stat info"><div class="v">5</div><div class="l">ролей в системе</div></div>
+      <div class="stat red"><div class="v">4</div><div class="l">P0-допущений (критичны)</div></div>
+      <div class="stat amber"><div class="v">2</div><div class="l">ловушки: cold-start + право</div></div>
+      <div class="stat green"><div class="v">2 нед.</div><div class="l">discovery-спринт до gate</div></div>
+    </div>
+
+    <h2>Карта допущений: риск × уверенность</h2>
+    <p class="role-goal">Приоритет = высокий риск × низкая уверенность. <span class="pill p0">P0</span> проверить первыми · <span class="pill p1">P1</span> следом · <span class="pill p2">P2</span> позже.</p>
+    <div class="scrollx">
+      <table>
+        <thead><tr><th>Роль</th><th>Допущение</th><th>Тип</th><th>Риск</th><th>Увер.</th><th>Приор.</th></tr></thead>
+        <tbody>
+          <tr class="p0"><td><b>Покупатель</b></td><td>Реально не доверяет поставщикам и активно ищет независимую оценку перед закупкой.</td><td class="sub">Desirability</td><td><b>Высокий</b></td><td class="sub">Низкая</td><td><span class="pill p0">P0</span></td></tr>
+          <tr class="p0"><td><b>Вендор</b></td><td>Воспримет публичный скоринг без согласия как ценность («заявить профиль»), а не угрозу/диффамацию.</td><td class="sub">Desirability</td><td><b>Высокий</b></td><td class="sub">Низкая</td><td><span class="pill p0">P0</span></td></tr>
+          <tr class="p0"><td><b>Сеть</b></td><td>Покупателей будет достаточно, чтобы вендорам имело смысл заявлять профиль (cold-start).</td><td class="sub">Viability</td><td><b>Высокий</b></td><td class="sub">Низкая</td><td><span class="pill p0">P0</span></td></tr>
+          <tr class="p0"><td><b>Право</b></td><td>Публикация оценок названных компаний без согласия допустима в EU/CH (диффамация, GDPR).</td><td class="sub">Feasibility</td><td><b>Высокий</b></td><td class="sub">Низкая</td><td><span class="pill p0">P0</span></td></tr>
+          <tr class="p1"><td><b>Лаборатория</b></td><td>Лаборатории-оракулы согласятся поставлять верификации на устойчивых условиях.</td><td class="sub">Feasibility</td><td><b>Высокий</b></td><td class="sub">Низкая</td><td><span class="pill p1">P1</span></td></tr>
+          <tr class="p1"><td><b>Оператор</b></td><td>Нейтральная модель без рекламных денег финансово устойчива на таргете EU/CH.</td><td class="sub">Viability</td><td><b>Высокий</b></td><td class="sub">Средняя</td><td><span class="pill p1">P1</span></td></tr>
+          <tr class="p1"><td><b>Покупатель</b></td><td>Score 0–100 с доминирующим фактором понятен и влияет на решение, а не вызывает недоверие.</td><td class="sub">Desirability</td><td>Средний</td><td class="sub">Низкая</td><td><span class="pill p1">P1</span></td></tr>
+          <tr class="p1"><td><b>Вендор</b></td><td>Вендоры готовы проходить KYB (L2/L3), чтобы поднять свой Score.</td><td class="sub">Desirability</td><td>Средний</td><td class="sub">Низкая</td><td><span class="pill p1">P1</span></td></tr>
+          <tr><td><b>GB-организатор</b></td><td>Публичный Score полезен для привлечения участников складчин.</td><td class="sub">Desirability</td><td>Средний</td><td class="sub">Средняя</td><td><span class="pill p2">P2</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Матрица валидации по ролям</h2>
+    <p class="role-goal">Критерии — фальсифицируемые. Спрашиваем про прошлое поведение, а не «нравится ли идея».</p>
+    <div class="scrollx">
+      <table>
+        <thead><tr><th>Роль</th><th>Риск-гипотеза</th><th>Дешёвая проверка</th><th>«Подтверждено», если</th><th>Сигнал на разворот</th></tr></thead>
+        <tbody>
+          <tr class="p0"><td><b>Покупатель</b><br><span class="pill p0">P0</span></td><td>Не доверяет и поменяет решение из-за Score.</td><td class="sub">6–8 интервью (Mom Test) + Wizard-of-Oz: показать 5 настоящих профилей.</td><td>≥40% за 6 мес искали инфо о надёжности и не нашли; ≥3/8 просят доступ.</td><td><em>&lt;2/8 интереса после показа профилей.</em></td></tr>
+          <tr class="p0"><td><b>Вендор</b><br><span class="pill p0">P0</span></td><td>Заявит профиль без согласия; пройдёт KYB.</td><td class="sub">Интервью + fake-door «Заявить профиль»: показать черновой профиль.</td><td>≥3 хотят заявить/улучшить; 0 юр-угроз из 8.</td><td><em>≥2 требуют удаления или угрожают.</em></td></tr>
+          <tr class="p0"><td><b>Право / Оператор</b><br><span class="pill p0">P0</span></td><td>Скоринг без согласия допустим; экономика сходится.</td><td class="sub">Консультация юриста EU + модель юнит-экономики.</td><td>Юрист подтверждает конструкцию; LTV/CAC &gt; 3.</td><td><em>Юрист видит высокий риск претензий.</em></td></tr>
+          <tr class="p1"><td><b>Лаборатория</b><br><span class="pill p1">P1</span></td><td>Поставит данные на устойчивых условиях.</td><td class="sub">3–5 интервью об условиях + 1 пилот.</td><td>≥1 лаборатория готова на пилот на устойчивых условиях.</td><td><em>Нет готовых отдавать данные без чрезмерной платы.</em></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Двухнедельный discovery-спринт</h2>
+    <div class="two">
+      <div class="card">
+        <h3>Неделя 1 · спрос <span class="pill p0">Desirability</span></h3>
+        <p>Интервью с покупателями и вендорами (риск D). Параллельно — юр-консультация EU по скорингу без согласия. Wizard-of-Oz: руками собрать 5–10 настоящих профилей.</p>
+        <p class="sub" style="color:var(--muted);font-size:13px;"><b>Gate:</b> есть ли сигнал спроса у покупателя и не-враждебная реакция вендора? Нет — разворот до трат на фичи.</p>
+      </div>
+      <div class="card">
+        <h3>Неделя 2 · предложение и экономика <span class="pill p1">Viability/Feasibility</span></h3>
+        <p>Discovery-разговоры с лабораториями об условиях участия (статус Verified Oracle, поток заказов). Fake-door «Заявить профиль» на проде с аналитикой. Юнит-экономика нейтральной модели без рекламных денег. Цель — ≥1 пилот лаборатории и сходящаяся модель.</p>
+        <p class="sub" style="color:var(--muted);font-size:13px;"><b>Gate pivot/persevere:</b> подтверждены ли поставка данных лабораториями и устойчивость экономики? Это решает, строим ли дальше и для какой роли первой.</p>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <b class="title">Cold-start: проектировать single-player value</b>
+      Реестр должен быть полезен покупателю даже при малом числе вендоров. Концьерж-наполнение 10–20 реальных профилей вручную, «горячая сторона» (покупатель) — первой. Это снимает зависимость от мгновенных сетевых эффектов на старте.
+    </div>
+    <div class="callout danger">
+      <b class="title">Скоринг без согласия — валидировать рано</b>
+      Публичная оценка названных компаний — главный юридический и репутационный нюанс. В UI уже есть фактура, право на ответ и апелляции — это снижает риск, но до масштабирования нужна юр-проверка конструкции в EU/CH.
+    </div>
+  </section>
+
+  <section class="panel" id="guides">
+    <div class="callout info">
+      <b class="title">Правила, общие для всех интервью</b>
+      <ul>
+        <li>Говорите про их жизнь и прошлые ситуации, а не про наш продукт. Продукт показываем в конце.</li>
+        <li>Копайте в конкретику: «расскажите про последний раз…», «что было дальше?», «сколько это стоило?».</li>
+        <li>Не задавайте гипотетических вопросов («пользовались бы вы…») и наводящих на «да».</li>
+        <li>Ищите коммитмент: время, интро, документы, согласие на пилот — слова без действий не считаются.</li>
+        <li>Формат: 30–40 мин, 6–8 интервью на роль, двое со стороны команды (ведущий + конспект), запись с согласия.</li>
+      </ul>
+    </div>
+
+    <details class="guide" open>
+      <summary>1. Покупатель / исследователь <span class="pill p0">P0</span></summary>
+      <div class="guide-body">
+        <p class="role-goal">Гипотеза: не доверяет поставщикам, тратит усилия на проверку и поменяет решение из-за независимого Score.</p>
+        <div class="two">
+          <div><div class="label">Кого звать (скрининг)</div><p>Покупал пептиды/реагенты за 6–12 мес; влияет на выбор поставщика; EU/CH или целевой рынок.</p></div>
+          <div><div class="label">Разогрев</div><p><em>«Расскажите, чем занимаетесь и где в вашей работе появляются пептиды/реагенты?»</em></p></div>
+        </div>
+        <div class="label">Ключевые вопросы (о прошлом поведении)</div>
+        <ol class="q">
+          <li>Расскажите про последний раз, когда выбирали нового поставщика. Что происходило по шагам?</li>
+          <li>Как вы решали, можно ли ему доверять? Что конкретно проверяли?</li>
+          <li>Был ли случай, когда поставщик подвёл — качество, чистота, сроки? Что вы сделали?</li>
+          <li>Где вы сейчас ищете информацию о надёжности поставщика? Сколько времени это занимает?</li>
+          <li>Что вы делали, когда нужной информации не нашлось?</li>
+          <li>Во что обошёлся неудачный поставщик в последний раз (деньги, время, эксперимент)?</li>
+          <li>Кому/чему вы доверяете в этом вопросе сегодня (коллеги, форумы, COA, лаборатории)?</li>
+        </ol>
+        <div class="label">Показ прототипа</div>
+        <p>Покажите 3–5 настоящих профилей (Wizard-of-Oz): понятно ли, кому верить? что бы проверили перед закупкой? помогло бы в той ситуации, о которой рассказали?</p>
+        <div class="two">
+          <div><div class="label">Зонды</div><ul><li>«Почему это было важно?»</li><li>«Что было дальше?»</li><li>«Расскажите подробнее про тот случай.»</li></ul></div>
+          <div><div class="label">Чего не делать</div><ul><li>Не показывать продукт в начале.</li><li>Не спрашивать «пользовались бы вы реестром?».</li><li>Не вести к «да».</li></ul></div>
+        </div>
+        <div class="signals">
+          <div class="signal g"><b>Сигнал «подтверждено»</b>Уже тратят время/деньги на проверку · вспоминают конкретный инцидент · искали и не нашли · просят доступ.</div>
+          <div class="signal r"><b>Сигнал «опровергнуто»</b>«В целом доверяю», нет конкретики · проверка не их забота · равнодушие после показа.</div>
+        </div>
+        <div class="label">Запрос на коммитмент</div>
+        <p>Email для раннего доступа · привести коллегу · согласие на follow-up через 2 недели.</p>
+      </div>
+    </details>
+
+    <details class="guide">
+      <summary>2. RUO-вендор (витрина/бренд) <span class="pill p0">P0</span></summary>
+      <div class="guide-body">
+        <p class="role-goal">Гипотеза: воспримет публичный профиль (без согласия) как ценность, захочет заявить и пройти KYB — а не угрозу.</p>
+        <div class="two">
+          <div><div class="label">Кого звать</div><p>Продаёт RUO-пептиды в EU/CH; роль: основатель, продажи, маркетинг или комплаенс.</p></div>
+          <div><div class="label">Разогрев</div><p><em>«Как сейчас покупатели понимают, что вам можно доверять?»</em></p></div>
+        </div>
+        <div class="label">Ключевые вопросы</div>
+        <ol class="q">
+          <li>Как вы сегодня доказываете качество и легальность новым покупателям? Что работает, что нет?</li>
+          <li>Расскажите про случай, когда сделка сорвалась из-за недоверия покупателя.</li>
+          <li>Сталкивались, что вас ставят в один ряд с «серыми» продавцами? Как реагировали?</li>
+          <li>Сколько усилий уходит, чтобы выглядеть легитимно (сертификаты, COA, лицензии)?</li>
+          <li>Вас уже где-то публично оценивали/рейтинговали? Как восприняли?</li>
+          <li>Что делаете, когда о вас публикуют неверную или негативную информацию?</li>
+        </ol>
+        <div class="label">Показ прототипа</div>
+        <p>Покажите черновой публичный профиль их компании и молчите — слушайте реакцию: заявить / улучшить / «удалите» / угроза? Что неверно? Готовы пройти KYB и дать документы, чтобы поднять Score? Что бы остановило?</p>
+        <div class="two">
+          <div><div class="label">Зонды</div><ul><li>«Что именно вас здесь беспокоит?»</li><li>«Что вы сделали в прошлый раз?»</li><li>«Кто решает об участии в таких реестрах?»</li></ul></div>
+          <div><div class="label">Чего не делать</div><ul><li>Не продавать «как это поможет».</li><li>После показа держать паузу.</li><li>Не обещать правки, чтобы понравиться.</li></ul></div>
+        </div>
+        <div class="signals">
+          <div class="signal g"><b>Сигнал «подтверждено»</b>Хотят заявить/улучшить · борются за легитимность · дают документы · просят убрать «серых».</div>
+          <div class="signal r"><b>Сигнал «опровергнуто»</b>«Удалите профиль» · упоминают юриста/претензию · «нам всё равно».</div>
+        </div>
+        <div class="label">Запрос на коммитмент</div>
+        <p>Согласие заявить профиль · документы для KYB-пилота · интро к 1–2 другим вендорам.</p>
+      </div>
+    </details>
+
+    <details class="guide">
+      <summary>3. Лаборатория-оракул <span class="pill p1">P1</span></summary>
+      <div class="guide-body">
+        <p class="role-goal">Гипотеза: независимые лаборатории согласятся поставлять верификации на устойчивых условиях.</p>
+        <div class="two">
+          <div><div class="label">Кого звать</div><p>Независимые лаборатории, делающие анализ чистоты/идентичности пептидов; решение о партнёрствах.</p></div>
+          <div><div class="label">Разогрев</div><p><em>«Как устроена ваша загрузка и кто заказывает анализы пептидов?»</em></p></div>
+        </div>
+        <div class="label">Ключевые вопросы</div>
+        <ol class="q">
+          <li>Кто и зачем заказывает у вас независимые тесты сегодня? Какой объём?</li>
+          <li>Передаёте ли результаты третьим сторонам/платформам? На каких условиях?</li>
+          <li>Что критично, чтобы делиться данными (цена, юр-защита, репутация)?</li>
+          <li>Были ли конфликты из-за публикации результатов? Как решали?</li>
+          <li>Какая модель рабочая: платите вы, платят вам, или бартер на трафик?</li>
+        </ol>
+        <div class="two">
+          <div><div class="label">Зонды</div><ul><li>«Что было, когда делились данными?»</li><li>«Какой объём сделал бы это интересным?»</li></ul></div>
+          <div><div class="label">Чего не делать</div><ul><li>Не обещать объёмы/трафик, которых нет.</li><li>Выяснять реальную экономику и риски.</li></ul></div>
+        </div>
+        <div class="signals">
+          <div class="signal g"><b>Сигнал «подтверждено»</b>Готовы на пилот/выгрузку · уже делятся данными · видят маркетинговую выгоду.</div>
+          <div class="signal r"><b>Сигнал «опровергнуто»</b>Высокая плата без обязательств · юр-страхи без решений · нет интереса.</div>
+        </div>
+        <div class="label">Запрос на коммитмент</div>
+        <p>Пилотная договорённость / тестовая выгрузка · интро к коллегам-лабораториям.</p>
+      </div>
+    </details>
+
+    <div class="callout neutral">
+      <b class="title">Лестница коммитмента — как считать «настоящий» сигнал</b>
+      Слабый → сильный: вежливый интерес → потраченное время (follow-up, интро) → репутация (публичный отзыв) → действие (документы, согласие на пилот, тестовая выгрузка данных). Засчитываем гипотезу подтверждённой только при шагах справа. Для GB-организатора (P2) переиспользуйте структуру гайда вендора, заменив «легитимность» на «привлечение участников складчины».
+    </div>
+
+    <div class="callout success">
+      <b class="title">Программа «Founding-50» — что предлагаем за коммитмент (не за «да»)</b>
+      Один общий оффер для всех ролей. Тем, кто реально включается на раннем этапе — заявил профиль, дал документы, согласился на пилот, привёл коллегу, — предлагаем войти в число первых участников реестра.
+      <ul>
+        <li><b>Пожизненный founding-бейдж</b> в профиле и закреплённые условия — ранние перки не ухудшатся со временем.</li>
+        <li><b>Имя в благодарностях</b> проекта и прямая линия с командой (без общей поддержки).</li>
+        <li><b>Право голоса по роадмапу</b> — что и для какой роли строим дальше, какие факторы учитываются.</li>
+      </ul>
+      <b>Правило Mom Test:</b> оффер даём только в письме «после общения», за конкретное действие — не в холодном письме за внимание. Иначе притянем «охотников за плюшками» и получим ложные сигналы спроса. Деньги предлагаем лишь как компенсацию времени занятым (покупатель, сотрудник лаборатории) и независимо от их ответа — это не искажает сигнал.
+    </div>
+  </section>
+
+  <section class="panel" id="mail">
+    <div class="callout info">
+      <b class="title">Правила писем</b>
+      <ul>
+        <li>60–120 слов, один призыв к действию, читается с телефона за 15 секунд.</li>
+        <li>Первая строка — персональная. Просим опыт, не внимание к продукту.</li>
+        <li>Предлагаем не созвон, а переписку в удобном мессенджере (Telegram/WhatsApp) — короткими сообщениями, когда удобно. Так ниже барьер для ответа и проще общаться на разных языках.</li>
+        <li>Лёгкий выход: «если не вы — подскажите, к кому обратиться».</li>
+        <li>Отправка вт–чт утром; напоминание через 3 рабочих дня.</li>
+        <li>Плейсхолдеры: <code>{{Имя}}</code>, <code>{{Компания}}</code>, <code>{{Ваше имя}}</code>, <code>{{ваш мессенджер}}</code>.</li>
+      </ul>
+    </div>
+
+    <h2>1. Покупатель / исследователь <span class="pill p0">P0</span></h2>
+    <div class="email">
+      <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+      <p class="subject"><b>Тема:</b> <span>Пара вопросов: как вы выбираете поставщиков пептидов?</span></p>
+      <div class="body" data-subject="Пара вопросов: как вы выбираете поставщиков пептидов?">Здравствуйте, {{Имя}}!
+
+Меня зовут {{Ваше имя}}, я из PeptideTrust. Если в двух словах — мы собираем независимый реестр поставщиков пептидов и реагентов, где у каждого виден понятный рейтинг доверия. Не магазин и не реклама: смотрим на документы — COA, сертификаты, лицензии — и на то, не было ли проколов в прошлом.
+
+Знаю, как это обычно бывает: чтобы понять, можно ли доверять новому поставщику, приходится перерывать форумы и сверять бумаги — и всё равно есть шанс получить не то, сорвать сроки или запороть эксперимент. Хочется, чтобы это можно было проверить за минуту, а не за вечер.
+
+Сейчас как раз разбираемся, как исследователи и закупщики на самом деле выбирают поставщиков. Было бы здорово расспросить вас: как вы в последний раз искали поставщика и что проверяли перед заказом.
+
+Если откликается — давайте спишемся в удобном мессенджере (Telegram/WhatsApp): {{ваш мессенджер}}. Отвечать можно короткими сообщениями, когда удобно — никакого созвона.
+А если этим у вас занимается кто-то другой — подскажете, к кому лучше обратиться?
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+      <p class="subject"><b>Тема:</b> <span>Re: пара вопросов о выборе поставщиков</span></p>
+      <div class="body" data-subject="Re: пара вопросов о выборе поставщиков">Здравствуйте, {{Имя}}!
+
+Понимаю, что писем много. Поднимаю своё — нам правда ценен ваш опыт выбора поставщиков, даже если он «ничего особенного».
+
+Можно совсем без созвона — пара сообщений в мессенджере, когда будет минутка: {{ваш мессенджер}}. Если тема не ваша — просто ответьте «не я», и я не буду беспокоить.
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag after">Письмо 3 · после общения</span><span class="when">в тот же день</span></div>
+      <p class="subject"><b>Тема:</b> <span>Спасибо за ответы + ранний доступ</span></p>
+      <div class="body" data-subject="Спасибо за ответы + ранний доступ">{{Имя}}, спасибо, что нашли время ответить — особенно за историю про {{упомянутый случай}}.
+
+Мы готовим ранний доступ к реестру с проверенными профилями поставщиков. Хотите, включу вас в число первых тестировщиков — программа «Founding-50»? Это пожизненный founding-статус, имя в благодарностях проекта и право голоса по тому, что мы строим дальше. Заодно сможете первыми запросить профили нужных вам поставщиков.
+
+И ещё просьба: если среди ваших коллег есть те, кто тоже регулярно выбирает поставщиков, — буду благодарен за интро (хватит пары слов в мессенджере).
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+
+    <h2>2. RUO-вендор (витрина/бренд) <span class="pill p0">P0</span></h2>
+    <div class="email">
+      <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+      <p class="subject"><b>Тема:</b> <span>Черновик публичного профиля {{Компания}} — ваш отзыв до публикации</span></p>
+      <div class="body" data-subject="Черновик публичного профиля {{Компания}} — ваш отзыв до публикации">Здравствуйте, {{Имя}}!
+
+{{Ваше имя}}, команда PeptideTrust. Мы строим нейтральный публичный реестр доверия поставщиков пептидов (research-use-only) — не маркетплейс, без рекламных денег.
+
+Мы подготовили черновой профиль {{Компания}} на основе открытых данных и хотим показать его вам до публикации: услышать, что верно, что нет, и как вы доказываете качество покупателям.
+
+Удобнее всего спишемся в мессенджере (Telegram/WhatsApp): {{ваш мессенджер}} — скину черновик профиля прямо туда, и вы скажете, что поправить. Можно короткими сообщениями, без созвона.
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+      <p class="subject"><b>Тема:</b> <span>Re: профиль {{Компания}} в реестре</span></p>
+      <div class="body" data-subject="Re: профиль {{Компания}} в реестре">Здравствуйте, {{Имя}}!
+
+Возвращаюсь к черновому профилю {{Компания}}. Нам важно, чтобы данные были корректны, поэтому хотим дать вам слово до публикации.
+
+Достаточно пары сообщений в мессенджере, когда будет удобно: {{ваш мессенджер}}. Если ответственный за это — другой человек, подскажете контакт?
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag after">Письмо 3 · после общения</span><span class="when">в тот же день</span></div>
+      <p class="subject"><b>Тема:</b> <span>Как заявить профиль {{Компания}} и поднять Trust Score</span></p>
+      <div class="body" data-subject="Как заявить профиль {{Компания}} и поднять Trust Score">{{Имя}}, спасибо за правки по профилю.
+
+Как договорились: вы можете заявить профиль {{Компания}} и пройти верификацию (KYB) — это поднимает Trust Score и показывает покупателям, что данные подтверждены вами. Из документов понадобятся выписка из торгового реестра (регистрация компании), учредительные документы (устав), профильная лицензия или разрешение (если есть) и документ бенефициара (UBO). Качество продукции можно подтвердить отдельно — GMP-сертификатом и COA.
+
+Готовы запустить вас в пилоте верификации? Если да — пришлю короткую форму на 10 минут. Первые вендоры, кто пройдёт верификацию, входят в программу «Founding-50»: пожизненный founding-бейдж в профиле, закреплённые условия и право голоса по методологии — какие факторы учитываются в оценке.
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+
+    <h2>3. Лаборатория-оракул <span class="pill p1">P1</span></h2>
+    <div class="email">
+      <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+      <p class="subject"><b>Тема:</b> <span>Независимые тесты пептидов — условия партнёрства</span></p>
+      <div class="body" data-subject="Независимые тесты пептидов — условия партнёрства">Здравствуйте, {{Имя}}!
+
+{{Ваше имя}} из PeptideTrust. Мы строим нейтральный реестр доверия поставщиков пептидов, где независимые лабораторные верификации повышают оценку участников.
+
+Хотим понять, на каких условиях лаборатории вроде {{Компания}} готовы делиться результатами тестов и что для вас критично (цена, юр-защита, репутация).
+
+Удобнее всего спишемся в мессенджере (Telegram/WhatsApp): {{ваш мессенджер}} — можно короткими сообщениями, без созвона.
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+      <p class="subject"><b>Тема:</b> <span>Re: партнёрство по верификациям</span></p>
+      <div class="body" data-subject="Re: партнёрство по верификациям">Здравствуйте, {{Имя}}!
+
+Возвращаюсь к вопросу о партнёрстве. Для нас важно построить условия так, чтобы лаборатории видели в этом выгоду, а не нагрузку.
+
+Пара сообщений в мессенджере поможет это понять: {{ваш мессенджер}}. Если есть профильный человек — подскажете контакт?
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag after">Письмо 3 · после общения</span><span class="when">в тот же день</span></div>
+      <p class="subject"><b>Тема:</b> <span>Пилот по выгрузке верификаций</span></p>
+      <div class="body" data-subject="Пилот по выгрузке верификаций">{{Имя}}, спасибо за прозрачность по условиям.
+
+Предлагаю небольшой пилот без обязательств и без оплаты с чьей-либо стороны. Что в нём для вас: статус Verified Oracle в реестре, криптоподпись ваших COA (их нельзя подделать или выдать от вашего имени), поток заказов как доверенному источнику и защита репутации — если кто-то подменит образец после теста, это бьёт по вендору, а не по вашей лаборатории.
+
+Со стороны лаборатории — верификация по {{N}} образцам, чтобы обе стороны оценили процесс вживую. Как участник пилота вы входите в «Founding-50»: статус Founding Verified Oracle, имя в благодарностях и право голоса по роадмапу. Подготовить короткое соглашение о пилоте? И есть ли коллеги-лаборатории, кому это может быть интересно?
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+
+    <h2>4. GB-организатор (групповые закупки) <span class="pill p2">P2</span></h2>
+    <div class="email">
+      <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+      <p class="subject"><b>Тема:</b> <span>Как вы ведёте совместные закупки? Пара вопросов</span></p>
+      <div class="body" data-subject="Как вы ведёте совместные закупки? Пара вопросов">Здравствуйте, {{Имя}}!
+
+Меня зовут {{Ваше имя}}, я из PeptideTrust. Мы собираем независимый реестр доверия в нише пептидов — где репутацию участника видно по проверяемым данным, а не по словам.
+
+Вы организуете совместные закупки, а это держится на вашем личном слове перед участниками. Хочу понять, как это устроено на практике: как вы в последний раз вели закупку и как доказывали людям, что партия качественная, а распределение честное.
+
+Если откликается — спишемся в удобном мессенджере (Telegram/WhatsApp): {{ваш мессенджер}}. Можно короткими сообщениями, без созвона.
+А если такие закупки ведёт кто-то ещё из ваших знакомых — подскажете, к кому обратиться?
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+      <p class="subject"><b>Тема:</b> <span>Re: пара вопросов о совместных закупках</span></p>
+      <div class="body" data-subject="Re: пара вопросов о совместных закупках">Здравствуйте, {{Имя}}!
+
+Поднимаю своё письмо. Нам правда важен опыт тех, кто ведёт складчины руками — даже если кажется, что рассказывать особо нечего.
+
+Пара сообщений в мессенджере, когда будет минутка: {{ваш мессенджер}}. Если тема не ваша — просто ответьте «не я», и я не буду беспокоить.
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+    <div class="email">
+      <div class="email-head"><span class="tag after">Письмо 3 · после общения</span><span class="when">в тот же день</span></div>
+      <p class="subject"><b>Тема:</b> <span>Как подтвердить честность закупки без эскроу</span></p>
+      <div class="body" data-subject="Как подтвердить честность закупки без эскроу">{{Имя}}, спасибо, что нашли время ответить — особенно за историю про {{упомянутый случай}}.
+
+Похоже, вам это может быть полезно: в реестре организатор закупки может выступить «естественным оракулом» — отобрать образец из общей партии до распределения, и тогда независимый тест засчитывается с максимальным весом. А ваша честность и качество партий складываются в публичный репутационный Score — участникам видно, кому доверять, без всякого эскроу.
+
+Хотите попробовать на одной закупке? Зафиксируем её в реестре как пилот, без обязательств. Первые организаторы входят в «Founding-50»: пожизненный founding-бейдж организатора, закреплённые условия и право голоса по тому, что строим дальше. И если среди знакомых организаторов есть те, кому это близко, — буду благодарен за интро (хватит пары слов в мессенджере).
+
+Спасибо!
+{{Ваше имя}}</div>
+      <button class="copy">Копировать письмо</button>
+    </div>
+  </section>
+
+  <footer>
+    Источник: BA-аудит PeptideTrust · PRD/scope · The Mom Test. Материалы — для discovery и фиксации коммитмента, не являются офертой. Перед массовой рассылкой проверьте GDPR/e-Privacy (EU): идентификация отправителя + явный opt-out.
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var card = btn.closest('.email');
+      var bodyEl = card.querySelector('.body');
+      var subject = bodyEl.getAttribute('data-subject') || '';
+      var text = (subject ? 'Тема: ' + subject + '\n\n' : '') + bodyEl.innerText;
+      var done = function () {
+        btn.classList.add('done'); var old = btn.textContent; btn.textContent = 'Скопировано ✓';
+        setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fb(text, done); });
+      } else { fb(text, done); }
+    });
+  });
+  function fb(text, done) {
+    var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Risk Register</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;min-width:250px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.25rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.76rem}
+thead th{background:#1a1917;color:#eee;padding:6px 9px;text-align:left;font-weight:600;font-size:.67rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:6px 9px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917;font-family:ui-monospace,Menlo,monospace;font-size:.72rem}
+.sev{font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:6px;text-transform:uppercase;white-space:nowrap}
+.hi{background:#fbe9e9;color:#a5281f}.med{background:#fdf0e3;color:#b6651a}.low{background:#eef0fb;color:#3b4a8c}
+.cat{font-size:.6rem;font-weight:700;color:#8a8a82;text-transform:uppercase;letter-spacing:.04em}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Risk Register<span class="sb-sub">единый проектный</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор и шкала</a>
+<a class="nav-link" href="#strategic"><span class="nav-num">02</span>Стратегические</a>
+<a class="nav-link" href="#tech"><span class="nav-num">03</span>Технические</a>
+<a class="nav-link" href="#security"><span class="nav-num">04</span>Безопасность/доверие</a>
+<a class="nav-link" href="#legal"><span class="nav-num">05</span>Правовые/комплаенс</a>
+<a class="nav-link" href="#ops"><span class="nav-num">06</span>Операционные/команда</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Бэклог · Risk Register</div>
+<h1>Risk Register (единый проектный)</h1>
+<p class="sec-intro">Консолидация рисков из всех источников (7 внешних зависимостей Волны 4, реестр допущений PRD Foundations, риски Release Plan) в один реестр с владельцем и митигацией. Оценка = Вероятность × Влияние.</p>
+<table>
+<thead><tr><th>Уровень</th><th>Критерий</th></tr></thead>
+<tbody>
+<tr><td><span class="sev hi">High</span></td><td>Высокая вероятность и/или критическое влияние — нужен активный план</td></tr>
+<tr><td><span class="sev med">Med</span></td><td>Заметное влияние — мониторинг + готовый ответ</td></tr>
+<tr><td><span class="sev low">Low</span></td><td>Ограниченное влияние — принять/наблюдать</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="strategic">
+<div class="sec-badge">02 — Стратегические / продуктовые</div>
+<table>
+<thead><tr><th>ID</th><th>Риск</th><th>Уровень</th><th>Митигация</th><th>Владелец</th></tr></thead>
+<tbody>
+<tr><td>R-S1</td><td>Cold-start: нет данных → нет ценности → нет участников</td><td><span class="sev hi">High</span></td><td>Demand-first стратегия (Vision); seed-данные из публичных источников; Chain Pull; B2B как ранний спрос</td><td>PO</td></tr>
+<tr><td>R-S2</td><td>Слабое принятие ключевыми ролями (вендоры/оракулы)</td><td><span class="sev med">Med</span></td><td>Эксклюзивные выгоды по ролям (бейдж, верифицированный статус); анализ 22 ролей; пилоты</td><td>PO</td></tr>
+<tr><td>R-S3</td><td>Конкурент/статус-кво «достаточно хорош»</td><td><span class="sev med">Med</span></td><td>Позиционирование против альтернатив; ончейн-проверяемость как дифференциатор</td><td>PO</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="tech">
+<div class="sec-badge">03 — Технические</div>
+<table>
+<thead><tr><th>ID</th><th>Риск</th><th>Уровень</th><th>Митигация</th><th>Владелец</th></tr></thead>
+<tbody>
+<tr><td>R-T1</td><td>Калибровка алгоритма (v0.9) неверна → несправедливые Score</td><td><span class="sev hi">High</span></td><td>SME-валидация до v1.0; golden-датасеты; forward-only versioning; апелляции</td><td>Tech Lead/Комитет</td></tr>
+<tr><td>R-T2</td><td>ZK (E11) — исследовательский риск, сложность/сроки</td><td><span class="sev med">Med</span></td><td>Shielded assertion как MVP-fallback; ZK отложен в V2; spike до коммита</td><td>Tech Lead</td></tr>
+<tr><td>R-T3</td><td>Сбой внешней интеграции (KYB/L2/KMS) ломает поток</td><td><span class="sev med">Med</span></td><td>Read-путь изолирован; очереди+ретраи; fallback-провайдеры; <a href="../reports/ops-runbooks.html">Runbooks</a></td><td>Tech Lead</td></tr>
+<tr><td>R-T4</td><td>Производительность read-пути под нагрузкой</td><td><span class="sev med">Med</span></td><td>CDN+кэш; индексы; нагрузочное тестирование; NFR-цели</td><td>Backend</td></tr>
+<tr><td>R-T5</td><td>L2-сеть: рост газа/деградация</td><td><span class="sev low">Low</span></td><td>HashAnchor-абстракция (смена сети); Merkle-батчинг; Score валиден off-chain</td><td>Backend</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="security">
+<div class="sec-badge">04 — Безопасность и доверие</div>
+<table>
+<thead><tr><th>ID</th><th>Риск</th><th>Уровень</th><th>Митигация</th><th>Владелец</th></tr></thead>
+<tbody>
+<tr><td>R-X1</td><td>Гейминг системы (Sybil, сговор, накрутка)</td><td><span class="sev hi">High</span></td><td>PoP+KYB; граф-детектор колец; cap/штрафы пропагации; <a href="../reports/spec-security-test-cases.html">SEC-кейсы</a></td><td>Security</td></tr>
+<tr><td>R-X2</td><td>Компрометация ключа подписанта/оракула</td><td><span class="sev hi">High</span></td><td>KMS/HSM, офлайн-корень, CRL, ротация; Runbooks RB-07/08</td><td>Security</td></tr>
+<tr><td>R-X3</td><td>Атака репутацией (фейк-репорты на конкурента)</td><td><span class="sev med">Med</span></td><td>Reliability-of-initiator; буфер не аннулируется без подтверждения; панель</td><td>Security/Комитет</td></tr>
+<tr><td>R-X4</td><td>Утечка ПДн</td><td><span class="sev hi">High</span></td><td>Минимизация off-chain; shielded; шифрование; Runbook RB-09; DPO</td><td>DPO/Security</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="legal">
+<div class="sec-badge">05 — Правовые / комплаенс</div>
+<table>
+<thead><tr><th>ID</th><th>Риск</th><th>Уровень</th><th>Митигация</th><th>Владелец</th></tr></thead>
+<tbody>
+<tr><td>R-L1</td><td>Иски о диффамации / спорные негативные Score</td><td><span class="sev hi">High</span></td><td>ToS/defamation framework; right-of-reply; takedown; нейтральная подача фактов</td><td>DPO/Legal</td></tr>
+<tr><td>R-L2</td><td>Unclaimed-профили: правомерность пред-заполнения</td><td><span class="sev med">Med</span></td><td>Только нейтральные факты из легитимных источников; механизм возражения/удаления</td><td>DPO/Legal</td></tr>
+<tr><td>R-L3</td><td>Юрисдикционные ограничения (RUO, KYB-покрытие)</td><td><span class="sev med">Med</span></td><td>CH/EU+US база (Волна 0); KYB fallback; сегментация Verified-Legal</td><td>Legal</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="ops">
+<div class="sec-badge">06 — Операционные / команда</div>
+<table>
+<thead><tr><th>ID</th><th>Риск</th><th>Уровень</th><th>Митигация</th><th>Владелец</th></tr></thead>
+<tbody>
+<tr><td>R-O1</td><td>Финансирование независимых тестов — доминирующая статья расходов</td><td><span class="sev hi">High</span></td><td>Parametric unit economics; grants+B2B-выручка; приоритизация random-тестов</td><td>PO</td></tr>
+<tr><td>R-O2</td><td>Velocity не калибрована → сдвиг сроков</td><td><span class="sev med">Med</span></td><td>Provisional Release Plan; калибровка после S1–S2; буфер</td><td>PM</td></tr>
+<tr><td>R-O3</td><td>Недостаток найма (lean-hybrid)</td><td><span class="sev med">Med</span></td><td>Verified Curators (community) как первая линия; приоритизация MVP-scope</td><td>PO/PM</td></tr>
+<tr><td>R-O4</td><td>Зависимость от ключевых лиц (bus factor)</td><td><span class="sev med">Med</span></td><td>Документация (PRD-корпус); ADR; runbooks; кросс-ревью</td><td>Tech Lead</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Процесс</div><p>Реестр живой: ревью на ретро каждого спринта; новые риски из постмортемов (Runbooks) и грумминга. High-риски имеют активного владельца и план; каждый связан с конкретной митигацией в корпусе.</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

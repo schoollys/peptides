@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Product Requirements Document (Core)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:255px;min-width:255px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.76rem;padding:.4rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.64rem;min-width:24px}
+section{margin-bottom:3.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:2.1rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.12}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:840px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.6rem 0 .6rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+a{color:#b8731a;text-decoration:none;border-bottom:1px solid #e8cba0}
+a:hover{color:#7a3b12}
+.meta{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0;font-size:.8rem}
+.meta td:first-child{color:#666;font-weight:600;width:160px}
+.lead{font-size:1.05rem;color:#2a2925;line-height:1.7;margin-bottom:1.2rem;font-weight:500}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ref{display:inline-block;font-size:.72rem;background:#eef0fb;color:#3b4a8c;padding:2px 8px;border-radius:8px;margin:.2rem .3rem .2rem 0;border-bottom:none}
+.ref:hover{background:#dde1f5;color:#2a3670}
+.phase{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.7rem;font-weight:700}
+.p-mvp{background:#e7f3ec;color:#15673f}.p-v1{background:#eef0fb;color:#3b4a8c}.p-v2{background:#f7eef8;color:#7a3b7a}
+.docmap{background:#fff;border:1px solid #e4e2dc;border-radius:12px;padding:1rem 1.2rem;margin:1rem 0}
+.docmap-row{display:flex;gap:.7rem;padding:.45rem 0;border-bottom:1px solid #f0eee8;font-size:.82rem;align-items:baseline}
+.docmap-row:last-child{border-bottom:none}
+.docmap-row .k{min-width:170px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>PRD (Core)<span class="sb-sub">мастер-документ · v0.9 draft</span></div>
+<a class="nav-link" href="#summary"><span class="nav-num">00</span>Executive summary</a>
+<a class="nav-link" href="#problem"><span class="nav-num">01</span>Проблема и видение</a>
+<a class="nav-link" href="#goals"><span class="nav-num">02</span>Цели и метрики</a>
+<a class="nav-link" href="#audience"><span class="nav-num">03</span>Аудитория и персоны</a>
+<a class="nav-link" href="#scope"><span class="nav-num">04</span>Scope</a>
+<a class="nav-link" href="#func"><span class="nav-num">05</span>Функц. требования</a>
+<a class="nav-link" href="#algo"><span class="nav-num">06</span>Алгоритм доверия</a>
+<a class="nav-link" href="#identity"><span class="nav-num">07</span>Идентичность и ончейн</a>
+<a class="nav-link" href="#product"><span class="nav-num">08</span>Продукт и UX</a>
+<a class="nav-link" href="#rules"><span class="nav-num">09</span>Бизнес-правила</a>
+<a class="nav-link" href="#secops"><span class="nav-num">10</span>Безопасность и операции</a>
+<a class="nav-link" href="#econ"><span class="nav-num">11</span>Экономика и право</a>
+<a class="nav-link" href="#nfr"><span class="nav-num">12</span>NFR</a>
+<a class="nav-link" href="#roadmap"><span class="nav-num">13</span>Roadmap</a>
+<a class="nav-link" href="#assume"><span class="nav-num">14</span>Допущения и вопросы</a>
+<a class="nav-link" href="#docmap"><span class="nav-num">15</span>Карта документов</a>
+</nav>
+
+<main class="content">
+
+<section id="summary">
+<div class="sec-badge">Product Requirements Document — Core</div>
+<h1>PeptideTrust — PRD (мастер-документ)</h1>
+<table class="meta">
+<tbody>
+<tr><td>Название</td><td>PeptideTrust (рабочее, placeholder под ребрендинг)</td></tr>
+<tr><td>Тип документа</td><td>Core PRD — краткий читаемый верх + ссылки на детальные приложения</td></tr>
+<tr><td>Аудитория</td><td>Инженерный фокус (разработка), доступно для стейкхолдеров</td></tr>
+<tr><td>Язык</td><td>Русский</td></tr>
+<tr><td>Версия</td><td>v0.9 draft (параметры провизорные до SME-валидации → v1.0)</td></tr>
+<tr><td>Статус</td><td>Готов к ревью; P0-зависимости — блокеры продакшена, не MVP-демо</td></tr>
+</tbody>
+</table>
+<p class="lead">PeptideTrust — открытый, прозрачный, верифицируемый слой доверия для RUO-рынка пептидов. Не маркетплейс и не эскроу: агрегирует и независимо проверяет данные о качестве, логистике и поведении участников, выражая их в публичном Trust Score с доминирующим фактором. Цель — чтобы решения на рынке принимались на доказательствах, а не на слухах.</p>
+<div class="rec-box">
+<div class="rec-t">Как читать этот PRD</div>
+<p>Core-документ даёт связную картину «зачем, что, как». Глубина каждого раздела вынесена в приложения — ссылки помечены значком и собраны в <a href="#docmap">Карте документов</a> (§15). Открытые вопросы и провизорные числа — в <a href="#assume">Реестре допущений</a> (§14).</p>
+</div>
+</section>
+
+<section id="problem">
+<div class="sec-badge">01 — Проблема и видение</div>
+<h2>Дефицит доверия на RUO-рынке</h2>
+<p>Рынок research-use-only пептидов работает в условиях системного недоверия: информация о качестве разрознена и анонимна (Reddit, форумы), COA самопубликуются и подделываются, заявления нечем проверить, а добросовестные игроки не могут доказуемо отстроиться. Покупатель не отличает надёжного поставщика от опасного до сделки.</p>
+<p><strong>Видение:</strong> доверие как проверяемый публичный актив. Покупатель получает уверенность бесплатно; добросовестный поставщик — отстройку; верификатор (лаборатория, GB-организатор) — признание и поток.</p>
+<a class="ref" href="../reports/vision-concept.html">↗ Vision / Concept</a>
+<a class="ref" href="../artifacts/v2-peptide-trust-registry.html">↗ v2-реестр (концепция)</a>
+</section>
+
+<section id="goals">
+<div class="sec-badge">02 — Цели и метрики</div>
+<h2>North Star, OKR и KPI</h2>
+<p><strong>North Star:</strong> «проверенные решения» — число проверок Score перед сделкой (просмотры профиля + клики по бейджу с целью оценки). Прямой прокси доставленной ценности.</p>
+<table>
+<thead><tr><th>Фаза</th><th>Objective</th><th>Ключевые KPI</th></tr></thead>
+<tbody>
+<tr><td><span class="phase p-mvp">Bootstrap</span></td><td>Доказать ценность для спроса</td><td>Покрытие топ-N поставщиков; первые бейджи; рост проверок нед/нед</td></tr>
+<tr><td><span class="phase p-mvp">MVP</span></td><td>Запустить маховик доверия</td><td>North Star ↑; доля профилей с ≥1 независимым Vᵢ; активные податели данных</td></tr>
+<tr><td><span class="phase p-v1">Growth (V1)</span></td><td>Самоподдерживающийся рост</td><td>Доля рынка с подтверждёнными данными; виральность (Chain Pull); первая B2B-выручка</td></tr>
+<tr><td><span class="phase p-v2">Scale (V2)</span></td><td>Устойчивость и охват</td><td>Самоокупаемость (B2B покрывает burn); рост категорий; снижение CAC</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Числовые таргеты KPI — провизорные (см. §14).</p>
+<a class="ref" href="../reports/vision-concept.html">↗ Vision §06</a>
+<a class="ref" href="../reports/wave3-product-specs.html">↗ Волна 3 (метрики)</a>
+</section>
+
+<section id="audience">
+<div class="sec-badge">03 — Аудитория и персоны</div>
+<h2>22 роли, 3 макро-стороны, 5 ключевых персон</h2>
+<p>Полная таксономия — 22 роли в 11 категориях. Три макро-стороны: <strong>спрос</strong> (покупатели, сообщество, клиники, дистрибьюторы), <strong>предложение</strong> (заводы, вендоры, бренды, дропшипперы, аптеки), <strong>верификация/инфраструктура</strong> (независимые лаборатории-оракулы, GB-организаторы, аудиторы, кураторы, логистика).</p>
+<p>Детально проработаны 5 персон: покупатель (Алекс), вендор (Мария), лаборатория (Др. Лаб), GB-организатор (Глеб), клиника/prescriber — с болями, JTBD и ценностью.</p>
+<p><strong>Реализация MVP (код).</strong> Из полной таксономии MVP реализует срез из 7 ролей с <strong>5 якорными</strong> (полностью оцениваются): <strong>MANUFACTURER</strong> — завод-синтез / API-producer (upstream, B2B-источник качества, не buyer-facing); <strong>VENDOR</strong> — RUO-вендор, т.е. витрина/бренд, у которого покупают (не обязательно завод); <strong>LABORATORY</strong> — лаборатория-оракул; <strong>DISTRIBUTOR</strong> — GB-организатор; <strong>RETAILER</strong> — ритейлер/реселлер. RETAILER — тоже точка покупки, поэтому buyer-facing и якорный, но его доверие опирается на пока неверифицированный upstream-источник: тир ограничен потолком <strong>Gold</strong> с пометкой «источник не верифицирован» до запуска Vᵢ-пропагации (V1), которая позволит наследовать верифицированный субскор от связанного MANUFACTURER. Подробнее — ADR <code>docs/adr-role-taxonomy.md</code>.</p>
+<div class="rec-box">
+<div class="rec-t">Стратегия cold-start: спрос-first (pull)</div>
+<p>Бесплатный каталог + бейдж создают спрос покупателей → предложение вынуждено присоединяться (absence-as-red-flag), Chain Pull усиливает. Это определяет приоритет MVP: сначала read-инструменты ценности для спроса.</p>
+</div>
+<a class="ref" href="../reports/vision-concept.html">↗ Vision §02–03</a>
+<a class="ref" href="../artifacts/v2-peptide-trust-registry.html">↗ Таксономия 22 ролей (v2)</a>
+</section>
+
+<section id="scope">
+<div class="sec-badge">04 — Scope</div>
+<h2>Границы продукта</h2>
+<p><strong>Всегда в границах:</strong> открытый реестр и Score, агрегация+верификация данных, бейдж и read-API, идентичность/PKI/ончейн-якоря, апелляции/управление, B2B-продукты.</p>
+<p><strong>Всегда вне границ:</strong> маркетплейс/продажи, эскроу/платежи за сделки, медицинские рекомендации, гарантия качества товара, продажа влияния на Score.</p>
+<p>Разбивка по фазам (MVP/V1/V2), явные исключения с обоснованием и процесс изменения scope — в Scope Document.</p>
+<a class="ref" href="../reports/prd-scope-document.html">↗ Scope Document</a>
+</section>
+
+<section id="func">
+<div class="sec-badge">05 — Функциональные требования</div>
+<h2>Эпики и пользовательские истории</h2>
+<p>Функциональность описана 12 эпиками с историями и критериями приёмки (Given/When/Then), сгруппированными по фазам:</p>
+<table>
+<thead><tr><th>Фаза</th><th>Эпики</th></tr></thead>
+<tbody>
+<tr><td><span class="phase p-mvp">MVP</span></td><td>E1 Каталог/профиль · E2 Score+доминирующий фактор · E3 Бейдж/API · E4 Онбординг/идентичность · E5 Тесты/оракулы/ончейн</td></tr>
+<tr><td><span class="phase p-v1">V1</span></td><td>E6 Пропагация/алерты · E7 Chain Pull · E8 Апелляции/Steward · E9 B2B · E10 Lot-QR/custody</td></tr>
+<tr><td><span class="phase p-v2">V2</span></td><td>E11 ZK/приватность · E12 Аналитика/VaaS/охват</td></tr>
+</tbody>
+</table>
+<p>Каждая история имеет проверяемые AC, ссылающиеся на бизнес-правила (BR-*).</p>
+<a class="ref" href="../reports/prd-user-stories-acceptance.html">↗ User Stories &amp; Acceptance Criteria</a>
+</section>
+
+<section id="algo">
+<div class="sec-badge">06 — Алгоритм доверия</div>
+<h2>Trust Score: модель и факторы</h2>
+<p>Формула: <code>TS = Σ(Fᵢ·Wᵢ·Dᵢ·Vᵢ)·(1−Pₛ)</code>, где Fᵢ — качество по фактору (0–100, абсолютные банды), Wᵢ — вес роли (ΣWᵢ=1.0, матрица 22×9), Dᵢ — свежесть (4 класса decay), Vᵢ — верификация (с одношаговой пропагацией, λ_blind, потолком), Pₛ — штрафы (с потолками тиров).</p>
+<p>9 факторов: QEF, PCF, SCIF, TRF, FRF, CCF, CVF, CVF-B, RF. Score показывается с доминирующим фактором («82 — преимущественно качество»). Детальная нормализация всех факторов, матрица весов и worked example — в Волне 1.</p>
+<div class="warn">
+<div class="warn-t">Ключевые принципы</div>
+<p>Fᵢ (качество) отделён от надёжности источника (Vᵢ). Нет данных → Fᵢ=0. Доверие зарабатывается независимыми подтверждениями, не декларациями. Изменение параметров — forward-only по algo_version.</p>
+</div>
+<a class="ref" href="../reports/wave1-data-model-and-scoring.html">↗ Волна 1 (данные+скоринг)</a>
+<a class="ref" href="../reports/p1-algorithm-finalization.html">↗ P1 алгоритм (Dᵢ/пропагация/Vᵢ)</a>
+<a class="ref" href="../reports/prd-business-rules-edge-cases.html">↗ Бизнес-правила</a>
+</section>
+
+<section id="identity">
+<div class="sec-badge">07 — Идентичность и ончейн</div>
+<h2>KYB/KYC, PKI, блокчейн-якоря</h2>
+<p>Уровни идентичности L0–L3: L0 — PoP (телефон+device), L1 — KYC, L2 — KYB бизнес, L3 — лицензии. «Verified-but-shielded» псевдонимность; KYB через стороннего провайдера; fallback для непокрытых юрисдикций (L1 + вес blind-тестов + потолок). Оракулы аккредитуются через Root CA с ротацией/отзывом ключей (CRL).</p>
+<p>Целостность: хеши Score-событий, COA и custody анкорятся в Ethereum L2 (Base/Arbitrum) через абстракцию HashAnchor с Merkle-батчингом. ZK отложен (MVP — shielded assertion). Удаление — tombstone-модель. Хеши анонимны (соль, без идентификаторов).</p>
+<a class="ref" href="../reports/wave2-identity-verification-onchain.html">↗ Волна 2 (идентичность/ончейн)</a>
+<a class="ref" href="../reports/p1-legal-identity-economics.html">↗ P1 (PoP/KYB/custody/data-protection)</a>
+</section>
+
+<section id="product">
+<div class="sec-badge">08 — Продукт и UX</div>
+<h2>Онбординг, каталог, бейдж, API, UX-флоу</h2>
+<p>Первичная поверхность — публичное read-API + встраиваемый подписанный SVG/PNG бейдж. Онбординг — claim-profile + waitlist. Каталог сегментирован по ролям с доминирующим фактором и фильтрами (вкл. Verified-Legal). Write-эндпоинты — API-key + payload-подпись. UX задан wireframe-флоу (онбординг, каталог, профиль, подача данных, апелляции, встраивание бейджа).</p>
+<a class="ref" href="../reports/wave3-product-specs.html">↗ Волна 3 (продукт)</a>
+<a class="ref" href="../reports/wave4-ux-security-operations.html">↗ Волна 4 (UX)</a>
+<a class="ref" href="../reports/p2-appendices-edge-cases.html">↗ P2 (OpenAPI-контур, ER-модель, уведомления)</a>
+<a class="ref" href="../reports/design-information-architecture.html">↗ IA / Sitemap</a>
+<a class="ref" href="../reports/design-system.html">↗ UI Kit / Design System</a>
+</section>
+
+<section id="rules">
+<div class="sec-badge">09 — Бизнес-правила и edge cases</div>
+<h2>Справочник для реализации</h2>
+<p>~50 правил (BR-*) в 8 группах: Score/нормализация, Vᵢ/пропагация, Dᵢ-decay, Pₛ/демпфер, идентичность/статусы, custody/артефакты, lifecycle, лимиты/валидации. Плюс каталог из 17 edge cases с ожидаемым поведением (конфликт оракулов, циклы, cold start, тай-брейк, оффбординг с флагом, recall, sample-swap, отмена демпфера и др.).</p>
+<a class="ref" href="../reports/prd-business-rules-edge-cases.html">↗ Business Rules &amp; Edge Cases</a>
+</section>
+
+<section id="secops">
+<div class="sec-badge">10 — Безопасность и операции</div>
+<h2>Threat model, инфраструктура, операции</h2>
+<p>Threat model: STRIDE + 8 нишевых abuse-сценариев с контрмерами. Инфраструктура: хостинг EU/CH, ключи в KMS/HSM, anti-DDoS, privacy-by-design. Операции: lean-hybrid штат, реагирование на инциденты с публичным логом, стартовые SLA, responsible disclosure. Реестр рисков из 7 внешних зависимостей с митигацией.</p>
+<a class="ref" href="../reports/wave4-ux-security-operations.html">↗ Волна 4 (безопасность/операции)</a>
+<a class="ref" href="../reports/architecture-system-design.html">↗ SAD</a>
+<a class="ref" href="../reports/architecture-decision-records.html">↗ ADR</a>
+<a class="ref" href="../reports/architecture-integration-map.html">↗ Integration Map</a>
+<a class="ref" href="../reports/architecture-infra-devops.html">↗ Infra &amp; DevOps</a>
+<a class="ref" href="../reports/ops-runbooks.html">↗ Runbooks / On-call</a>
+<a class="ref" href="../reports/spec-security-test-cases.html">↗ Security Test Cases</a>
+<a class="ref" href="../reports/spec-db-physical-schema.html">↗ DB Schema</a>
+<a class="ref" href="../reports/spec-api-reference.html">↗ API Reference</a>
+<a class="ref" href="../reports/spec-tdd-sequence-statemachines.html">↗ TDD (sequence/state)</a>
+<a class="ref" href="../reports/spec-integration-contracts.html">↗ Integration Contracts</a>
+<a class="ref" href="../reports/spec-test-strategy.html">↗ Test Strategy</a>
+<a class="ref" href="../reports/architecture-erd-security.html">↗ ERD &amp; Security</a>
+</section>
+
+<section id="econ">
+<div class="sec-badge">11 — Экономика и право</div>
+<h2>Юнит-экономика, B2B, ToS/право</h2>
+<p><strong>Экономика:</strong> публичный Score всегда бесплатен; платит «решающий», не оцениваемый. Параметрическая модель издержек (KYB, gas, хостинг, независимые тесты) и burn/CAC/runway; независимые тесты — доминирующая статья. Финансирование: гранты + founder/angel на bootstrap, затем B2B-SKU (due-diligence, мониторинг-API, аналитика, VaaS).</p>
+<p><strong>Право:</strong> RUO-позиционирование; фреймворк ToS / политики клеветы / права на ответ (финал — за юристом CH/EU+US); data-protection режим (DPIA/SCC/ретеншен, удержание фрод-флагов на срок наказания).</p>
+<a class="ref" href="../reports/p0-closure.html">↗ P0 (экономика, ToS, версионирование, Unclaimed)</a>
+<a class="ref" href="../reports/wave0-foundational-decisions.html">↗ Волна 0 (оператор/право/финансирование)</a>
+</section>
+
+<section id="nfr">
+<div class="sec-badge">12 — Нефункциональные требования</div>
+<h2>NFR</h2>
+<p>Производительность (профиль p95&lt;300мс, бейдж&lt;150мс), доступность (read-путь 99.9%), масштабируемость (stateless read за CDN, очереди на пересчёт), безопасность (PKI, KMS/HSM, anti-DDoS), приватность (анонимные хеши, минимизация ПДн, DPIA), целостность (L2-якоря), наблюдаемость, a11y (WCAG 2.1 AA), совместимость (бейдж без JS), локализация (EN для MVP), SLA восстановления.</p>
+<a class="ref" href="../reports/prd-foundations-glossary-nfr-register.html">↗ PRD Foundations §02 (NFR)</a>
+</section>
+
+<section id="roadmap">
+<div class="sec-badge">13 — Roadmap</div>
+<h2>MVP → V1 → V2</h2>
+<table>
+<thead><tr><th>Фаза</th><th>Основное</th></tr></thead>
+<tbody>
+<tr><td><span class="phase p-mvp">MVP</span></td><td>Каталог/профиль/Score, бейдж+read-API, claim+KYB+Provisional, независимые тесты+оракулы+COA PKI, ончейн-якоря, Unclaimed</td></tr>
+<tr><td><span class="phase p-v1">V1</span></td><td>Trust-пропагация+алерты+демпфер, Chain Pull, апелляции+Steward, B2B (due-diligence+мониторинг), Lot-QR custody, анти-gaming, Affiliate/Curator/Verified-Legal</td></tr>
+<tr><td><span class="phase p-v2">V2</span></td><td>Полный ZK, аналитика-SKU+VaaS, расширение категорий/регионов+i18n, инфра-модуль процессингов</td></tr>
+</tbody>
+</table>
+<p>Переходы между фазами — по KPI exit-criteria, не по календарю.</p>
+<a class="ref" href="../reports/prd-scope-document.html">↗ Scope по фазам</a>
+</section>
+
+<section id="assume">
+<div class="sec-badge">14 — Допущения и открытые вопросы</div>
+<h2>To-be-confirmed (честный register)</h2>
+<p>Все провизорные параметры и внешние зависимости собраны в реестре с приоритетом и владельцем. Критичные (P0) — блокеры продакшена:</p>
+<table>
+<thead><tr><th>Вопрос</th><th>Приоритет</th><th>Владелец</th></tr></thead>
+<tbody>
+<tr><td>Числовые параметры алгоритма (банды, веса, N, сроки) — v0.9</td><td>P0</td><td>SME → v1.0</td></tr>
+<tr><td>Реальные числа юнит-экономики и финмодель тестов</td><td>P0</td><td>Финансы/основатели</td></tr>
+<tr><td>ToS / клевета / право на ответ — финал</td><td>P0</td><td>Юрист (CH/EU+US)</td></tr>
+<tr><td>DPIA, SCC, состав хешируемой нагрузки</td><td>P0</td><td>DPO</td></tr>
+<tr><td>Покрытие KYB по юрисдикциям, выбор провайдеров, аккредитация оракулов, KPI-таргеты</td><td>P1</td><td>Комплаенс/инженерия/продукт</td></tr>
+<tr><td>Название/бренд, прайс B2B, финальные RPO/RTO</td><td>P2</td><td>Продукт/инженерия/бизнес</td></tr>
+</tbody>
+</table>
+<p style="font-size:.8rem;color:#5a5955;margin-top:.6rem"><strong>Закрыто с момента v0.9:</strong> техстек финализирован (<a href="../reports/architecture-tech-stack.html">Tech Stack Map</a>, ADR-009/012–015); OpenAPI YAML создан (<a href="../api/openapi.yaml">openapi.yaml</a>); ER-схема и физическая модель готовы (<a href="../reports/architecture-erd-security.html">ERD &amp; Security</a>, <a href="../reports/spec-db-physical-schema.html">DB Schema</a>); RPO/RTO заданы провизорно в <a href="../reports/architecture-infra-devops.html">Infra &amp; DevOps</a> (финал — P2).</p>
+<a class="ref" href="../reports/prd-foundations-glossary-nfr-register.html">↗ PRD Foundations §03 (полный реестр)</a>
+<a class="ref" href="../reports/prd-completeness-audit.html">↗ Аудит полноты</a>
+</section>
+
+<section id="docmap">
+<div class="sec-badge">15 — Карта документов</div>
+<h2>Структура корпуса PRD</h2>
+<p class="sec-intro">Этот core-PRD — вершина пирамиды. Ниже — все приложения по слоям. Все провизорные (v0.9) до SME-валидации.</p>
+<div class="docmap">
+<div class="docmap-row"><span class="k">Стратегия</span><span><a href="../reports/vision-concept.html">Vision / Concept</a> — проблема, персоны, ценность, OKR, рынок, CJM, scope, roadmap</span></div>
+<div class="docmap-row"><span class="k">Концепция</span><span><a href="../artifacts/v2-peptide-trust-registry.html">v2-реестр</a> — концепция + таксономия 22 ролей</span></div>
+<div class="docmap-row"><span class="k">Основания</span><span><a href="../reports/wave0-foundational-decisions.html">Волна 0</a> — оператор, право, финансирование, KYB</span></div>
+<div class="docmap-row"><span class="k">Алгоритм</span><span><a href="../reports/wave1-data-model-and-scoring.html">Волна 1</a> · <a href="../reports/p1-algorithm-finalization.html">P1 алгоритм</a></span></div>
+<div class="docmap-row"><span class="k">Идентичность/ончейн</span><span><a href="../reports/wave2-identity-verification-onchain.html">Волна 2</a> · <a href="../reports/p1-legal-identity-economics.html">P1 право/идентичность/экономика</a></span></div>
+<div class="docmap-row"><span class="k">Продукт</span><span><a href="../reports/wave3-product-specs.html">Волна 3</a> · <a href="../reports/p2-appendices-edge-cases.html">P2 приложения/edge</a></span></div>
+<div class="docmap-row"><span class="k">UX/безопасность/опер.</span><span><a href="../reports/wave4-ux-security-operations.html">Волна 4</a></span></div>
+<div class="docmap-row"><span class="k">Закрытия</span><span><a href="../reports/p0-closure.html">P0</a> · <a href="../reports/prd-completeness-audit.html">Аудит полноты</a> · <a href="../reports/prd-readiness-gap-analysis.html">Gap-анализ</a></span></div>
+<div class="docmap-row"><span class="k">PRD-приложения</span><span><a href="../reports/prd-scope-document.html">Scope</a> · <a href="../reports/prd-user-stories-acceptance.html">User Stories/AC</a> · <a href="../reports/prd-business-rules-edge-cases.html">Business Rules/Edge</a> · <a href="../reports/prd-foundations-glossary-nfr-register.html">Foundations (глоссарий/NFR/реестр)</a></span></div>
+<div class="docmap-row"><span class="k">Архитектура</span><span><a href="../reports/architecture-system-design.html">SAD</a> · <a href="../reports/architecture-decision-records.html">ADR</a> · <a href="../reports/architecture-tech-stack.html">Tech Stack Map</a> · <a href="../reports/architecture-integration-map.html">Integration Map</a> · <a href="../reports/architecture-infra-devops.html">Infra &amp; DevOps</a> · <a href="../reports/architecture-erd-security.html">ERD &amp; Security</a></span></div>
+<div class="docmap-row"><span class="k">Дизайн</span><span><a href="../reports/design-information-architecture.html">IA / Sitemap</a> · <a href="../reports/design-system.html">UI Kit / Design System</a></span></div>
+<div class="docmap-row"><span class="k">Тех. спецификации</span><span><a href="../reports/spec-db-physical-schema.html">DB Schema</a> · <a href="../api/openapi.yaml">openapi.yaml</a> · <a href="../reports/spec-api-reference.html">API Reference</a> · <a href="../reports/spec-api-conventions-errors.html">API Conventions/Errors</a> · <a href="../reports/spec-tdd-sequence-statemachines.html">TDD (sequence/state)</a> · <a href="../reports/spec-integration-contracts.html">Integration Contracts</a> · <a href="../reports/spec-test-strategy.html">Test Strategy</a></span></div>
+<div class="docmap-row"><span class="k">Эксплуатация/безопасность</span><span><a href="../reports/ops-runbooks.html">Runbooks / On-call</a> · <a href="../reports/spec-security-test-cases.html">Security Test Cases</a></span></div>
+<div class="docmap-row"><span class="k">Качество и бэклог</span><span><a href="../reports/qa-test-plan.html">Test Plan + Cases↔AC + Traceability</a> · <a href="../reports/delivery-backlog-wbs.html">Backlog &amp; WBS</a> (<a href="../backlog/backlog.csv">CSV</a>) · <a href="../reports/delivery-release-plan.html">Release Plan</a> · <a href="../reports/delivery-governance.html">DoR/DoD + RACI</a> · <a href="../reports/delivery-risk-register.html">Risk Register</a> · <a href="../reports/qa-uat-acceptance.html">UAT / Acceptance</a></span></div>
+<div class="docmap-row"><span class="k">Алгоритм и параметры</span><span><a href="../reports/spec-algorithm.html">Algorithm Spec</a> · <a href="../reports/spec-config-parameters.html">Parameters Registry</a> · <a href="../reports/spec-analytics-taxonomy.html">Analytics Taxonomy</a></span></div>
+<div class="docmap-row"><span class="k">Разработка</span><span><a href="../reports/dev-onboarding-local.html">Dev Onboarding</a> · <a href="../reports/dev-coding-standards.html">Coding Standards</a> · <a href="../reports/spec-observability.html">Observability</a> · <a href="../reports/spec-module-tdds.html">Module TDDs</a> · <a href="../reports/spec-data-migration-seeding.html">Data Migration/Seeding</a></span></div>
+<div class="docmap-row"><span class="k">Дизайн (экраны)</span><span><a href="../reports/design-wireframes.html">Wireframes / Screen Specs</a></span></div>
+</div>
+<div class="rec-box">
+<div class="rec-t">Статус готовности</div>
+<p>Закрыты все P0/P1/P2, проработаны Волны 0–4, стратегия и сшивающие слои. PRD пригоден для старта инженерной проработки MVP. До продакшена нужно закрыть P0-зависимости (SME-числа, экономика, юрист, DPO) — они помечены в §14 и не блокируют MVP-демо/прототип.</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

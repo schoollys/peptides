@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Architecture Decision Records</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.74rem;padding:.38rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.45rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.62rem;min-width:48px}
+section{margin-bottom:2.6rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.6rem;color:#3a3935;font-size:.86rem}
+strong{color:#1a1917}
+ul{margin:.2rem 0 .7rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.25rem;line-height:1.55}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.adr{background:#fff;border:1px solid #e4e2dc;border-radius:12px;padding:1.1rem 1.3rem;margin:1.1rem 0}
+.adr-h{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.3rem;flex-wrap:wrap}
+.adr-id{font-size:.72rem;font-weight:800;color:#c06a1a;background:#fef3e8;padding:2px 9px;border-radius:8px;letter-spacing:.04em}
+.adr-title{font-size:1.0rem;font-weight:800;color:#0f0e0d}
+.status{font-size:.66rem;font-weight:700;padding:1px 8px;border-radius:8px;text-transform:uppercase;letter-spacing:.04em;background:#e7f3ec;color:#15673f}
+.lbl{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#5b78a8;margin:.6rem 0 .2rem}
+.lbl.r{color:#15673f}.lbl.c{color:#b8731a}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>ADR<span class="sb-sub">Architecture Decision Records</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">—</span>Формат</a>
+<a class="nav-link" href="#adr1"><span class="nav-num">001</span>Модульный монолит</a>
+<a class="nav-link" href="#adr2"><span class="nav-num">002</span>PostgreSQL</a>
+<a class="nav-link" href="#adr3"><span class="nav-num">003</span>Хостинг EU/CH</a>
+<a class="nav-link" href="#adr4"><span class="nav-num">004</span>L2 Base/Arbitrum</a>
+<a class="nav-link" href="#adr5"><span class="nav-num">005</span>Off-chain + хеши</a>
+<a class="nav-link" href="#adr6"><span class="nav-num">006</span>Серверный SVG-бейдж</a>
+<a class="nav-link" href="#adr7"><span class="nav-num">007</span>Сторонний KYB/KYC</a>
+<a class="nav-link" href="#adr8"><span class="nav-num">008</span>KMS/HSM для ключей</a>
+<a class="nav-link" href="#adr9"><span class="nav-num">009</span>TypeScript/Node</a>
+<a class="nav-link" href="#adr10"><span class="nav-num">010</span>Событийно+batch</a>
+<a class="nav-link" href="#adr11"><span class="nav-num">011</span>Shielded → ZK позже</a>
+<a class="nav-link" href="#adr12"><span class="nav-num">012</span>Frontend: Next.js</a>
+<a class="nav-link" href="#adr13"><span class="nav-num">013</span>Backend: NestJS/Fastify</a>
+<a class="nav-link" href="#adr14"><span class="nav-num">014</span>Worker: BullMQ</a>
+<a class="nav-link" href="#adr15"><span class="nav-num">015</span>Оркестрация+IaC</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Архитектурный трек · ADR</div>
+<h1>Architecture Decision Records</h1>
+<p class="sec-intro">Зачем зафиксированы ключевые технические решения с обоснованием и последствиями — чтобы через полгода команда не переписывала всё «потому что забыли почему». Формат каждой записи: Контекст → Решение → Обоснование → Последствия → Рассмотренные альтернативы. Все 15 решений зафиксированы (статус <strong>Accepted</strong>). Открытыми осознанно остаются лишь конкретные точки выбора — финальная L2-сеть (Base vs Arbitrum), провайдеры KYB и KMS/HSM, облачный провайдер, состав хешируемого payload и триггеры масштабирования — они помечены в разделах «Последствия» и привязаны к внешним данным/зависимостям (см. Integration Map, реестр §14 PRD).</p>
+</section>
+
+<section id="adr1">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-001</span><span class="adr-title">Модульный монолит first</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Lean-команда, MVP, транзакционный скоринг, неопределённый профиль нагрузки.</p>
+<div class="lbl r">Решение</div><p>Модульный монолит для MVP/V1; вне ядра только async-worker и signing-сервис.</p>
+<div class="lbl">Обоснование</div><ul><li>Минимум операционной сложности при lean-команде</li><li>ACID для скоринга в единой БД</li><li>Модульные границы = будущие швы для выделения сервисов</li></ul>
+<div class="lbl c">Последствия</div><p>Нужна дисциплина границ модулей (нет прямого доступа в чужие таблицы). Масштабирование частей — через реплики/воркеры до выделения сервисов.</p>
+<div class="lbl">Альтернативы</div><p>Микросервисы — отклонено (преждевременная сложность); единый немодульный монолит — отклонено (нет швов для эволюции).</p>
+</div>
+</section>
+
+<section id="adr2">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-002</span><span class="adr-title">PostgreSQL как первичное хранилище</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Реляционная модель (Participant↔ScoreEvent↔FactorInput↔Lot↔COA), потребность в ACID и сложных выборках для каталога/ранжирования.</p>
+<div class="lbl r">Решение</div><p>PostgreSQL — основная БД; Redis — кэш и очередь; Object Storage — блобы.</p>
+<div class="lbl">Обоснование</div><ul><li>Сильная реляционная модель и транзакции для скоринга</li><li>Зрелость, расширения (JSONB для гибких полей, full-text для поиска)</li><li>Простота при lean-эксплуатации</li></ul>
+<div class="lbl c">Последствия</div><p>Шардинг/партиционирование при росте (по диапазону id). Тяжёлую аналитику B2B — выносить в реплику/витрину.</p>
+<div class="lbl">Альтернативы</div><p>NoSQL (Mongo) — отклонено (нужны транзакции/связи); сразу OLAP — преждевременно.</p>
+</div>
+</section>
+
+<section id="adr3">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-003</span><span class="adr-title">Хостинг и data-residency в EU/CH</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Правовой режим CH/EU (Волна 0), GDPR, обработка KYB/ПДн.</p>
+<div class="lbl r">Решение</div><p>Прод-инфраструктура и хранение данных — в EU/CH регионах; провайдер с соответствием GDPR.</p>
+<div class="lbl">Обоснование</div><ul><li>Соответствие выбранному правовому режиму и DPIA</li><li>Минимизация трансграничной передачи ПДн (SCC только где неизбежно)</li></ul>
+<div class="lbl c">Последствия</div><p>Выбор провайдера ограничен регионом; US-аудитория обслуживается через CDN-edge, но первичные данные — EU/CH.</p>
+<div class="lbl">Альтернативы</div><p>US-хостинг — отклонено (расходится с правовым режимом и усложняет GDPR).</p>
+</div>
+</section>
+
+<section id="adr4">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-004</span><span class="adr-title">L2 Ethereum (Base/Arbitrum) через HashAnchor</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Нужна публичная неизменяемая фиксация целостности без хранения данных в цепи; стоимость газа важна.</p>
+<div class="lbl r">Решение</div><p>Анкоринг хешей в Ethereum L2 (Base/Arbitrum) через абстракцию <code>HashAnchor</code> с Merkle-батчингом.</p>
+<div class="lbl">Обоснование</div><ul><li>Низкая стоимость газа L2 vs L1; экосистема и надёжность Ethereum</li><li>Абстракция HashAnchor отвязывает от конкретной сети (смена L2 без переписывания)</li><li>Merkle-батчинг минимизирует число транзакций</li></ul>
+<div class="lbl c">Последствия</div><p>Зависимость от RPC-провайдера/нод L2 (см. Integration Map). Финальный выбор Base vs Arbitrum — за бенчмарком стоимости/латентности.</p>
+<div class="lbl">Альтернативы</div><p>L1 Ethereum — отклонено (дорого); приватный блокчейн — отклонено (нет публичной проверяемости); другие L1 — отклонено (меньше доверия/экосистемы).</p>
+</div>
+</section>
+
+<section id="adr5">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-005</span><span class="adr-title">Данные off-chain, в цепь — только анонимные хеши</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>GDPR/право на удаление несовместимо с записью ПДн в неизменяемую цепь.</p>
+<div class="lbl r">Решение</div><p>Все данные — off-chain (PostgreSQL/Storage); в L2 идут только <code>hash(payload‖salt)</code> без идентификаторов; удаление — tombstone.</p>
+<div class="lbl">Обоснование</div><ul><li>Совместимость с правом на удаление (off-chain удаляемо)</li><li>Анонимные хеши = не ПДн (соль, без идентификаторов) — подтверждает DPO</li><li>Целостность сохраняется (хеш сверяется)</li></ul>
+<div class="lbl c">Последствия</div><p>Состав каждого payload утверждается DPO на анонимность. Восстановление по хешу невозможно (by design).</p>
+<div class="lbl">Альтернативы</div><p>Полные данные on-chain — отклонено (нарушает GDPR, дорого).</p>
+</div>
+</section>
+
+<section id="adr6">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-006</span><span class="adr-title">Бейдж — серверный подписанный SVG/PNG</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Бейдж встраивается на любые сайты; нужна совместимость и защита от подделки значения.</p>
+<div class="lbl r">Решение</div><p>Server-rendered подписанное изображение через signed endpoint; не JS-виджет.</p>
+<div class="lbl">Обоснование</div><ul><li>Работает без JS на любой площадке (широкая совместимость)</li><li>Подпись эндпоинта = защита от подмены значения</li><li>Кэшируемо на CDN (производительность)</li></ul>
+<div class="lbl c">Последствия</div><p>Интерактивность ограничена (клик→профиль); «живость» — через TTL-кэш и пересчёт.</p>
+<div class="lbl">Альтернативы</div><p>JS-виджет — отклонено (блокируется, подделываем, тяжелее); статичная картинка без подписи — отклонено (подделка).</p>
+</div>
+</section>
+
+<section id="adr7">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-007</span><span class="adr-title">KYB/KYC через стороннего провайдера</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Верификация бизнеса/личности — регуляторно сложна и не является нашим ядром ценности.</p>
+<div class="lbl r">Решение</div><p>Интеграция стороннего KYB/KYC-провайдера; мы храним только статус/уровень, не сырьё (provider — процессор).</p>
+<div class="lbl">Обоснование</div><ul><li>Не изобретаем комплаенс-ядро; быстрее к рынку</li><li>Минимизация хранимых ПДн (privacy-by-design)</li></ul>
+<div class="lbl c">Последствия</div><p>Зависимость от покрытия провайдера по юрисдикциям → fallback-механика (BR-KYB-FALLBACK). Выбор провайдера — P1 (Integration Map).</p>
+<div class="lbl">Альтернативы</div><p>Собственный KYB — отклонено (дорого, не ядро, риск).</p>
+</div>
+</section>
+
+<section id="adr8">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-008</span><span class="adr-title">Ключи в KMS/HSM, выделенный signing-сервис</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Подпись бейджей, COA-верификация, anchoring — критичные крипто-операции; компрометация ключа = катастрофа доверия.</p>
+<div class="lbl r">Решение</div><p>Приватные ключи — только в KMS/HSM; доступ через изолированный signing-сервис; ротация и CRL.</p>
+<div class="lbl">Обоснование</div><ul><li>Ключи не покидают защищённый модуль</li><li>Изоляция сервиса ограничивает поверхность атаки</li><li>Поддержка ротации/отзыва (PKI-lifecycle)</li></ul>
+<div class="lbl c">Последствия</div><p>Доступ к подписи — узкое место с аудитом; провайдер KMS/HSM — зависимость (Integration Map).</p>
+<div class="lbl">Альтернативы</div><p>Ключи в приложении/файлах — отклонено (риск утечки).</p>
+</div>
+</section>
+
+<section id="adr9">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-009</span><span class="adr-title">TypeScript / Node для продукта</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Web-продукт, SSR, единый язык фронт+бэк, богатая экосистема для крипто/web3/SVG.</p>
+<div class="lbl r">Решение</div><p>TypeScript на Node (бэкенд + SSR); типобезопасность сквозь стек. Финализировано как стандарт стека.</p>
+<div class="lbl">Обоснование</div><ul><li>Единый язык фронт/бэк → меньше контекста для lean-команды</li><li>Сильные web3/crypto-библиотеки, SVG-рендеринг</li><li>Типобезопасность контрактов API</li></ul>
+<div class="lbl c">Последствия</div><p>CPU-тяжёлый скоринг — выносить в воркер; при необходимости — отдельный сервис на более «числовом» рантайме.</p>
+<div class="lbl">Альтернативы</div><p>Python (хорош для аналитики, но два языка), Go (быстрее, но меньше web3-экосистемы для full-stack lean). Отклонены в пользу единого TS-стека.</p>
+</div>
+</section>
+
+<section id="adr10">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-010</span><span class="adr-title">Гибрид: событийный пересчёт + суточный batch</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Алерты не должны опаздывать, но пересчёт decay для всех в реальном времени избыточен (BR-CADENCE).</p>
+<div class="lbl r">Решение</div><p>Критичные события (Pₛ-флаг, новый тест, отмена демпфера) — пересчёт сразу; decay/пропагация — batch раз в сутки.</p>
+<div class="lbl">Обоснование</div><ul><li>Оперативность защитных алертов + разумная стоимость инфраструктуры</li><li>Decay предсказуем, не требует реального времени</li></ul>
+<div class="lbl c">Последствия</div><p>Нужны очередь и идемпотентные воркеры; согласованность кэша после batch.</p>
+<div class="lbl">Альтернативы</div><p>Всё в реальном времени — отклонено (дорого); всё батчем — отклонено (алерты опаздывают).</p>
+</div>
+</section>
+
+<section id="adr11">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-011</span><span class="adr-title">MVP: shielded assertion, полный ZK — в V2</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Blind-раскрытие требует доказательства факта без раскрытия личности; полноценный ZK сложен и дорог в реализации.</p>
+<div class="lbl r">Решение</div><p>MVP/V1 — «shielded assertion» (реестр как доверенная третья сторона); полный ZK — V2.</p>
+<div class="lbl">Обоснование</div><ul><li>Быстрее к рынку без ZK-инженерии</li><li>Достаточный уровень приватности для старта при доверии к оператору</li><li>Чёткий путь апгрейда до ZK без смены семантики</li></ul>
+<div class="lbl c">Последствия</div><p>До V2 приватность опирается на доверие к оператору (гибридное управление, Волна 0). Миграция на ZK спланирована.</p>
+<div class="lbl">Альтернативы</div><p>Сразу полный ZK — отклонено (срок/стоимость); без приватности — отклонено (нужно посредникам).</p>
+</div>
+</section>
+
+<section id="adr12">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-012</span><span class="adr-title">Frontend — Next.js (React, SSR/RSC)</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Каталог и профили должны быть SEO-индексируемы и быстро отдаваться (read-path SLO); бейдж — отдельный серверный эндпоинт (ADR-006).</p>
+<div class="lbl r">Решение</div><p>Next.js (React) с SSR/RSC как фронтенд-фреймворк на Node/TypeScript.</p>
+<div class="lbl">Обоснование</div><ul><li>SSR/SEO «из коробки» для публичного каталога и профилей</li><li>Единый TS-стек (ADR-009), общие типы контрактов с бэкендом</li><li>Зрелая экосистема, кэш/ISR для read-тяжёлых страниц</li></ul>
+<div class="lbl c">Последствия</div><p>Граница между SSR-слоем Next и API NestJS должна быть чёткой; рендеринг бейджа — вне Next (выделенный signing-сервис, ADR-006/008).</p>
+<div class="lbl">Альтернативы</div><p>Remix (меньше распространён в команде), SPA без SSR — отклонено (SEO/латентность каталога).</p>
+</div>
+</section>
+
+<section id="adr13">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-013</span><span class="adr-title">Backend API — NestJS поверх Fastify</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Модульный монолит из 13 доменных модулей с чёткими границами (ADR-001); нужны DI, инкапсуляция модулей, единый формат ошибок/валидации.</p>
+<div class="lbl r">Решение</div><p>NestJS (DI, модули) с Fastify-адаптером в качестве HTTP-слоя.</p>
+<div class="lbl">Обоснование</div><ul><li>Модули NestJS ложатся 1:1 на доменные границы — главная страховка монолита</li><li>DI/провайдеры упрощают вынос модуля в сервис при эволюции</li><li>Fastify даёт производительность read-пути; единый pipeline валидации/ошибок (API Conventions)</li></ul>
+<div class="lbl c">Последствия</div><p>Дисциплина границ модулей контролируется линтером (Coding Standards); чистое скоринг-ядро остаётся фреймворк-независимым.</p>
+<div class="lbl">Альтернативы</div><p>Голый Fastify (легче, но без структуры под 13 модулей), Express (медленнее) — отклонены.</p>
+</div>
+</section>
+
+<section id="adr14">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-014</span><span class="adr-title">Асинхронные задачи — BullMQ на Redis</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>Гибрид «событие + суточный batch» (ADR-010): пересчёт Score, пропагация, anchoring, transactional outbox/вебхуки — нужны очереди и идемпотентные воркеры.</p>
+<div class="lbl r">Решение</div><p>BullMQ поверх уже имеющегося Redis (ADR-002) для очередей и планировщика.</p>
+<div class="lbl">Обоснование</div><ul><li>Не вводит новую инфраструктуру — Redis уже в стеке</li><li>Ретраи/backoff/повторяемые задания «из коробки» (anchoring, вебхуки)</li><li>Идемпотентность через job-id и transactional outbox</li></ul>
+<div class="lbl c">Последствия</div><p>Redis становится критичным для воркеров — нужны HA и мониторинг глубины очереди (Observability).</p>
+<div class="lbl">Альтернативы</div><p>Выделенный брокер (RabbitMQ/Kafka) — избыточен для MVP-нагрузки; managed-очередь облака — лок-ин, отложено.</p>
+</div>
+</section>
+
+<section id="adr15">
+<div class="adr">
+<div class="adr-h"><span class="adr-id">ADR-015</span><span class="adr-title">Оркестрация — managed-контейнеры (k8s-ready), IaC — Terraform</span><span class="status">Accepted</span></div>
+<div class="lbl">Контекст</div><p>EU/CH-хостинг (ADR-003), lean-команда, потребность в воспроизводимой инфраструктуре без преждевременной сложности.</p>
+<div class="lbl r">Решение</div><p>Старт на управляемом контейнер-сервисе (Docker-образы), архитектурно k8s-ready; вся инфраструктура — через Terraform.</p>
+<div class="lbl">Обоснование</div><ul><li>Минимум операционной нагрузки на старте, путь миграции в k8s по росту</li><li>Terraform: версионируемые сеть/БД/кэш/storage/секреты (Infra &amp; DevOps)</li><li>Контейнеризация даёт паритет dev/stage/prod</li></ul>
+<div class="lbl c">Последствия</div><p>Двенадцатифакторное приложение; конфиг — из окружения/секрет-менеджера, не в образе.</p>
+<div class="lbl">Альтернативы</div><p>Сразу self-managed k8s — отклонено (оверхед для MVP); чистый PaaS без IaC — отклонено (воспроизводимость/аудит).</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

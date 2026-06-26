@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Физическая схема БД</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.2rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.3rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.77rem}
+thead th{background:#1a1917;color:#eee;padding:6px 9px;text-align:left;font-weight:600;font-size:.69rem;text-transform:uppercase;letter-spacing:.03em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:6px 9px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917;font-family:ui-monospace,Menlo,monospace;font-size:.74rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+pre{background:#0f0e0d;border-radius:10px;padding:1rem 1.1rem;margin:1rem 0;overflow-x:auto;font-family:ui-monospace,Menlo,monospace;font-size:.74rem;color:#cfcfc7;line-height:1.5}
+pre .k{color:#e8935a}.pre .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+.file{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:.78rem;background:#1a1917;color:#e8935a;padding:.4rem .8rem;border-radius:8px;border-bottom:none}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Физическая схема БД<span class="sb-sub">PostgreSQL · DDL · индексы</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#tables"><span class="nav-num">02</span>Таблицы и поля</a>
+<a class="nav-link" href="#enums"><span class="nav-num">03</span>Перечисления</a>
+<a class="nav-link" href="#index"><span class="nav-num">04</span>Индексы</a>
+<a class="nav-link" href="#invariants"><span class="nav-num">05</span>Инварианты</a>
+<a class="nav-link" href="#migrations"><span class="nav-num">06</span>Миграции</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Технические спецификации · Физическая схема БД</div>
+<h1>Физическая схема БД</h1>
+<p class="sec-intro">PostgreSQL 15+. Реализация логической ERD (<a href="../reports/architecture-erd-security.html">ERD &amp; Security</a>) в физические таблицы с типами, ограничениями и индексами. Рабочий DDL — отдельным файлом.</p>
+<a class="file" href="../db/schema.sql">📄 db/schema.sql — рабочий DDL</a>
+<div class="rec-box" style="margin-top:1rem">
+<div class="rec-t">Принципы схемы</div>
+<p>Off-chain хранение (в L2 — только хеши, ADR-005); ПДн минимизированы (KYB-сырьё у провайдера, ADR-007); <code>algo_version</code> — forward-only; tombstone сохраняет публичную историю при очистке ПДн.</p>
+</div>
+</section>
+
+<section id="tables">
+<div class="sec-badge">02 — Таблицы и поля</div>
+<table>
+<thead><tr><th>Таблица</th><th>Назначение</th><th>Ключевые поля</th></tr></thead>
+<tbody>
+<tr><td>participants</td><td>Любой участник</td><td>status, kyb_level, role_code, jurisdiction, trust_ceiling, current_algo_version</td></tr>
+<tr><td>roles</td><td>22 роли / 11 категорий</td><td>code PK, category, has_full_ts</td></tr>
+<tr><td>identity_verifications</td><td>Статусы KYB/KYC (не сырьё)</td><td>level, provider_ref, pop_method, expires_at</td></tr>
+<tr><td>algo_versions</td><td>Версии параметров</td><td>version PK, is_current</td></tr>
+<tr><td>role_factor_weights</td><td>Матрица весов 22×9 по версии</td><td>(algo_version, role_code, factor) PK, weight</td></tr>
+<tr><td>sources</td><td>Источники/оракулы</td><td>type, independence_flag, pubkey, status</td></tr>
+<tr><td>factor_inputs</td><td>Входы по факторам</td><td>factor, value(Fᵢ), di_class, vi, source_id, observed_at</td></tr>
+<tr><td>score_events</td><td>Снимки Score (анкорятся)</td><td>score, dominant_factor, algo_version, inputs_hash, anchor_hash, anchor_status</td></tr>
+<tr><td>penalty_flags</td><td>Штрафы Pₛ</td><td>type, severity, pk, status, expires_at</td></tr>
+<tr><td>counterparty_links</td><td>Связи для пропагации Vᵢ</td><td>from_id, to_id, lot_share, blind_flag, lambda</td></tr>
+<tr><td>lots / custody_records / coas</td><td>Партии, custody, сертификаты</td><td>lot_qr_key, steps(JSONB), complete, signed_payload, media_hash</td></tr>
+<tr><td>appeals / stewards / governance_log</td><td>Апелляции, панели, аудит</td><td>panel(JSONB), chair_oracle_id, term_start/end, anchor_hash</td></tr>
+<tr><td>b2b_subscriptions</td><td>B2B (V1)</td><td>sku, target_id, webhook_url, api_key_hash</td></tr>
+<tr><td>event_outbox</td><td>Событийная доставка</td><td>event_type, status, attempts, next_retry_at</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="enums">
+<div class="sec-badge">03 — Перечисления</div>
+<table>
+<thead><tr><th>Enum</th><th>Значения</th></tr></thead>
+<tbody>
+<tr><td>participant_status</td><td>unclaimed, provisional, active, suspended, tombstone</td></tr>
+<tr><td>kyb_level</td><td>L0, L1, L2, L3</td></tr>
+<tr><td>factor_code</td><td>QEF, PCF, SCIF, TRF, FRF, CCF, CVF, CVF_B, RF</td></tr>
+<tr><td>decay_class</td><td>A, B, C, D (T½ 365/120/45/90 дней)</td></tr>
+<tr><td>penalty_severity</td><td>INFO, WARNING, CRITICAL</td></tr>
+<tr><td>penalty_status</td><td>open, upheld, dismissed, expired</td></tr>
+<tr><td>source_type</td><td>buyer, gb_organizer, auditor, lab, self, community</td></tr>
+<tr><td>lot_status</td><td>active, recalled</td></tr>
+<tr><td>appeal_status</td><td>submitted, panel_forming, in_review, decided, withdrawn</td></tr>
+<tr><td>anchor_status</td><td>pending, anchored, failed</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Перечисления провизорны (v0.9) и могут расширяться через миграции (forward-only).</p>
+</section>
+
+<section id="index">
+<div class="sec-badge">04 — Индексы (производительность read-пути)</div>
+<table>
+<thead><tr><th>Индекс</th><th>Зачем</th></tr></thead>
+<tbody>
+<tr><td>idx_participants_name_trgm (GIN trgm)</td><td>Fuzzy-поиск по каталогу</td></tr>
+<tr><td>idx_participants_role / _status / _domain</td><td>Фильтры каталога и поиск по домену/бейджу</td></tr>
+<tr><td>idx_se_participant (DESC)</td><td>Последний/история Score быстро</td></tr>
+<tr><td>idx_se_anchor (partial)</td><td>Очередь незаанкоренных событий</td></tr>
+<tr><td>idx_fi_participant_factor</td><td>Пересчёт по факторам участника</td></tr>
+<tr><td>idx_pf_participant (partial open)</td><td>Активные штрафы</td></tr>
+<tr><td>idx_cl_from / _to</td><td>Обход графа пропагации</td></tr>
+<tr><td>idx_coa_media_hash (unique partial)</td><td>Анти-reuse артефактов (BR-ARTIFACT-REUSE)</td></tr>
+<tr><td>idx_outbox_pending (partial)</td><td>Доставка событий воркером</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="invariants">
+<div class="sec-badge">05 — Инварианты и ограничения</div>
+<ul style="margin-left:1.1rem">
+<li><code>SUM(weight)</code> по <code>(algo_version, role_code)</code> = 1.000 — проверяется приложением/тестом (BR-SCORE-2).</li>
+<li><code>value</code> (Fᵢ) ∈ [0,100]; <code>vi</code>, <code>pk</code>, <code>lambda</code> ∈ [0,1] — CHECK-ограничения.</li>
+<li><code>counterparty_links</code>: <code>from_id ≠ to_id</code>, уникальность пары; циклы исключаются логикой пропагации (BR-PROP-CYCLE).</li>
+<li>Анти-reuse: уникальный <code>media_hash</code> на COA.</li>
+<li><code>score_events.algo_version</code> неизменна после записи — forward-only (BR-VERSION).</li>
+</ul>
+</section>
+
+<section id="migrations">
+<div class="sec-badge">06 — Стратегия миграций</div>
+<ul style="margin-left:1.1rem">
+<li><strong>Forward-only, обратносовместимые:</strong> добавление колонок/таблиц до удаления старых (expand → contract), чтобы откат кода не ломал данные.</li>
+<li><strong>Версионируемые</strong> миграции в репозитории; применяются автоматически на staging, с approve на prod (Infra &amp; DevOps §04).</li>
+<li><strong>Изменение параметров скоринга</strong> → новая запись в <code>algo_versions</code> + новые <code>role_factor_weights</code>; исторические <code>score_events</code> остаются под своей версией.</li>
+<li><strong>Tombstone</strong> (оффбординг): <code>status='tombstone'</code> + очистка ПДн; публичная история (score_events, penalty_flags) сохраняется (BR-OFFBOARD/RETENTION).</li>
+<li><strong>Партиционирование</strong> <code>score_events</code>/<code>factor_inputs</code> по времени при росте; шардинг по диапазону id (ADR-002).</li>
+</ul>
+</section>
+
+</main>
+</div>
+</body>
+</html>

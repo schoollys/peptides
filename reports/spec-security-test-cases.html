@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Security Test Cases</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:255px;min-width:255px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.sb-grp{color:#5a5955;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.8rem 1.1rem .25rem}
+.nav-link{color:#999;font-size:.76rem;padding:.4rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:24px}
+section{margin-bottom:2.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.2rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.tc{background:#fff;border:1px solid #e4e2dc;border-radius:11px;padding:.9rem 1.2rem;margin:.8rem 0}
+.tc-h{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.45rem}
+.tc-id{font-family:ui-monospace,Menlo,monospace;font-size:.72rem;font-weight:800;color:#b8731a}
+.tc-t{font-size:.95rem;font-weight:700;color:#1a1917}
+.maps{font-size:.62rem;font-weight:700;padding:1px 7px;border-radius:6px;background:#eef0fb;color:#3b4a8c;text-transform:uppercase;letter-spacing:.03em}
+.gwt{font-size:.83rem;color:#3a3935;margin:.12rem 0;padding-left:4.4rem;text-indent:-4.4rem}
+.gwt b{display:inline-block;width:4rem;color:#15673f;font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.gwt.w b{color:#b6651a}.gwt.t b{color:#3b4a8c}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Security Test Cases<span class="sb-sub">threat model → кейсы</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">00</span>Обзор и матрица</a>
+<div class="sb-grp">STRIDE</div>
+<a class="nav-link" href="#spoof"><span class="nav-num">S</span>Spoofing</a>
+<a class="nav-link" href="#tamper"><span class="nav-num">T</span>Tampering</a>
+<a class="nav-link" href="#repud"><span class="nav-num">R</span>Repudiation</a>
+<a class="nav-link" href="#disclose"><span class="nav-num">I</span>Info disclosure</a>
+<a class="nav-link" href="#dos"><span class="nav-num">D</span>Denial of service</a>
+<a class="nav-link" href="#eop"><span class="nav-num">E</span>Elev. of privilege</a>
+<div class="sb-grp">Нишевые abuse</div>
+<a class="nav-link" href="#sybil"><span class="nav-num">A1</span>Sybil</a>
+<a class="nav-link" href="#collusion"><span class="nav-num">A2</span>Сговор/кольца</a>
+<a class="nav-link" href="#swap"><span class="nav-num">A3</span>Sample-swap</a>
+<a class="nav-link" href="#oraclekey"><span class="nav-num">A4</span>Ключ оракула</a>
+<a class="nav-link" href="#reuse"><span class="nav-num">A5</span>Реюз артефактов</a>
+<a class="nav-link" href="#repattack"><span class="nav-num">A6</span>Атака репутацией</a>
+<a class="nav-link" href="#erase"><span class="nav-num">A7</span>Стирание истории</a>
+<a class="nav-link" href="#badge"><span class="nav-num">A8</span>Подделка бейджа</a>
+<div class="sb-grp">Кросс</div>
+<a class="nav-link" href="#authz"><span class="nav-num">X1–2</span>AuthZ / replay</a>
+<a class="nav-link" href="#exec"><span class="nav-num">01</span>Исполнение</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Технические спецификации · Security Test Cases</div>
+<h1>Security Test Cases</h1>
+<p class="sec-intro">Конкретные тест-кейсы (Given/When/Then), выведенные из <a href="../reports/wave4-ux-security-operations.html">threat model</a> (STRIDE + 8 нишевых abuse-сценариев) и PKI/AuthZ/privacy. Питают раздел Security <a href="../reports/spec-test-strategy.html">Test Strategy</a>; каждая угроза имеет ≥1 кейс.</p>
+<table>
+<thead><tr><th>Группа</th><th>Кейсы</th><th>Контрмера (источник)</th></tr></thead>
+<tbody>
+<tr><td>STRIDE (6)</td><td>SEC-S/T/R/I/D/E</td><td>Волна 4 §02; PKI Волна 2</td></tr>
+<tr><td>Abuse (8)</td><td>SEC-A1…A8</td><td>Волна 4 §02 нишевые; BR-*</td></tr>
+<tr><td>Кросс</td><td>SEC-X1, SEC-X2 (AuthZ, replay)</td><td>ERD &amp; Security (матрица); anti-replay</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="spoof">
+<div class="sec-badge">Spoofing</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-S1</span><span class="tc-t">Поддельная подпись на write</span><span class="maps">Spoofing</span></div>
+<p class="gwt"><b>Given</b> валидный payload и подделанный/чужой <code>X-Signature</code></p>
+<p class="gwt w"><b>When</b> POST /submissions</p>
+<p class="gwt t"><b>Then</b> 401 <code>BAD_SIGNATURE</code>; запись не создана; событие в аудит-лог</p>
+</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-S2</span><span class="tc-t">COA от неаккредитованного «оракула»</span><span class="maps">Spoofing</span></div>
+<p class="gwt"><b>Given</b> COA, подписанный ключом без записи в Oracle-PKI</p>
+<p class="gwt w"><b>When</b> подача kind=coa</p>
+<p class="gwt t"><b>Then</b> отклонение; вклад не засчитан; сертификат не в доверенной цепочке</p>
+</div>
+</section>
+
+<section id="tamper">
+<div class="sec-badge">Tampering</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-T1</span><span class="tc-t">Подмена Score задним числом</span><span class="maps">Tampering</span></div>
+<p class="gwt"><b>Given</b> заанкоренное событие Score с <code>anchor_hash</code></p>
+<p class="gwt w"><b>When</b> попытка изменить score-событие в БД и пересобрать</p>
+<p class="gwt t"><b>Then</b> <code>/verify/{hash}</code> не сходится с L2; расхождение детектируется</p>
+</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-T2</span><span class="tc-t">Подмена тела бейджа</span><span class="maps">Tampering</span></div>
+<p class="gwt"><b>Given</b> подписанный SVG-бейдж</p>
+<p class="gwt w"><b>When</b> изменение числа Score в SVG на стороне сайта</p>
+<p class="gwt t"><b>Then</b> подпись невалидна; клик ведёт на профиль с ончейн-проверкой (расхождение видно)</p>
+</div>
+</section>
+
+<section id="repud">
+<div class="sec-badge">Repudiation</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-R1</span><span class="tc-t">Отрицание факта подачи</span><span class="maps">Repudiation</span></div>
+<p class="gwt"><b>Given</b> участник подал подписанные данные с таймстампом</p>
+<p class="gwt w"><b>When</b> участник отрицает подачу</p>
+<p class="gwt t"><b>Then</b> аудит-лог + подпись + ончейн-якорь времени доказывают факт и момент</p>
+</div>
+</section>
+
+<section id="disclose">
+<div class="sec-badge">Information disclosure</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-I1</span><span class="tc-t">Утечка shielded-идентичности через API</span><span class="maps">Info disclosure</span></div>
+<p class="gwt"><b>Given</b> участник в режиме Verified-but-shielded</p>
+<p class="gwt w"><b>When</b> запрос профиля/каталога/бейджа любым клиентом</p>
+<p class="gwt t"><b>Then</b> real_identity и ПДн отсутствуют в ответе, логах и метаданных SVG</p>
+</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-I2</span><span class="tc-t">ПДн в логах/ошибках</span><span class="maps">Info disclosure</span></div>
+<p class="gwt"><b>Given</b> ошибка валидации с пользовательскими данными</p>
+<p class="gwt w"><b>When</b> формируется ответ ошибки и лог</p>
+<p class="gwt t"><b>Then</b> ПДн маскированы; в ответе только <code>code/message/request_id</code></p>
+</div>
+</section>
+
+<section id="dos">
+<div class="sec-badge">Denial of service</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-D1</span><span class="tc-t">Флуд на read/бейдж</span><span class="maps">DoS</span></div>
+<p class="gwt"><b>Given</b> всплеск запросов с источника сверх лимита</p>
+<p class="gwt w"><b>When</b> массовые GET /badge и /participants</p>
+<p class="gwt t"><b>Then</b> CDN/кэш поглощает; rate-limit → 429 + Retry-After; ядро не деградирует</p>
+</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-D2</span><span class="tc-t">Спам апелляциями/репортами</span><span class="maps">DoS</span></div>
+<p class="gwt"><b>Given</b> участник с низкой reliability-of-initiator</p>
+<p class="gwt w"><b>When</b> массовая подача репортов/апелляций</p>
+<p class="gwt t"><b>Then</b> троттлинг по reliability; нет влияния на Score целей без подтверждения</p>
+</div>
+</section>
+
+<section id="eop">
+<div class="sec-badge">Elevation of privilege</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-E1</span><span class="tc-t">Несанкционированное изменение весов</span><span class="maps">EoP</span></div>
+<p class="gwt"><b>Given</b> аккаунт без прав комитета</p>
+<p class="gwt w"><b>When</b> попытка изменить <code>role_factor_weights</code>/algo_version</p>
+<p class="gwt t"><b>Then</b> отказ; изменение возможно только через supermajority комитета + запись в changelog</p>
+</div>
+</section>
+
+<!-- ABUSE -->
+<section id="sybil">
+<div class="sec-badge">Abuse · Sybil</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A1</span><span class="tc-t">Массовые фейковые аккаунты/отзывы</span><span class="maps">Sybil</span></div>
+<p class="gwt"><b>Given</b> попытка создать множество L0 с одного устройства/номера</p>
+<p class="gwt w"><b>When</b> регистрация + безартефактные отзывы</p>
+<p class="gwt t"><b>Then</b> PoP (phone+device) блокирует дубли; безартефактный отзыв вес 0.45; нет KYB → trust ceiling</p>
+</div>
+</section>
+
+<section id="collusion">
+<div class="sec-badge">Abuse · Сговор</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A2</span><span class="tc-t">Кольцо взаимной накрутки Vᵢ</span><span class="maps">Collusion</span></div>
+<p class="gwt"><b>Given</b> группа аффилированных участников, ссылающихся друг на друга</p>
+<p class="gwt w"><b>When</b> взаимные подтверждения/пропагация по циклу</p>
+<p class="gwt t"><b>Then</b> CYCLE_DETECTED — пропагация запрещена; граф-детектор помечает кластер; концентрация top_share&gt;0.6 штрафуется</p>
+</div>
+</section>
+
+<section id="swap">
+<div class="sec-badge">Abuse · Sample-swap</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A3</span><span class="tc-t">Чистый образец на тест, разбавленный в продажу</span><span class="maps">Sample-swap</span></div>
+<p class="gwt"><b>Given</b> вендор сам предоставляет образец на тест (self-sampling)</p>
+<p class="gwt w"><b>When</b> подаётся COA с высоким Fᵢ</p>
+<p class="gwt t"><b>Then</b> Vᵢ&lt;1.0 (не независимый сэмплинг); при выявлении подмены — Pₛ-удар вендору, не оракулу</p>
+</div>
+</section>
+
+<section id="oraclekey">
+<div class="sec-badge">Abuse · Компрометация ключа оракула</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A4</span><span class="tc-t">Подписи после компрометации</span><span class="maps">Key compromise</span></div>
+<p class="gwt"><b>Given</b> сертификат оракула отозван (CRL) с датой компрометации</p>
+<p class="gwt w"><b>When</b> проверяются подписи до и после этой даты</p>
+<p class="gwt t"><b>Then</b> подписи ДО — валидны; ПОСЛЕ — отклонены; вклад снят, пересчёт (см. RB-07)</p>
+</div>
+</section>
+
+<section id="reuse">
+<div class="sec-badge">Abuse · Реюз артефактов</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A5</span><span class="tc-t">Повторная подача того же медиа</span><span class="maps">Artifact reuse</span></div>
+<p class="gwt"><b>Given</b> медиа-артефакт, уже использованный (media_hash/pHash известен)</p>
+<p class="gwt w"><b>When</b> повторная подача (тот же или дубликат-изображение)</p>
+<p class="gwt t"><b>Then</b> ARTIFACT_REUSE — отклонение; nonce-челлендж/EXIF-проверка; нет повторного вклада</p>
+</div>
+</section>
+
+<section id="repattack">
+<div class="sec-badge">Abuse · Атака репутацией</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A6</span><span class="tc-t">Фейк-репорты, чтобы «утопить» конкурента</span><span class="maps">Reputation attack</span></div>
+<p class="gwt"><b>Given</b> поток неподтверждённых негативных репортов на участника</p>
+<p class="gwt w"><b>When</b> репорты обрабатываются</p>
+<p class="gwt t"><b>Then</b> буфер демпфера НЕ аннулируется без подтверждения; reliability-of-initiator снижает вес; спорное → Steward-панель</p>
+</div>
+</section>
+
+<section id="erase">
+<div class="sec-badge">Abuse · Стирание истории</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A7</span><span class="tc-t">Сброс негатива через удаление и пересоздание</span><span class="maps">History erase</span></div>
+<p class="gwt"><b>Given</b> участник с подтверждёнными Pₛ-флагами запрашивает удаление</p>
+<p class="gwt w"><b>When</b> оффбординг и попытка вернуться «с нуля»</p>
+<p class="gwt t"><b>Then</b> tombstone: история/флаги публичны (ПДн сняты); возврат → повторный KYB + старт с Provisional</p>
+</div>
+</section>
+
+<section id="badge">
+<div class="sec-badge">Abuse · Подделка бейджа</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-A8</span><span class="tc-t">Чужой/устаревший бейдж на сайте</span><span class="maps">Badge forgery</span></div>
+<p class="gwt"><b>Given</b> сайт встраивает скопированный/устаревший бейдж</p>
+<p class="gwt w"><b>When</b> пользователь видит бейдж и кликает</p>
+<p class="gwt t"><b>Then</b> серверный рендер с TTL отдаёт актуальное значение; клик → профиль с ончейн-проверкой; подделка не проходит подпись</p>
+</div>
+</section>
+
+<section id="authz">
+<div class="sec-badge">Кросс · AuthZ / доступ</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-X1</span><span class="tc-t">Доступ к чужому write-ресурсу</span><span class="maps">AuthZ</span></div>
+<p class="gwt"><b>Given</b> валидный API-key участника A</p>
+<p class="gwt w"><b>When</b> попытка подать/изменить данные от имени участника B</p>
+<p class="gwt t"><b>Then</b> 403 FORBIDDEN по матрице доступа (ERD &amp; Security); запись в аудит</p>
+</div>
+<div class="tc">
+<div class="tc-h"><span class="tc-id">SEC-X2</span><span class="tc-t">Replay вебхука/запроса</span><span class="maps">AuthZ/Integrity</span></div>
+<p class="gwt"><b>Given</b> перехваченный валидный запрос с таймстампом</p>
+<p class="gwt w"><b>When</b> повтор спустя время</p>
+<p class="gwt t"><b>Then</b> устаревший <code>X-PT-Timestamp</code> отклонён; идемпотентность по delivery_id/Idempotency-Key</p>
+</div>
+</section>
+
+<section id="exec">
+<div class="sec-badge">01 — Исполнение и регрессия</div>
+<table>
+<thead><tr><th>Аспект</th><th>Правило</th></tr></thead>
+<tbody>
+<tr><td>Где запускать</td><td>Security-suite в CI-гейте (Test Strategy §06): SAST/DAST/dependency + кейсы выше</td></tr>
+<tr><td>Регрессия</td><td>Каждый security-инцидент (постмортем RB-*) добавляет новый кейс SEC-*</td></tr>
+<tr><td>Пентест</td><td>Периодический внешний пентест + responsible disclosure (RB-10) дополняют автоматизацию</td></tr>
+<tr><td>Definition of Done</td><td>Затронутая угроза покрыта ≥1 кейсом; гейт зелёный</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Связка</div><p>Каждый кейс ссылается на контрмеру в threat model и/или бизнес-правило (BR-*). Runbooks (<a href="../reports/ops-runbooks.html">ops-runbooks.html</a>) описывают реакцию, когда контрмера всё же пробита.</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

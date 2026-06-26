@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Infra &amp; DevOps Strategy</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.diagram{background:#0f0e0d;border-radius:10px;padding:1.1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:#cfcfc7;line-height:1.6;overflow-x:auto;white-space:pre}
+.diagram .o{color:#e8935a}.diagram .g{color:#7fb88a}.diagram .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Infra &amp; DevOps<span class="sb-sub">env · CI/CD · бэкапы</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Принципы</a>
+<a class="nav-link" href="#env"><span class="nav-num">02</span>Окружения</a>
+<a class="nav-link" href="#iac"><span class="nav-num">03</span>IaC и провижининг</a>
+<a class="nav-link" href="#cicd"><span class="nav-num">04</span>CI/CD пайплайн</a>
+<a class="nav-link" href="#secrets"><span class="nav-num">05</span>Секреты и ключи</a>
+<a class="nav-link" href="#backup"><span class="nav-num">06</span>Бэкапы и DR</a>
+<a class="nav-link" href="#obs"><span class="nav-num">07</span>Observability</a>
+<a class="nav-link" href="#release"><span class="nav-num">08</span>Релизы и откаты</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Архитектурный трек · Infrastructure &amp; DevOps Strategy</div>
+<h1>Infra &amp; DevOps Strategy</h1>
+<p class="sec-intro">Окружения, провижининг, CI/CD, секреты, бэкапы/DR, наблюдаемость и релизы. Опирается на решения ADR (EU/CH хостинг, KMS/HSM) и NFR. Конкретные провайдеры и точные RPO/RTO — открытые P1/P2-вопросы.</p>
+<h4>Принципы</h4>
+<ul>
+<li><strong>EU/CH-резидентность</strong> данных (ADR-003); US-аудитория — через CDN-edge.</li>
+<li><strong>IaC во всём:</strong> воспроизводимость окружений, никакого ручного клика в проде.</li>
+<li><strong>Безопасность по умолчанию:</strong> секреты вне репозитория, ключи в KMS/HSM, least-privilege.</li>
+<li><strong>Lean-ops:</strong> управляемые сервисы где можно, минимум собственной эксплуатации (Волна 4).</li>
+</ul>
+</section>
+
+<section id="env">
+<div class="sec-badge">02 — Окружения</div>
+<table>
+<thead><tr><th>Окружение</th><th>Назначение</th><th>Данные</th></tr></thead>
+<tbody>
+<tr><td>dev</td><td>Локальная/общая разработка; быстрые итерации</td><td>Синтетические/анонимные фикстуры; тестовая L2 (testnet)</td></tr>
+<tr><td>staging</td><td>Прод-подобное; интеграционные/приёмочные тесты, демо</td><td>Обезличенные данные; testnet L2; sandbox внешних провайдеров</td></tr>
+<tr><td>prod</td><td>Боевое; EU/CH регион</td><td>Реальные данные; mainnet L2; реальные провайдеры</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Изоляция данных</div>
+<p>Реальные ПДн — только в prod (EU/CH). dev/staging работают на синтетике или обезличенных данных. Никакого копирования прод-ПДн в нижние окружения (требование data-protection).</p>
+</div>
+</section>
+
+<section id="iac">
+<div class="sec-badge">03 — IaC и провижининг</div>
+<ul>
+<li><strong>Инфраструктура как код</strong> — Terraform (ADR-015): сеть, БД, кэш, storage, секрет-хранилища, доступы — версионируются.</li>
+<li><strong>Контейнеризация</strong> приложения (Docker); оркестрация — управляемый контейнер-сервис (k8s-ready, миграция в k8s по росту нагрузки) (ADR-015).</li>
+<li><strong>Иммутабельные образы:</strong> один артефакт продвигается dev→staging→prod без пересборки.</li>
+<li><strong>Конфигурация через окружение</strong> (12-factor), не в образе.</li>
+</ul>
+</section>
+
+<section id="cicd">
+<div class="sec-badge">04 — CI/CD пайплайн</div>
+<div class="diagram"><span class="c">// Pipeline</span>
+PR ─► <span class="o">CI</span>: lint · типы · unit · integration · security-scan (SAST/deps) · build образа
+   └─► merge в main ─► <span class="o">CD staging</span> (авто) ─► smoke/e2e ─► приёмка
+                          └─► <span class="o">CD prod</span> (ручное approve) ─► canary ─► full
+                                                            └─► авто-откат при ошибках
+</div>
+<table>
+<thead><tr><th>Этап</th><th>Гейты</th></tr></thead>
+<tbody>
+<tr><td>CI на PR</td><td>Линтеры, типы, unit+integration тесты, SAST, аудит зависимостей, сборка образа</td></tr>
+<tr><td>CD staging</td><td>Авто-деплой при merge; smoke + e2e; миграции БД (forward-only)</td></tr>
+<tr><td>CD prod</td><td>Ручной approve; canary/поэтапный rollout; авто-откат по метрикам/ошибкам</td></tr>
+<tr><td>Миграции</td><td>Версионируемые, обратносовместимые; согласованы с algo_version (forward-only)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="secrets">
+<div class="sec-badge">05 — Секреты и ключи</div>
+<ul>
+<li><strong>Секреты приложения</strong> — в secret-manager (не в коде/образе); ротация.</li>
+<li><strong>Приватные крипто-ключи</strong> — только в KMS/HSM (ADR-008), доступ через signing-сервис; ротация и CRL.</li>
+<li><strong>Least-privilege:</strong> сервисные аккаунты с минимальными правами; доступ к подписи аудируется.</li>
+<li><strong>Никаких прод-секретов</strong> в dev/staging.</li>
+</ul>
+</section>
+
+<section id="backup">
+<div class="sec-badge">06 — Бэкапы и Disaster Recovery</div>
+<table>
+<thead><tr><th>Объект</th><th>Стратегия</th></tr></thead>
+<tbody>
+<tr><td>PostgreSQL</td><td>PITR (continuous WAL) + ежедневные снапшоты; хранение в EU/CH; регулярные тест-восстановления</td></tr>
+<tr><td>Object Storage</td><td>Версионирование + cross-AZ репликация в регионе</td></tr>
+<tr><td>Секреты/конфиг</td><td>Бэкап secret-manager; KMS-ключи — по политике провайдера (без экспорта приватных)</td></tr>
+<tr><td>L2-анкоры</td><td>Не требуют бэкапа (публичная цепь); off-chain payload восстанавливается из БД-бэкапа</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">RPO / RTO</div>
+<p>Целевые значения — провизорные (P2): RPO ≈ минуты (PITR), RTO ≈ часы для полного восстановления. Точные SLA восстановления уточняются под реальную нагрузку и бизнес-критичность (NFR §SLA). Обязательны периодические DR-учения (восстановление из бэкапа на staging).</p>
+</div>
+</section>
+
+<section id="obs">
+<div class="sec-badge">07 — Observability</div>
+<ul>
+<li><strong>Метрики:</strong> p50/p95 латентность read-пути и бейджа, длина очереди воркера, лаг anchoring, успех/ошибки внешних интеграций, бизнес-KPI (проверки Score).</li>
+<li><strong>Логи:</strong> структурированные, централизованные; без ПДн в логах (приватность).</li>
+<li><strong>Трейсинг:</strong> распределённые трейсы request→worker→внешние сервисы.</li>
+<li><strong>Алертинг:</strong> по SLO (доступность read 99.9%, латентность, ошибки, аномалии скоринга).</li>
+<li><strong>Публичный лог</strong> инцидентов и управления (Волна 4) — отдельно от внутренней телеметрии.</li>
+</ul>
+</section>
+
+<section id="release">
+<div class="sec-badge">08 — Релизы и откаты</div>
+<ul>
+<li><strong>Canary/поэтапный</strong> rollout в prod с наблюдением метрик.</li>
+<li><strong>Авто-откат</strong> при росте ошибок/латентности выше порога.</li>
+<li><strong>Миграции БД — forward-only</strong>, обратносовместимые (расширение перед удалением колонок), чтобы откат кода не ломал данные.</li>
+<li><strong>algo_version</strong> при изменении параметров скоринга — новый релиз фиксирует версию; исторические Score остаются под своей версией (ADR-010, BR-VERSION).</li>
+<li><strong>Feature flags</strong> для постепенного включения фич по фазам (V1/V2).</li>
+</ul>
+<p style="font-size:.78rem;color:#888">Стек частично зафиксирован: IaC — Terraform, оркестрация — managed-контейнеры (k8s-ready), очереди — BullMQ/Redis (ADR-014/015). Открытыми P1-решениями остаются конкретные вендоры: CI-платформа, observability-стек, облачный провайдер; здесь зафиксированы стратегия и требования, инвариантные к выбору вендора.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

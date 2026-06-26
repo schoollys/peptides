@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Information Architecture / Sitemap</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.diagram{background:#0f0e0d;border-radius:10px;padding:1.1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.76rem;color:#cfcfc7;line-height:1.6;overflow-x:auto;white-space:pre}
+.diagram .o{color:#e8935a}.diagram .g{color:#7fb88a}.diagram .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.phase{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.7rem;font-weight:700}
+.p-mvp{background:#e7f3ec;color:#15673f}.p-v1{background:#eef0fb;color:#3b4a8c}.p-v2{background:#f7eef8;color:#7a3b7a}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>IA / Sitemap<span class="sb-sub">структура и навигация</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Принципы IA</a>
+<a class="nav-link" href="#sitemap"><span class="nav-num">02</span>Sitemap</a>
+<a class="nav-link" href="#urls"><span class="nav-num">03</span>URL-схема</a>
+<a class="nav-link" href="#nav"><span class="nav-num">04</span>Навигация</a>
+<a class="nav-link" href="#pages"><span class="nav-num">05</span>Каталог страниц</a>
+<a class="nav-link" href="#states"><span class="nav-num">06</span>Состояния страниц</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Дизайн-трек · Information Architecture</div>
+<h1>Information Architecture / Sitemap</h1>
+<p class="sec-intro">Структура продукта, навигация и URL-схема. Опирается на Волну 3 (онбординг, каталог, бейдж) и SAD (Web App SSR). Каждая страница связана с user stories и состояниями (happy/error/empty/loading).</p>
+<h4>Принципы IA</h4>
+<ul style="margin-left:1.1rem">
+<li><strong>Read-first:</strong> публичные страницы (каталог/профиль) доступны без регистрации — pull-стратегия.</li>
+<li><strong>Доминирующий фактор везде:</strong> Score не показывается без контекста-фактора.</li>
+<li><strong>Сегментация по ролям:</strong> навигация и фильтры отражают таксономию (Verified-Legal отделён).</li>
+<li><strong>Прозрачность:</strong> проверка целостности (anchor) и история доступны с профиля.</li>
+</ul>
+</section>
+
+<section id="sitemap">
+<div class="sec-badge">02 — Sitemap</div>
+<div class="diagram"><span class="o">/</span> <span class="c">Лендинг (ценность, поиск, призыв проверить)</span>
+├── <span class="o">/catalog</span> <span class="c">Каталог (сегменты, фильтры, сортировка)</span> [MVP]
+│     └── <span class="o">/p/{id}</span> <span class="c">Профиль участника (Score, фактор, история, флаги)</span> [MVP]
+│            ├── /p/{id}/history <span class="c">История Score по algo_version</span> [MVP]
+│            └── /p/{id}/verify <span class="c">Проверка целостности (anchor)</span> [MVP]
+├── <span class="o">/compare</span> <span class="c">Сравнение в сегменте</span> [MVP]
+├── <span class="o">/claim</span> <span class="c">Заявить/верифицировать профиль</span> [MVP]
+│     └── /claim/kyb <span class="c">KYB/KYC шаги</span> [MVP]
+├── <span class="o">/dashboard</span> <span class="c">Кабинет участника</span> [MVP]
+│     ├── /dashboard/data <span class="c">Подача данных/артефактов</span> [MVP]
+│     ├── /dashboard/badge <span class="c">Получить бейдж (сниппет)</span> [MVP]
+│     ├── /dashboard/alerts <span class="c">Алерты по контрагентам</span> [V1]
+│     └── /dashboard/appeals <span class="c">Апелляции</span> [V1]
+├── <span class="o">/b2b</span> <span class="c">B2B: due-diligence, мониторинг, аналитика</span> [V1]
+├── <span class="g">/api/v1/*</span> <span class="c">Публичное read + protected write API</span> [MVP]
+├── <span class="g">/badge/{id}.svg</span> <span class="c">Подписанный бейдж-эндпоинт</span> [MVP]
+└── <span class="o">/about · /trust-model · /docs · /incidents · /legal</span> <span class="c">Инфо/прозрачность</span>
+</div>
+</section>
+
+<section id="urls">
+<div class="sec-badge">03 — URL-схема</div>
+<table>
+<thead><tr><th>URL</th><th>Назначение</th><th>Фаза</th></tr></thead>
+<tbody>
+<tr><td><code>/catalog?role=&amp;tier=&amp;factor=</code></td><td>Сегментированный каталог с фильтрами</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td><code>/p/{id}</code></td><td>Профиль (канонический)</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td><code>/p/{id}/history</code>, <code>/verify</code></td><td>История и проверка целостности</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td><code>/compare?ids=a,b,c</code></td><td>Сравнение участников одной роли</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td><code>/claim</code>, <code>/dashboard/*</code></td><td>Онбординг и кабинет</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td><code>/badge/{id}.svg</code></td><td>Подписанный бейдж (изображение)</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td><code>/api/v1/...</code></td><td>API (read public / write protected)</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td><code>/b2b/*</code></td><td>B2B-продукты</td><td><span class="phase p-v1">V1</span></td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">URL стабильны и человекочитаемы; <code>/p/{id}</code> канонический для SEO и шеринга. API-версия в пути (<code>/v1</code>) согласована с SAD/Волной 3.</p>
+</section>
+
+<section id="nav">
+<div class="sec-badge">04 — Навигация</div>
+<table>
+<thead><tr><th>Уровень</th><th>Элементы</th></tr></thead>
+<tbody>
+<tr><td>Глобальный хедер</td><td>Лого · Поиск · Каталог · Сравнение · (Войти/Кабинет) · B2B</td></tr>
+<tr><td>Каталог (фасеты)</td><td>Роль/сегмент · Тир · Доминирующий фактор · Verified-Legal · Статус (вкл. Provisional)</td></tr>
+<tr><td>Профиль (табы)</td><td>Обзор · Факторы · История · Проверка целостности · Связи (V1)</td></tr>
+<tr><td>Кабинет</td><td>Профиль · Подача данных · Бейдж · Алерты (V1) · Апелляции (V1)</td></tr>
+<tr><td>Футер</td><td>Trust-модель · Документы · Лог инцидентов · Правовое · Контакты</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="pages">
+<div class="sec-badge">05 — Каталог страниц</div>
+<table>
+<thead><tr><th>Страница</th><th>Цель</th><th>User stories</th></tr></thead>
+<tbody>
+<tr><td>Лендинг</td><td>Объяснить ценность, дать поиск/проверку</td><td>US-1.1</td></tr>
+<tr><td>Каталог</td><td>Поиск/фильтр/сравнение в сегменте</td><td>US-1.1</td></tr>
+<tr><td>Профиль</td><td>Score+доминирующий фактор, факторы, флаги, история, проверка</td><td>US-1.2, US-2.1, US-5.2</td></tr>
+<tr><td>Сравнение</td><td>Сопоставить участников роли</td><td>произв. от US-1.1 (нет отдельной истории)</td></tr>
+<tr><td>Claim/KYB</td><td>Заявить профиль и верифицироваться</td><td>US-4.1, US-4.2</td></tr>
+<tr><td>Кабинет → Подача данных</td><td>Загрузка отзывов/тестов/COA/артефактов</td><td>US-5.1, US-10.1</td></tr>
+<tr><td>Кабинет → Бейдж</td><td>Получить и встроить бейдж</td><td>US-3.1</td></tr>
+<tr><td>Кабинет → Алерты</td><td>Реакция на падение контрагента</td><td>US-6.2</td></tr>
+<tr><td>Кабинет → Апелляции</td><td>Оспорить флаг/отзыв</td><td>US-8.1</td></tr>
+<tr><td>B2B</td><td>Due-diligence, мониторинг, аналитика</td><td>US-9.1, US-9.2</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="states">
+<div class="sec-badge">06 — Состояния страниц</div>
+<p>Каждая ключевая страница покрывает не только happy-path, но и углы (детализация визуала — в Design System):</p>
+<table>
+<thead><tr><th>Страница</th><th>Empty</th><th>Loading</th><th>Error</th></tr></thead>
+<tbody>
+<tr><td>Каталог</td><td>«Нет результатов по фильтрам» + сброс</td><td>Скелетоны карточек</td><td>«Не удалось загрузить» + retry</td></tr>
+<tr><td>Профиль</td><td>Unclaimed: «нейтральные факты, нет Score» / «нет данных»</td><td>Скелетон профиля</td><td>404 / ошибка загрузки</td></tr>
+<tr><td>Подача данных</td><td>«Ещё нет поданных данных»</td><td>Прогресс загрузки файла</td><td>Ошибки валидации полей</td></tr>
+<tr><td>Claim/KYB</td><td>—</td><td>«Проверка у провайдера…»</td><td>Отказ верификации + что делать</td></tr>
+<tr><td>Сравнение</td><td>«Добавьте участников»</td><td>Скелетон таблицы</td><td>—</td></tr>
+<tr><td>Алерты</td><td>«Нет активных алертов»</td><td>—</td><td>—</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Связь с дизайн-системой</div>
+<p>Компоненты этих состояний (skeleton, empty-state, error-state, валидация форм) определены в <a href="../reports/design-system.html">UI Kit / Design System</a> со всеми визуальными состояниями, а прорисовка самих экранов и их состояний — в <a href="../reports/design-wireframes.html">Wireframes / Screen Specs</a>. IA задаёт <em>где</em> они используются, Design System — <em>как выглядят</em>, Wireframes — <em>как скомпонованы</em>.</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

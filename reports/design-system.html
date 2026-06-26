@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — UI Kit / Design System</title>
+<style>
+:root{
+  /* Brand */
+  --brand:#e8935a; --brand-ink:#7a3b12; --brand-soft:#fef3e8;
+  /* Ink / surfaces */
+  --ink:#1a1917; --ink-2:#3a3935; --ink-3:#5a5955; --muted:#8a8a82;
+  --bg:#f2f1ee; --surface:#ffffff; --surface-2:#faf9f7; --line:#e4e2dc; --ink-dark:#151412;
+  /* Tiers */
+  --tier-gold:#c9a227; --tier-silver:#9aa0a6; --tier-bronze:#b07a45; --tier-new:#5b78a8;
+  /* Semantic */
+  --ok:#15673f; --ok-bg:#f6faf7; --ok-line:#cfe3d4;
+  --warn:#b8731a; --warn-bg:#fef7f0; --warn-line:#f5c898;
+  --err:#b3261e; --err-bg:#fdeceb; --err-line:#f1c5c2;
+  --info:#3b4a8c; --info-bg:#eef0fb; --info-line:#cdd4f3;
+  /* Radius / shadow / space */
+  --r-sm:6px; --r:10px; --r-lg:14px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:var(--ink-dark);position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:var(--brand);font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:var(--brand)}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--brand);margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:var(--ink-3);margin-bottom:1.2rem;max-width:800px}
+h3{font-size:1rem;font-weight:700;margin:1.6rem 0 .7rem;color:var(--ink);border-bottom:1px solid var(--line);padding-bottom:.35rem}
+p{margin-bottom:.7rem;color:var(--ink-2);font-size:.87rem}
+code{font-family:var(--mono);font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:var(--brand-ink)}
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:1.2rem;margin:.8rem 0;display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
+.demo-col{flex-direction:column;align-items:stretch}
+.lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;font-weight:700}
+
+/* ---- Color swatches ---- */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.7rem}
+.sw{border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;font-size:.72rem}
+.sw .chip{height:48px}
+.sw .meta{padding:.4rem .5rem;background:var(--surface)}
+.sw .name{font-weight:700;color:var(--ink)}
+.sw .val{color:var(--muted);font-family:var(--mono);font-size:.68rem}
+
+/* ---- Type scale ---- */
+.t-d{font-size:2rem;font-weight:800;color:#0f0e0d}
+.t-h1{font-size:1.5rem;font-weight:800}
+.t-h2{font-size:1.2rem;font-weight:700}
+.t-body{font-size:.95rem}
+.t-small{font-size:.8rem;color:var(--ink-3)}
+.t-cap{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+
+/* ---- Buttons ---- */
+.btn{font-family:var(--font);font-size:.85rem;font-weight:600;border-radius:var(--r-sm);padding:.5rem 1rem;border:1px solid transparent;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:.4rem;line-height:1}
+.btn-primary{background:var(--brand);color:#3a1c08}
+.btn-primary:hover{background:#d97f44}
+.btn-primary:active{background:#c46f37;transform:translateY(1px)}
+.btn-primary:disabled{background:#f0d3bd;color:#b89679;cursor:not-allowed}
+.btn-secondary{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn-secondary:hover{background:var(--surface-2);border-color:#cfccc4}
+.btn-secondary:active{background:#f0eee8;transform:translateY(1px)}
+.btn-secondary:disabled{color:var(--muted);cursor:not-allowed;background:var(--surface)}
+.btn-ghost{background:transparent;color:var(--brand-ink)}
+.btn-ghost:hover{background:var(--brand-soft)}
+.btn-danger{background:var(--err);color:#fff}
+.btn-danger:hover{background:#9d211a}
+.spinner{width:13px;height:13px;border:2px solid rgba(58,28,8,.3);border-top-color:#3a1c08;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---- Inputs ---- */
+.field{display:flex;flex-direction:column;gap:.3rem;max-width:320px;width:100%}
+.field label{font-size:.78rem;font-weight:600;color:var(--ink)}
+.input{font-family:var(--font);font-size:.86rem;padding:.5rem .7rem;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);transition:all .15s}
+.input::placeholder{color:#b3b0a8}
+.input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(232,147,90,.2)}
+.input:disabled{background:var(--surface-2);color:var(--muted);cursor:not-allowed}
+.input.err{border-color:var(--err);box-shadow:0 0 0 3px rgba(179,38,30,.12)}
+.hint{font-size:.72rem;color:var(--muted)}
+.hint.err{color:var(--err)}
+
+/* ---- Trust badge ---- */
+.tbadge{display:inline-flex;align-items:center;gap:.55rem;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:.5rem .8rem;box-shadow:var(--sh)}
+.tbadge .score{font-size:1.5rem;font-weight:800;line-height:1}
+.tbadge .meta{display:flex;flex-direction:column;gap:1px}
+.tbadge .tier{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.tbadge .factor{font-size:.72rem;color:var(--ink-3)}
+.tier-gold .score,.tier-gold .tier{color:var(--tier-gold)}
+.tier-silver .score,.tier-silver .tier{color:var(--tier-silver)}
+.tier-bronze .score,.tier-bronze .tier{color:var(--tier-bronze)}
+.tier-new .score,.tier-new .tier{color:var(--tier-new)}
+.pill{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+.pill-gold{background:#fbf3da;color:#8a6d12}
+.pill-prov{background:var(--info-bg);color:var(--info)}
+.pill-verleg{background:#eaf6ef;color:var(--ok)}
+
+/* ---- Card ---- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:1rem;box-shadow:var(--sh);max-width:300px;width:100%;transition:all .15s}
+.card:hover{border-color:#cfccc4;transform:translateY(-2px)}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem}
+.card-name{font-weight:700;font-size:.95rem}
+.card-role{font-size:.72rem;color:var(--muted)}
+.card-foot{margin-top:.7rem;padding-top:.6rem;border-top:1px solid var(--line);font-size:.72rem;color:var(--ink-3);display:flex;justify-content:space-between}
+
+/* ---- Table ---- */
+table.ui{width:100%;border-collapse:collapse;font-size:.8rem}
+table.ui thead th{background:var(--ink);color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase}
+table.ui tbody tr{border-bottom:1px solid #e8e6df}
+table.ui tbody tr:hover{background:var(--surface-2)}
+table.ui td{padding:7px 10px}
+
+/* ---- Alerts ---- */
+.alert{border-radius:var(--r);padding:.7rem 1rem;font-size:.83rem;border:1px solid;margin:.4rem 0;max-width:520px}
+.alert-ok{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok)}
+.alert-warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.alert-err{background:var(--err-bg);border-color:var(--err-line);color:var(--err)}
+.alert-info{background:var(--info-bg);border-color:var(--info-line);color:var(--info)}
+.alert b{display:block;margin-bottom:2px}
+
+/* ---- States ---- */
+.state-box{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:1.6rem;text-align:center;color:var(--muted);max-width:360px}
+.state-box .ico{font-size:1.6rem;margin-bottom:.4rem;opacity:.6}
+.state-box .t{font-weight:700;color:var(--ink-2);font-size:.9rem;margin-bottom:.2rem}
+.state-box .d{font-size:.8rem}
+.skeleton{background:linear-gradient(90deg,#eee 25%,#f5f4f1 50%,#eee 75%);background-size:200% 100%;animation:shimmer 1.3s infinite;border-radius:var(--r-sm)}
+@keyframes shimmer{to{background-position:-200% 0}}
+.sk-card{max-width:300px;width:100%;padding:1rem;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.sk-line{height:12px;margin-bottom:8px}
+.note{font-size:.78rem;color:var(--muted);margin-top:.4rem}
+a{color:var(--brand-ink)}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>UI Kit / Design System<span class="sb-sub">живой HTML · все состояния</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Принципы</a>
+<a class="nav-link" href="#color"><span class="nav-num">02</span>Цвета и токены</a>
+<a class="nav-link" href="#type"><span class="nav-num">03</span>Типографика</a>
+<a class="nav-link" href="#space"><span class="nav-num">04</span>Сетка и отступы</a>
+<a class="nav-link" href="#buttons"><span class="nav-num">05</span>Кнопки + состояния</a>
+<a class="nav-link" href="#inputs"><span class="nav-num">06</span>Поля + состояния</a>
+<a class="nav-link" href="#badge"><span class="nav-num">07</span>Trust-бейдж и пиллы</a>
+<a class="nav-link" href="#card"><span class="nav-num">08</span>Карточки и таблицы</a>
+<a class="nav-link" href="#alerts"><span class="nav-num">09</span>Алерты</a>
+<a class="nav-link" href="#states"><span class="nav-num">10</span>Empty / Loading / Error</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Дизайн-трек · UI Kit / Design System</div>
+<h1>UI Kit / Design System</h1>
+<p class="sec-intro">Живой HTML: компоненты отрендерены реальным CSS со всеми состояниями (hover, active, disabled, error, loading, empty). Это каркас системы (токены + базовые компоненты), не финальный брендовый визуал — он за дизайнером. Палитра наследует визуальный язык документов проекта.</p>
+</section>
+
+<section id="color">
+<div class="sec-badge">02 — Цвета и токены</div>
+<h3>Brand &amp; ink</h3>
+<div class="swatches">
+<div class="sw"><div class="chip" style="background:#e8935a"></div><div class="meta"><div class="name">brand</div><div class="val">#e8935a</div></div></div>
+<div class="sw"><div class="chip" style="background:#7a3b12"></div><div class="meta"><div class="name">brand-ink</div><div class="val">#7a3b12</div></div></div>
+<div class="sw"><div class="chip" style="background:#1a1917"></div><div class="meta"><div class="name">ink</div><div class="val">#1a1917</div></div></div>
+<div class="sw"><div class="chip" style="background:#5a5955"></div><div class="meta"><div class="name">ink-3</div><div class="val">#5a5955</div></div></div>
+<div class="sw"><div class="chip" style="background:#f2f1ee"></div><div class="meta"><div class="name">bg</div><div class="val">#f2f1ee</div></div></div>
+<div class="sw"><div class="chip" style="background:#ffffff;border-bottom:1px solid #eee"></div><div class="meta"><div class="name">surface</div><div class="val">#ffffff</div></div></div>
+</div>
+<h3>Тиры</h3>
+<div class="swatches">
+<div class="sw"><div class="chip" style="background:#c9a227"></div><div class="meta"><div class="name">tier-gold</div><div class="val">#c9a227</div></div></div>
+<div class="sw"><div class="chip" style="background:#9aa0a6"></div><div class="meta"><div class="name">tier-silver</div><div class="val">#9aa0a6</div></div></div>
+<div class="sw"><div class="chip" style="background:#b07a45"></div><div class="meta"><div class="name">tier-bronze</div><div class="val">#b07a45</div></div></div>
+<div class="sw"><div class="chip" style="background:#5b78a8"></div><div class="meta"><div class="name">tier-new</div><div class="val">#5b78a8</div></div></div>
+</div>
+<h3>Семантические</h3>
+<div class="swatches">
+<div class="sw"><div class="chip" style="background:#15673f"></div><div class="meta"><div class="name">ok</div><div class="val">#15673f</div></div></div>
+<div class="sw"><div class="chip" style="background:#b8731a"></div><div class="meta"><div class="name">warn</div><div class="val">#b8731a</div></div></div>
+<div class="sw"><div class="chip" style="background:#b3261e"></div><div class="meta"><div class="name">error</div><div class="val">#b3261e</div></div></div>
+<div class="sw"><div class="chip" style="background:#3b4a8c"></div><div class="meta"><div class="name">info</div><div class="val">#3b4a8c</div></div></div>
+</div>
+<p class="note">Все цвета — CSS-переменные (<code>--brand</code>, <code>--ok</code>…) в <code>:root</code>, что упрощает темизацию и поддержку контраста (WCAG AA).</p>
+</section>
+
+<section id="type">
+<div class="sec-badge">03 — Типографика</div>
+<p class="note">Системный шрифт-стек (<code>system-ui</code>) — без веб-шрифтов для скорости (NFR). Моноширинный — для кода/хешей.</p>
+<div class="demo demo-col">
+<div><div class="lbl">Display / 2rem / 800</div><div class="t-d">Trust Score 82</div></div>
+<div><div class="lbl">H1 / 1.5rem / 800</div><div class="t-h1">Каталог поставщиков</div></div>
+<div><div class="lbl">H2 / 1.2rem / 700</div><div class="t-h2">Факторы доверия</div></div>
+<div><div class="lbl">Body / 0.95rem</div><div class="t-body">Доверие как проверяемый публичный актив.</div></div>
+<div><div class="lbl">Small / 0.8rem</div><div class="t-small">Обновлено 2 дня назад · algo_version 1</div></div>
+<div><div class="lbl">Caption / 0.7rem / uppercase</div><div class="t-cap">Доминирующий фактор</div></div>
+</div>
+</section>
+
+<section id="space">
+<div class="sec-badge">04 — Сетка и отступы</div>
+<p class="note">Шкала отступов кратна 4px: <code>4 · 8 · 12 · 16 · 24 · 32</code>. Радиусы: <code>6 / 10 / 14px</code>.</p>
+<div class="demo">
+<div style="display:flex;gap:8px;align-items:flex-end">
+<div style="width:4px;height:24px;background:var(--brand)"></div>
+<div style="width:8px;height:32px;background:var(--brand)"></div>
+<div style="width:12px;height:40px;background:var(--brand)"></div>
+<div style="width:16px;height:48px;background:var(--brand)"></div>
+<div style="width:24px;height:56px;background:var(--brand)"></div>
+<div style="width:32px;height:64px;background:var(--brand)"></div>
+</div>
+</div>
+</section>
+
+<section id="buttons">
+<div class="sec-badge">05 — Кнопки + состояния</div>
+<p class="note">Наведи/нажми для проверки hover/active. Disabled и loading — отдельные состояния.</p>
+<h3>Primary</h3>
+<div class="demo">
+<button class="btn btn-primary">Default</button>
+<button class="btn btn-primary" style="background:#d97f44">Hover</button>
+<button class="btn btn-primary" style="background:#c46f37;transform:translateY(1px)">Active</button>
+<button class="btn btn-primary" disabled>Disabled</button>
+<button class="btn btn-primary"><span class="spinner"></span> Loading…</button>
+</div>
+<h3>Secondary</h3>
+<div class="demo">
+<button class="btn btn-secondary">Default</button>
+<button class="btn btn-secondary" style="background:var(--surface-2);border-color:#cfccc4">Hover</button>
+<button class="btn btn-secondary" disabled>Disabled</button>
+</div>
+<h3>Ghost / Danger</h3>
+<div class="demo">
+<button class="btn btn-ghost">Ghost</button>
+<button class="btn btn-danger">Удалить данные</button>
+</div>
+</section>
+
+<section id="inputs">
+<div class="sec-badge">06 — Поля ввода + состояния</div>
+<div class="demo" style="gap:1.5rem;align-items:flex-start">
+<div class="field"><label>Default</label><input class="input" placeholder="example.com"></div>
+<div class="field"><label>Focus (кликни)</label><input class="input" value="peptidelab.io"></div>
+<div class="field"><label>Disabled</label><input class="input" value="—" disabled></div>
+</div>
+<div class="demo" style="gap:1.5rem;align-items:flex-start">
+<div class="field"><label>Error</label><input class="input err" value="не-домен"><span class="hint err">Введите корректный домен</span></div>
+<div class="field"><label>С подсказкой</label><input class="input" placeholder="LOT-2026-001"><span class="hint">Номер партии для привязки COA</span></div>
+</div>
+</section>
+
+<section id="badge">
+<div class="sec-badge">07 — Trust-бейдж и пиллы</div>
+<p class="note">Score всегда с доминирующим фактором и тиром. Это визуальная модель серверного бейджа (ADR-006).</p>
+<div class="demo">
+<div class="tbadge tier-gold"><div class="score">82</div><div class="meta"><div class="tier">Gold</div><div class="factor">преимущ. качество</div></div></div>
+<div class="tbadge tier-silver"><div class="score">68</div><div class="meta"><div class="tier">Silver</div><div class="factor">преимущ. логистика</div></div></div>
+<div class="tbadge tier-bronze"><div class="score">54</div><div class="meta"><div class="tier">Bronze</div><div class="factor">сбалансированный</div></div></div>
+<div class="tbadge tier-new"><div class="score">—</div><div class="meta"><div class="tier">New / Provisional</div><div class="factor">накопление данных</div></div></div>
+</div>
+<div class="demo">
+<span class="pill pill-gold">Gold</span>
+<span class="pill pill-prov">Provisional</span>
+<span class="pill pill-verleg">Verified-Legal</span>
+</div>
+</section>
+
+<section id="card">
+<div class="sec-badge">08 — Карточки и таблицы</div>
+<h3>Карточка участника (каталог)</h3>
+<div class="demo">
+<div class="card">
+<div class="card-h"><div><div class="card-name">PeptideLab.io</div><div class="card-role">Вендор RUO</div></div><div class="tbadge tier-gold" style="box-shadow:none;border:none;padding:0"><div class="score" style="font-size:1.3rem">82</div></div></div>
+<div class="t-small">Доминирующий фактор: <strong>качество (QEF)</strong></div>
+<div class="card-foot"><span>3 независимых теста</span><span>обновлено 2д</span></div>
+</div>
+<div class="card">
+<div class="card-h"><div><div class="card-name">NewSupplier</div><div class="card-role">Вендор RUO</div></div><span class="pill pill-prov">Provisional</span></div>
+<div class="t-small">Накопление подтверждений · KYB ✓</div>
+<div class="card-foot"><span>1 blind-тест</span><span>новый</span></div>
+</div>
+</div>
+<h3>Таблица сравнения</h3>
+<div class="demo">
+<table class="ui">
+<thead><tr><th>Участник</th><th>Score</th><th>Доминирующий</th><th>Подтверждения</th></tr></thead>
+<tbody>
+<tr><td>PeptideLab.io</td><td><strong>82</strong></td><td>Качество</td><td>3 незав.</td></tr>
+<tr><td>ChemSource</td><td>74</td><td>Логистика</td><td>2 незав.</td></tr>
+<tr><td>NewSupplier</td><td>—</td><td>Provisional</td><td>1 blind</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="alerts">
+<div class="sec-badge">09 — Алерты</div>
+<div class="demo demo-col" style="align-items:stretch">
+<div class="alert alert-info"><b>INFO</b>Контрагент обновил данные — без влияния на ваш Score.</div>
+<div class="alert alert-warn"><b>WARNING</b>Резкое падение субскора контрагента. Демпфер активен 30 дней — есть время на реакцию.</div>
+<div class="alert alert-err"><b>CRITICAL</b>Подтверждён Pₛ-флаг. Продолжение работы отменит буфер и пересчитает Score вниз.</div>
+<div class="alert alert-ok"><b>OK</b>KYB верифицирован. Профиль переведён в активный статус.</div>
+</div>
+</section>
+
+<section id="states">
+<div class="sec-badge">10 — Empty / Loading / Error</div>
+<p class="note">Покрываем не только «счастливый путь». Эти состояния используются в IA (§06).</p>
+<h3>Empty</h3>
+<div class="demo">
+<div class="state-box"><div class="ico">∅</div><div class="t">Нет результатов</div><div class="d">По выбранным фильтрам ничего не найдено. Сбросьте фильтры.</div></div>
+<div class="state-box"><div class="ico">◌</div><div class="t">Профиль не заявлен</div><div class="d">Unclaimed: только нейтральные факты, Score отсутствует до верификации.</div></div>
+</div>
+<h3>Loading (skeleton)</h3>
+<div class="demo">
+<div class="sk-card">
+<div class="skeleton sk-line" style="width:60%;height:16px"></div>
+<div class="skeleton sk-line" style="width:40%"></div>
+<div class="skeleton sk-line" style="width:90%"></div>
+<div class="skeleton sk-line" style="width:75%;margin-bottom:0"></div>
+</div>
+<div style="display:flex;align-items:center;gap:.5rem;color:var(--muted);font-size:.83rem"><span class="spinner" style="border-color:rgba(138,138,130,.3);border-top-color:var(--muted)"></span> Проверка у KYB-провайдера…</div>
+</div>
+<h3>Error</h3>
+<div class="demo">
+<div class="state-box" style="border-color:var(--err-line);background:var(--err-bg)"><div class="ico" style="color:var(--err)">!</div><div class="t" style="color:var(--err)">Не удалось загрузить</div><div class="d">Ошибка сети. <a href="#states">Повторить</a></div></div>
+<div class="state-box" style="border-color:var(--err-line);background:var(--err-bg)"><div class="ico" style="color:var(--err)">⊘</div><div class="t" style="color:var(--err)">Отказ верификации</div><div class="d">Не удалось подтвердить владение. Что делать →</div></div>
+</div>
+<div class="note" style="margin-top:1rem">Эта система — каркас (токены + базовые компоненты со всеми состояниями) для старта разработки и основа для финального визуала в дизайн-инструменте.</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

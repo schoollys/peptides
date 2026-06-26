@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Волна 2: идентичность, верификация артефактов, ончейн</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:780px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.fbox{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:#e8935a;line-height:1.7;overflow-x:auto;white-space:pre-wrap}
+.fbox .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ex{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.ex-t{font-size:.74rem;font-weight:800;color:#5b78a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ex p{font-size:.82rem;margin-bottom:.3rem}
+.val{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.72rem;font-weight:700;background:#fef3e8;color:#c06a1a;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Волна 2 — идентичность и ончейн<span class="sb-sub">KYB · артефакты · PKI · L2</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">00</span>Контекст и решения</a>
+<a class="nav-link" href="#identity"><span class="nav-num">01</span>Идентичность и KYB/KYC</a>
+<a class="nav-link" href="#shielded"><span class="nav-num">02</span>Verified-but-shielded</a>
+<a class="nav-link" href="#artifacts"><span class="nav-num">03</span>Артефакты и lot-QR PKI</a>
+<a class="nav-link" href="#oracles"><span class="nav-num">04</span>Оракулы: PKI и аккредитация</a>
+<a class="nav-link" href="#onchain"><span class="nav-num">05</span>Ончейн-архитектура и L2</a>
+<a class="nav-link" href="#deletion"><span class="nav-num">06</span>Удаление ↔ неизменяемость</a>
+<a class="nav-link" href="#next"><span class="nav-num">07</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">00 — Контекст и принятые решения</div>
+<h1>Волна 2: идентичность, верификация артефактов, ончейн</h1>
+<p class="sec-intro">Эта спека закрывает домены «идентичность / верификация артефактов / ончейн-слой» из отчёта о пробелах (P0: KYB/KYC, lot-QR, удаление↔неизменяемость; P1: PKI оракулов, выбор L2, ZK). Опирается на решения Волны 0 (гибридный оператор, CH/EU+US, многоуровневый KYB) и модель данных Волны 1.</p>
+<table>
+<thead><tr><th>Развилка</th><th>Принятое решение</th></tr></thead>
+<tbody>
+<tr><td>KYB/KYC-провайдер</td><td>Сторонний провайдер (класс Sumsub/Veriff/Onfido); реестр хранит только статус + хеш, не сырые документы</td></tr>
+<tr><td>Псевдонимность</td><td>Verified-but-shielded: личность проверена, публично виден псевдоним; реальное имя off-chain, раскрытие — по апелляции/юр.запросу</td></tr>
+<tr><td>Lot-QR / ключи</td><td>Реестр выдаёт namespace ключей; участник подписывает лот, реестр контр-подписывает → хеш в ончейн</td></tr>
+<tr><td>Ончейн-слой</td><td>Ethereum L2 (Base / Arbitrum), только хеши/якоря</td></tr>
+<tr><td>ZK-доказательства</td><td>Отложить настоящий ZK; в MVP — «shielded assertion», ZK как апгрейд за абстракцией</td></tr>
+<tr><td>Удаление ↔ аудит</td><td>Tombstone: off-chain ПДн удаляются, ончейн-хеш остаётся анонимным «призраком», Score пересчитывается</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Дисклеймер</div>
+<p>Технические дефолты (провайдеры, конкретный L2, параметры ключей) — инженерные рекомендации для старта, не юридическая консультация. Финальная конфигурация KYB/удаления/ончейна подлежит проверке у юриста по выбранным юрисдикциям (CH/EU+US, Волна 0) и DPO до продакшена.</p>
+</div>
+</section>
+
+<section id="identity">
+<div class="sec-badge">01 — Идентичность и KYB/KYC</div>
+<h2>Многоуровневая верификация по ролям</h2>
+<p class="sec-intro">KYB/KYC заменяет денежный депозит как «кожа в игре»: пройти верификацию дорого по усилию и привязывает к реальной ответственности, но не требует платить реестру. Глубина проверки масштабируется по тому, насколько решения участника влияют на чужую безопасность.</p>
+
+<h4>Уровни идентичности</h4>
+<table>
+<thead><tr><th>Уровень</th><th>Кто</th><th>Что проверяется</th><th>Провайдер</th></tr></thead>
+<tbody>
+<tr><td>L0 — Псевдонимный</td><td>Потребители, community-роли, неформальные продавцы</td><td>E-mail/телефон + proof-of-personhood (анти-Sybil), без раскрытия личности</td><td>Лёгкая аттестация (OTP + device/CAPTCHA)</td></tr>
+<tr><td>L1 — Verified Individual</td><td>Инфлюенсеры, биохакеры-доноры данных, физлица без юрлица</td><td>KYC: документ + liveness; уникальность личности</td><td>Сторонний KYC (Sumsub-класс)</td></tr>
+<tr><td>L2 — Verified Business</td><td>Вендоры, бренды, дистрибьюторы, аптеки, логисты, прескрайберы</td><td>KYB: регистрация юрлица, UBO/бенефициары, лицензии (где есть), sanctions/PEP-скрин</td><td>Сторонний KYB</td></tr>
+<tr><td>L3 — Verified Oracle</td><td>Независимые лаборатории</td><td>L2 + аккредитация (ISO 17025 / эквивалент) + выдача ключа-подписанта (§04)</td><td>KYB + ручная аккредитация реестром</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Роль присваивается не самовыбором: участник заявляет роль → требуется минимальный уровень для неё → до прохождения профиль в статусе New/Provisional (раздел 03 v2) и не может получить высоковесовые факторы.</p>
+
+<h4>Архитектура хранения (privacy-by-design)</h4>
+<div class="fbox">Участник → [KYB/KYC-провайдер]  <span class="c">// сырые документы остаются у провайдера</span>
+Провайдер → реестр: { verification_id, level, status, expiry, claims_hash }
+Реестр хранит: статус + claims_hash (напр. «юрлицо в CH, лицензия #… действует»)
+Реестр НЕ хранит: паспорта, селфи, сканы — только ссылку на провайдера + хеш</div>
+<p>Так реестр остаётся <strong>процессором минимальных данных</strong>: при запросе на удаление (§06) ему почти нечего стирать у себя, а отзыв верификации делается через провайдера.</p>
+
+<div class="warn">
+<div class="warn-t">Центральный риск принятия — готовность серого рынка к KYB</div>
+<p>Вся анти-Sybil/анти-сговор логика опирается на реальную идентичность, но ниша ценит анонимность. Снимается двумя механизмами: <strong>(1)</strong> Verified-but-shielded (§02) — проверка есть, публичность личности — нет; <strong>(2)</strong> discovery-интервью Волны 0 — до запуска проверяем на реальных игроках, какой уровень раскрытия они готовы принять. Если L2 окажется неподъёмным для серых вендоров — fallback: L1 + повышенный вес независимых blind-тестов вместо KYB.</p>
+</div>
+
+<h4>Физлица без юрлица</h4>
+<p>Серый вендор-физлицо проходит <strong>L1 (KYC)</strong> вместо L2 и помечается как «Individual seller (KYC)». Это даёт анти-Sybil-защиту и привязку к личности на случай разбора, но без требования регистрации бизнеса. Потолок доверия для L1-продавца ниже, чем для L2-юрлица при прочих равных (отражается через Vᵢ их собственных деклараций), что само мотивирует к апгрейду.</p>
+</section>
+
+<section id="shielded">
+<div class="sec-badge">02 — Verified-but-shielded</div>
+<h2>Проверено по-настоящему, публично — псевдоним</h2>
+<p class="sec-intro">Ключевой компромисс между анти-сговором (нужна реальная идентичность) и принятием рынком (нужна анонимность). Разрешается разделением: <strong>верификация ≠ публичность</strong>.</p>
+
+<h4>Как устроено</h4>
+<ul>
+<li><strong>Реальная личность</strong> проверена провайдером (§01) и привязана к скрытому <code>real_identity_id</code>, который видит только провайдер + узкий комплаенс-контур реестра под аудит-логом.</li>
+<li><strong>Публично</strong> виден лишь устойчивый псевдоним-хендл + бейдж «Verified L2» (без имени/юрлица), если участник сам не раскрыл больше.</li>
+<li><strong>Анти-сговор</strong> работает на скрытом <code>real_identity_id</code>: один реальный субъект = один профиль, кольца аффилированности детектируются по скрытым связям, не выставляя имена напоказ.</li>
+</ul>
+
+<h4>Триггеры раскрытия личности</h4>
+<table>
+<thead><tr><th>Событие</th><th>Что раскрывается и кому</th></tr></thead>
+<tbody>
+<tr><td>Обычная работа</td><td>Ничего — только псевдоним + уровень верификации</td></tr>
+<tr><td>Апелляция/спор (раздел 07 v2)</td><td>Реальная идентичность раскрывается смешанной комиссии под NDA, не публике</td></tr>
+<tr><td>Подтверждённое Pₛ-мошенничество</td><td>Публичный флаг привязывается к псевдониму; имя — только по юр. запросу</td></tr>
+<tr><td>Законный запрос (суд/регулятор)</td><td>Раскрытие провайдером по применимому праву (CH/EU+US, Волна 0)</td></tr>
+<tr><td>Добровольно</td><td>Участник сам открывает имя/юрлицо ради доверия (повышает TRF — раздел 06 v2)</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Почему это не «анонимность для мошенников»</div>
+<p>Псевдоним <em>несменяем без потери истории</em>: бросить запятнанный профиль и завести новый стоит повторного KYB и обнуления Score (New/Provisional). Реальная личность всегда восстановима под аудитом. То есть анонимность — только перед публикой и конкурентами, но не перед механизмом ответственности.</p>
+</div>
+</section>
+
+<section id="artifacts">
+<div class="sec-badge">03 — Артефакты и lot-QR PKI</div>
+<h2>Доказательство покупки и происхождения</h2>
+<p class="sec-intro">Реестр не маркетплейс и не видит оплату, поэтому «верифицированный покупатель» и «настоящая партия» подтверждаются проверяемыми артефактами (раздел 02 v2). Здесь — как именно они подписываются и защищаются от подделки/реюза.</p>
+
+<h4>Схема lot-QR (контр-подпись)</h4>
+<div class="fbox">1. Реестр выдаёт участнику namespace + ключ-подписант при онбординге (привязан к verification_id, §01)
+2. Участник формирует лот: { lot_id, api_ref, COA_hash, produced_at }
+   и подписывает своим ключом → sig_participant
+3. Реестр проверяет право на namespace и контр-подписывает → sig_registry
+4. Хеш записи { lot, sig_participant, sig_registry } → якорь в L2 (§05)
+5. QR на флаконе кодирует lot_id + ссылку на запись
+Проверка: скан QR → пересчёт хеша → сверка с ончейн-якорем → «подлинно / клон / подделка»</div>
+<p>Двойная подпись решает обе крайности: чистое self-issue нельзя отличить от фальшивки, а полная централизация генерации делает реестр узким горлом и единой точкой отказа. Контр-подпись = участник отвечает за содержание лота, реестр — за то, что namespace принадлежит именно ему.</p>
+
+<h4>Анти-реюз медиа-доказательств</h4>
+<p>Фото флакона/трекинга легко переслать или украсть. Защита — слой проверок, а не один признак:</p>
+<ul>
+<li><strong>Перцептивный хеш</strong> (pHash): одинаковое/слегка изменённое фото уже использованное в системе → флаг дубликата.</li>
+<li><strong>Nonce-челлендж</strong>: для verified-buyer-артефакта реестр выдаёт одноразовый код, который должен присутствовать в кадре (рукописно/на бумаге) — отсекает реюз старых фото.</li>
+<li><strong>Таймстамп + метаданные</strong>: EXIF/время загрузки сверяются с датой доставки; аномалии → понижение веса артефакта.</li>
+<li><strong>Привязка lot-номера</strong>: лот на фото должен сходиться с зарегистрированным COA — иначе артефакт не засчитывается.</li>
+</ul>
+<p style="font-size:.78rem;color:#888">Ни один признак не абсолютен; артефакт получает балл доверия, влияющий на Vᵢ отзыва (verified-buyer 0.75 vs review-no-artifact 0.45 — раздел 02 v2). Подозрительный — замораживается до ручной проверки.</p>
+
+<h4>Интеграции перевозчиков (трекинг)</h4>
+<table>
+<thead><tr><th>Тип</th><th>Метод сверки</th><th>MVP?</th></tr></thead>
+<tbody>
+<tr><td>Крупные перевозчики (API)</td><td>Прямая сверка статуса доставки по трек-номеру через API/агрегатор (AfterShip-класс)</td><td>Да (1–2 интеграции)</td></tr>
+<tr><td>Локальные/серые курьеры</td><td>Загрузка скрина трекинга + pHash/таймстамп-проверка (без API)</td><td>Да (fallback)</td></tr>
+<tr><td>Самовывоз/без трекинга</td><td>Только lot-QR + медиа-артефакт, вес ниже</td><td>Да</td></tr>
+</tbody>
+</table>
+
+<h4>Цепочка владения образцом (sample chain-of-custody)</h4>
+<p>Главная схема обмана — sample-swap (раздел 02 v2). Артефактный слой её закрывает так: <strong>Vᵢ=1.0</strong> получает только тест, где образец отобран независимо (покупателем/GB/аудитором) и его путь зафиксирован — кто отобрал, когда опечатал, какой лот. Тест по образцу вендора → Vᵢ=0.70 (верхняя граница, не гарантия). Подмена после теста бьёт по Pₛ вендора, а не по лаборатории (раздел 02 v2).</p>
+</section>
+
+<section id="oracles">
+<div class="sec-badge">04 — Оракулы: PKI и аккредитация</div>
+<h2>Жизненный цикл ключей лабораторий</h2>
+<p class="sec-intro">Подпись лаборатории — корень доверия к качеству. Закрываем P1: кто выдаёт ключ, как он ротируется и ревокается, и что происходит с уже подписанными COA при отзыве доверия.</p>
+
+<h4>Модель PKI</h4>
+<p>Реестр выступает <strong>корневым удостоверяющим центром (Root CA)</strong> только для namespace оракулов: он не подписывает результаты, но удостоверяет, что данный публичный ключ принадлежит аккредитованной лаборатории. Результаты подписывает сама лаборатория своим приватным ключом.</p>
+<div class="fbox">Аккредитация (L3) → реестр выпускает сертификат: { lab_id, pubkey, accreditation_ref, valid_from, valid_to }
+Лаборатория подписывает COA своим приватным ключом → sig_lab
+Проверка COA: sig_lab валидна по pubkey И сертификат активен на дату подписи → доверяем
+Сертификат в реестре ревокаций (CRL-аналог), якорь — в L2</div>
+
+<h4>Ротация и ревокация</h4>
+<table>
+<thead><tr><th>Событие</th><th>Действие</th><th>Что с ранее подписанными COA</th></tr></thead>
+<tbody>
+<tr><td>Плановая ротация ключа</td><td>Новый ключ выпускается, старый помечается valid_to; перекрытие по времени</td><td>Остаются валидными (подпись на дату, когда ключ был активен)</td></tr>
+<tr><td>Компрометация ключа</td><td>Немедленная ревокация + публикация в CRL с таймстампом компрометации</td><td>COA, подписанные ПОСЛЕ компрометации — недействительны; ДО — валидны</td></tr>
+<tr><td>Потеря статуса оракула (отзыв аккредитации)</td><td>Сертификат ревокается с даты отзыва</td><td>Прошлые COA сохраняют силу, новые не принимаются</td></tr>
+<tr><td>Доказанный сговор/фальсификация лаборатории</td><td>Полная ревокация + ретро-флаг всех её COA как недоверенных</td><td>Все COA помечаются «оракул скомпрометирован» → пересчёт затронутых Score</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Различение «дата подписи vs дата компрометации» критично: иначе одна потеря ключа обрушила бы доверие ко всей честной истории лаборатории. Дата подписи фиксируется ончейн-якорем (§05) и неоспорима.</p>
+
+<h4>Аккредитация оракула и fallback без API</h4>
+<ul>
+<li><strong>Процесс:</strong> заявка → проверка ISO 17025/эквивалента → KYB (L2) → межлабораторное сравнение (контрольный образец) → выдача ключа (L3).</li>
+<li><strong>Если лаборатория не хочет интегрироваться по API:</strong> ручной режим — оператор реестра загружает подписанный лабораторией PDF-COA, хеширует, лаборатория подтверждает хеш одноразовой подписью. Медленнее, но не блокирует bootstrap.</li>
+<li><strong>Bootstrap первых оракулов:</strong> начать с 2–3 уважаемых независимых лабораторий (критерий выхода Волны 0); их участие — маркетинговый актив «Verified Oracle» без оплаты кому-либо.</li>
+</ul>
+</section>
+
+<section id="onchain">
+<div class="sec-badge">05 — Ончейн-архитектура и L2</div>
+<h2>Что в цепочке, что вне её</h2>
+<p class="sec-intro">Ончейн нужен ровно для одного: сделать подмену задним числом обнаруживаемой. Поэтому в цепочку идут только хеши и якоря событий, а все данные с ПДн — off-chain с правом удаления (§06).</p>
+
+<h4>Граница on-chain / off-chain</h4>
+<table>
+<thead><tr><th>On-chain (L2, неизменяемо)</th><th>Off-chain (БД, удаляемо)</th></tr></thead>
+<tbody>
+<tr><td>Хеш входных данных (COA, тест, IoT-лог, отзыв)</td><td>Сами документы, файлы, фото</td></tr>
+<tr><td>Хеш события пересчёта Score + таймстамп</td><td>Детали расчёта, значения Fᵢ</td></tr>
+<tr><td>Якорь lot-записи + контр-подпись (§03)</td><td>Идентичности контрагентов, связи графа</td></tr>
+<tr><td>CRL-якорь сертификатов оракулов (§04)</td><td>ПДн, KYB-claims, real_identity_id</td></tr>
+</tbody>
+</table>
+
+<h4>Выбор L2 и абстракция</h4>
+<p>Сеть — <strong>Ethereum L2 (Base или Arbitrum)</strong>: низкая комиссия, зрелость, EVM-совместимость, готовая инфраструктура. Запись — это дешёвые хеш-якоря, не сложные контракты. Доступ к цепочке инкапсулируется за интерфейсом <code>HashAnchor</code> (методы <code>anchor(hash)</code> / <code>verify(hash)</code>), чтобы при необходимости сменить сеть без переписывания ядра.</p>
+<div class="fbox">interface HashAnchor {
+  anchor(payload_hash, event_type, ts) -> anchor_id   <span class="c">// батч-запись для экономии газа</span>
+  verify(payload_hash) -> { exists, ts, event_type }
+}
+<span class="c">// батчинг: N событий за период → один merkle-root в L2, газ амортизируется</span></div>
+<p style="font-size:.78rem;color:#888">Это концептуальный набросок интерфейса; финальная сигнатура <code>HashAnchor</code> (батч <code>anchor(merkleRoot, batchId)</code>) зафиксирована в <a href="../reports/spec-integration-contracts.html">Integration Contracts</a>.</p>
+<p style="font-size:.78rem;color:#888">Финансирование газа — из модели Волны 0 (гранты + B2B-сервисы); батчинг через merkle-root резко снижает стоимость записи на событие.</p>
+
+<h4>ZK — отложено, путь сохранён</h4>
+<p>Настоящие ZK-доказательства («субскор поставщика ≥ 70 без раскрытия имени») в MVP <strong>не реализуются</strong> — это дорого и рискованно для старта. Вместо них — <strong>shielded assertion</strong>: реестр как доверенная сторона проверяет факт и публикует только результат («поставщик ≥ Gold»), не раскрывая имя. Интерфейс утверждений делается так, чтобы позже заменить «реестр ручается» на «ZK-proof» без изменения потребителей API.</p>
+<div class="rec-box">
+<div class="rec-t">Компромисс честно назван</div>
+<p>Shielded assertion требует доверия к реестру в момент проверки (в отличие от полностью бездоверительного ZK). Это приемлемо для MVP, потому что реестр и так — доверенный вычислитель Score; ZK добавляется, когда появится спрос на бездоверительность и ресурс на аудит схем.</p>
+</div>
+</section>
+
+<section id="deletion">
+<div class="sec-badge">06 — Удаление ↔ неизменяемость</div>
+<h2>Tombstone: право на забвение без потери аудита</h2>
+<p class="sec-intro">Закрывает P0-конфликт «GDPR-право на удаление против неизменяемого аудита». Разрешение — разнести <em>что</em> неизменяемо (анонимный хеш-факт) и <em>что</em> удаляемо (ПДн и связи).</p>
+
+<h4>Что происходит при запросе на удаление</h4>
+<div class="fbox">1. Off-chain: ПДн участника и его связи удаляются/анонимизируются (реальная личность, KYB-claims, контакты)
+2. On-chain: хеш-якоря остаются — но они НЕ содержат ПДн, это «призрак» события
+3. Score: пересчитывается БЕЗ удалённых данных участника;
+   downstream-участники, чей Vᵢ опирался на его субскор, пересчитываются по правилам пропагации (раздел 05 v2)
+4. Аудит: в журнале остаётся запись «данные редактированы по запросу субъекта, дата» — без содержания</div>
+
+<h4>Почему это согласуется и с GDPR, и с аудитом</h4>
+<ul>
+<li><strong>Право на забвение:</strong> удаляются именно персональные данные; то, что остаётся ончейн — это безличный хеш, не позволяющий восстановить личность (по принципу «хеши без ПДн»).</li>
+<li><strong>Аудит расчётов:</strong> цепочка хешей пересчётов сохраняется — историческая целостность «никто не переписал прошлое» не нарушена, даже если содержимое удалено.</li>
+<li><strong>Ретеншен:</strong> off-chain данные хранятся не дольше необходимого; подтверждённые Pₛ-флаги (мошенничество) могут удерживаться на срок наказания на правовом основании защиты третьих лиц — финальный баланс согласуется с DPO.</li>
+</ul>
+
+<div class="warn">
+<div class="warn-t">Граница, требующая юридической проверки</div>
+<p>«Хеш без ПДн» считается анонимизированным только если по нему нельзя восстановить личность даже с доп.данными. Если в хеш входят идентифицирующие поля — это псевдонимизация, а не анонимизация, и она остаётся ПДн по GDPR. Поэтому в ончейн идут хеши <strong>обезличенных</strong> полезных нагрузок; конкретный состав того, что хешируется, утверждает DPO до продакшена.</p>
+</div>
+
+<h4>Защита от злоупотребления удалением</h4>
+<p>Чтобы «право на удаление» не стало способом стереть запятнанную историю и тут же вернуться чистым: возврат в систему после удаления требует <strong>повторного KYB</strong> и старта с New/Provisional, а <code>real_identity_id</code> у провайдера (если удержание законно) не даёт мгновенно отвязать прошлые подтверждённые нарушения. Баланс «забвение vs защита рынка» — предмет согласования с юристом.</p>
+</section>
+
+<section id="next">
+<div class="sec-badge">07 — Что дальше</div>
+<h2>Статус Волны 2 и переход к Волне 3</h2>
+<p>Волна 2 закрывает домены идентичности, верификации артефактов и ончейна из отчёта о пробелах:</p>
+<ol>
+<li><strong>Идентичность/KYB/KYC</strong> (§01) — уровни L0–L3, сторонний провайдер, хранение минимума, физлица без юрлица.</li>
+<li><strong>Псевдонимность</strong> (§02) — Verified-but-shielded + триггеры раскрытия.</li>
+<li><strong>Артефакты и lot-QR PKI</strong> (§03) — контр-подпись, анти-реюз медиа, интеграции перевозчиков, chain-of-custody.</li>
+<li><strong>PKI оракулов</strong> (§04) — выдача/ротация/ревокация ключей, аккредитация, fallback без API.</li>
+<li><strong>Ончейн</strong> (§05) — граница on/off-chain, L2 (Base/Arbitrum) за HashAnchor, ZK отложен через shielded assertion.</li>
+<li><strong>Удаление↔неизменяемость</strong> (§06) — tombstone-модель, ретеншен, анти-абьюз.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Следующий блок — Волна 3 (продуктовые спецификации)</div>
+<p>На основе ядра (Волна 1) и идентичности/верификации (Волна 2) достраиваются: сценарий онбординга по ролям, OpenAPI-черновик (публичные read + защищённые write эндпоинты), спецификация каталога/профиля/сравнения, форматы и защита live-бейджа, метрики и критерии фаз. Затем Волна 4 — UX-экраны, безопасность, операции (SLA, инцидент-менеджмент, модерация апелляций).</p>
+</div>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Технические дефолты (провайдеры, L2, параметры ключей и удаления) подлежат подтверждению профильными специалистами (юрист по CH/EU+US, DPO, крипто-инженер) до продакшена.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

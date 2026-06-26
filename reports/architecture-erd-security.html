@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — ERD &amp; Security Architecture</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.7rem 0 .6rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.diagram{background:#0f0e0d;border-radius:10px;padding:1.1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.73rem;color:#cfcfc7;line-height:1.55;overflow-x:auto;white-space:pre}
+.diagram .o{color:#e8935a}.diagram .g{color:#7fb88a}.diagram .b{color:#7fa8d8}.diagram .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>ERD &amp; Security<span class="sb-sub">данные · безопасность</span></div>
+<a class="nav-link" href="#erd"><span class="nav-num">01</span>ERD — модель данных</a>
+<a class="nav-link" href="#entities"><span class="nav-num">02</span>Сущности и поля</a>
+<a class="nav-link" href="#zones"><span class="nav-num">03</span>Зоны доверия</a>
+<a class="nav-link" href="#authnz"><span class="nav-num">04</span>AuthN / AuthZ</a>
+<a class="nav-link" href="#pki"><span class="nav-num">05</span>PKI-иерархия</a>
+<a class="nav-link" href="#dataclass"><span class="nav-num">06</span>Классификация данных</a>
+<a class="nav-link" href="#crypto"><span class="nav-num">07</span>Шифрование</a>
+<a class="nav-link" href="#threat"><span class="nav-num">08</span>Threat model (ссылка)</a>
+</nav>
+
+<main class="content">
+
+<section id="erd">
+<div class="sec-badge">Архитектурный трек · ERD &amp; Security Architecture</div>
+<h1>ERD и Security Architecture</h1>
+<p class="sec-intro">Консолидирует модель данных (формализация из P2 §06) и архитектуру безопасности (из Волны 4 + ADR). Юридическая часть — отдельно (ToS/право в P0). Threat model — в Волне 4.</p>
+<h2>ER-диаграмма</h2>
+<div class="diagram"><span class="o">Participant</span> <span class="c">(id PK, role, status, kyb_level, algo_version, created_at)</span>
+  │1
+  ├──&lt;∞ <span class="b">ScoreEvent</span> <span class="c">(id PK, participant_id FK, ts, score, dominant_factor, algo_version, anchor_hash)</span>
+  ├──&lt;∞ <span class="b">FactorInput</span> <span class="c">(id PK, participant_id FK, factor_code, value, di_class, vi, source_id FK, ts)</span>
+  ├──&lt;∞ <span class="b">PenaltyFlag</span> <span class="c">(id PK, participant_id FK, type, severity, pk, opened_at, status)</span>
+  └──&lt;∞ <span class="b">CounterpartyLink</span> <span class="c">(from_id FK, to_id FK, lot_share, blind_flag, lambda)</span>
+
+<span class="o">Lot</span> <span class="c">(id PK, vendor_id FK→Participant, status, lot_qr_key)</span>
+  ├──&lt;∞ <span class="b">CustodyRecord</span> <span class="c">(id PK, lot_ref FK, sampler_id FK, steps_json, lab_id FK, sig_lab, anchor_hash)</span>
+  └──&lt;∞ <span class="b">COA</span> <span class="c">(id PK, lot_ref FK, lab_id FK→Source, signed_payload, anchor_hash)</span>
+
+<span class="o">Source/Oracle</span> <span class="c">(id PK, type, independence_flag, accreditation, pubkey, status)</span>
+<span class="o">Appeal</span> <span class="c">(id PK, subject_id FK, panel_json, chair_oracle_id FK, decision, cost_bearer)</span>
+<span class="o">Steward</span> <span class="c">(participant_id FK, term_start, term_end, status)</span>
+<span class="o">GovernanceLog</span> <span class="c">(id PK, event, actor_id, ts, anchor_hash)</span>
+</div>
+</section>
+
+<section id="entities">
+<div class="sec-badge">02 — Сущности (ключевые)</div>
+<table>
+<thead><tr><th>Сущность</th><th>Роль</th><th>Связи</th></tr></thead>
+<tbody>
+<tr><td>Participant</td><td>Любой участник; статус Provisional/Active/Tombstone</td><td>1:N ScoreEvent, FactorInput, PenaltyFlag</td></tr>
+<tr><td>ScoreEvent</td><td>Снимок Score с algo_version и anchor_hash</td><td>N:1 Participant</td></tr>
+<tr><td>FactorInput</td><td>Вход по фактору с Dᵢ-классом, Vᵢ, источником</td><td>N:1 Participant, N:1 Source</td></tr>
+<tr><td>PenaltyFlag</td><td>Штраф pₖ с severity и статусом</td><td>N:1 Participant</td></tr>
+<tr><td>CounterpartyLink</td><td>Связь для пропагации Vᵢ (lot_share, blind, λ)</td><td>N:N Participant</td></tr>
+<tr><td>Lot / CustodyRecord / COA</td><td>Партия, цепочка владения, сертификат</td><td>Lot 1:N Custody/COA</td></tr>
+<tr><td>Source/Oracle</td><td>Источник доказательств; independence_flag, pubkey</td><td>1:N FactorInput/COA</td></tr>
+<tr><td>Appeal / Steward / GovernanceLog</td><td>Апелляции, состав панелей, аудит управления</td><td>—</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Здесь — логическая модель. Полная физическая схема (типы, индексы, ограничения, миграции) готова: <a href="../reports/spec-db-physical-schema.html">DB Physical Schema</a> · <a href="../db/schema.sql">schema.sql</a>.</p>
+</section>
+
+<section id="zones">
+<div class="sec-badge">03 — Зоны доверия</div>
+<div class="diagram"><span class="c">// Trust zones (снаружи → внутрь)</span>
+<span class="b">[Публичный интернет]</span>
+   │  TLS, WAF, anti-DDoS
+   ▼
+<span class="g">[DMZ: CDN / Edge / API Gateway]</span>  <span class="c">— только публичный read + аутентиф. write</span>
+   │  mTLS внутри периметра
+   ▼
+<span class="o">[App-зона: монолит + worker]</span>      <span class="c">— бизнес-логика, нет прямого доступа извне</span>
+   │
+   ├─► <span class="g">[Data-зона: PostgreSQL/Redis/Storage]</span>  <span class="c">— приватная сеть, без публичного IP</span>
+   └─► <span class="o">[Crypto-зона: signing-сервис → KMS/HSM]</span> <span class="c">— строжайший доступ, аудит</span>
+</div>
+<p>Сегментация сети: каждая зона доступна только из соседней внутренней; data- и crypto-зоны не имеют публичных адресов.</p>
+</section>
+
+<section id="authnz">
+<div class="sec-badge">04 — Аутентификация и авторизация</div>
+<table>
+<thead><tr><th>Поверхность</th><th>AuthN</th><th>AuthZ</th></tr></thead>
+<tbody>
+<tr><td>Публичный read (каталог/профиль/бейдж/verify)</td><td>Не требуется</td><td>Публично; rate-limit по IP</td></tr>
+<tr><td>Write (подача данных, claim, апелляции)</td><td>Сессия участника + API-key + payload-подпись</td><td>RBAC по роли/уровню KYB</td></tr>
+<tr><td>COA от оракула</td><td>PKI-подпись оракула</td><td>Только аккредитованные (Source.status=active)</td></tr>
+<tr><td>B2B-API/вебхуки</td><td>API-key + подпись</td><td>Скоуп подписки</td></tr>
+<tr><td>Админ/управление</td><td>MFA обязательна</td><td>Least-privilege, аудит в GovernanceLog</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="pki">
+<div class="sec-badge">05 — PKI-иерархия</div>
+<div class="diagram"><span class="o">Root CA (offline, в HSM)</span>
+   ├─► <span class="g">Intermediate CA: Oracles</span>  ──► сертификаты лабораторий-оракулов
+   ├─► <span class="g">Intermediate CA: Registry</span> ──► ключ подписи бейджей, countersign lot-keys
+   └─► <span class="g">CRL / статус-сервис</span>        ──► отзыв скомпрометированных/деаккредитованных
+</div>
+<ul>
+<li><strong>Root CA</strong> — оффлайн, в HSM; используется только для подписи промежуточных.</li>
+<li><strong>Оракулы</strong> получают сертификаты через аккредитацию; ротация по сроку.</li>
+<li><strong>Отзыв</strong> (CRL): компрометация/деаккредитация → COA оракула становятся недействительны, затронутые Score пересчитываются (BR-COA-PKI).</li>
+<li><strong>Lot-QR</strong> countersign реестром (Волна 2) — привязка артефактов к партии.</li>
+</ul>
+</section>
+
+<section id="dataclass">
+<div class="sec-badge">06 — Классификация данных</div>
+<table>
+<thead><tr><th>Класс</th><th>Примеры</th><th>Обращение</th></tr></thead>
+<tbody>
+<tr><td>Публичное</td><td>Score, доминирующий фактор, подтверждённые флаги, верифиц. факты</td><td>Открыто; кэшируемо</td></tr>
+<tr><td>Внутреннее</td><td>Сырые входы, метрики, телеметрия (без ПДн)</td><td>App-зона</td></tr>
+<tr><td>Конфиденциальное (ПДн)</td><td>KYB/KYC-статусы, контакты, идентичность</td><td>Data-зона, шифрование, минимизация, EU/CH</td></tr>
+<tr><td>Секретное</td><td>Приватные ключи, секреты</td><td>Только KMS/HSM, никогда в БД/логах</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Связь с приватностью</div>
+<p>ПДн минимизируются (храним статус, не сырьё KYB — ADR-007). В ончейн и логи ПДн не попадают. Удаление — tombstone: ПДн снимаются, публично значимая история сохраняется (BR-OFFBOARD, BR-RETENTION).</p>
+</div>
+</section>
+
+<section id="crypto">
+<div class="sec-badge">07 — Шифрование</div>
+<ul>
+<li><strong>В транзите:</strong> TLS снаружи, mTLS между внутренними сервисами.</li>
+<li><strong>В покое:</strong> шифрование БД, Object Storage, бэкапов; ключи шифрования — в KMS.</li>
+<li><strong>Подписи:</strong> бейдж, COA-верификация, anchoring — через signing-сервис/HSM (ADR-008).</li>
+<li><strong>Ончейн:</strong> только <code>hash(payload‖salt)</code>, соль не публична — анонимизация (ADR-005).</li>
+</ul>
+</section>
+
+<section id="threat">
+<div class="sec-badge">08 — Threat model</div>
+<p>Полная threat model (STRIDE + 8 нишевых abuse-сценариев с контрмерами: накрутка отзывов, sample-swap, collusion-ring, Sybil, подделка бейджа, манипуляция пропагацией, атака на апелляции, компрометация оракула) — в <a href="../reports/wave4-ux-security-operations.html">Волне 4</a>. Контрмеры на уровне правил — в <a href="../reports/prd-business-rules-edge-cases.html">Business Rules</a> (BR-VAL-INDEP, BR-PROP-*, BR-PS-SWAP, BR-COA-PKI и др.).</p>
+<div class="rec-box">
+<div class="rec-t">Сводка безопасности</div>
+<p>Безопасность стоит на: сегментации зон, изоляции ключей (KMS/HSM), PKI с отзывом, минимизации ПДн, анонимных ончейн-хешах и антиманипуляционных правилах скоринга. Юридический слой (ToS/право) — отдельно в P0; здесь — техническая часть.</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

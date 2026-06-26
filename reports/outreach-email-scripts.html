@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>PeptideTrust — скрипты переписки по ролям</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #0d1b2a;
+    --muted: #5b6b7d;
+    --faint: #8a97a6;
+    --line: #e3e8ee;
+    --accent: #533afd;
+    --green: #1f7a4d;
+    --green-bg: #e8f6ee;
+    --red: #b3261e;
+    --red-bg: #fdecea;
+    --code-bg: #f1f3f7;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0e1116; --card: #171b22; --ink: #e8edf3; --muted: #9aa7b4;
+      --faint: #6b7785; --line: #262c35; --accent: #8f7bff; --green: #5fd197;
+      --green-bg: #16271f; --red: #ff8a80; --red-bg: #2a1816; --code-bg: #1f242c;
+    }
+  }
+  * { box-sizing: border-box; -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-size: 16px;
+    padding: max(16px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header.page { padding: 8px 0 4px; }
+  .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); font-weight: 700; }
+  h1 { font-size: 24px; line-height: 1.25; margin: 6px 0 8px; letter-spacing: -.02em; }
+  .lead { color: var(--muted); font-size: 15px; margin: 0 0 18px; }
+  h2 { font-size: 19px; margin: 26px 0 4px; letter-spacing: -.01em; }
+  .role-goal { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  .principles {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px; margin: 0 0 8px;
+  }
+  .principles h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); }
+  .principles ul { margin: 0; padding-left: 18px; }
+  .principles li { font-size: 14px; color: var(--muted); margin: 4px 0; }
+  .email {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px; margin: 12px 0;
+  }
+  .email-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 999px; background: var(--code-bg); color: var(--muted);
+  }
+  .tag.cold { background: rgba(83,58,253,.12); color: var(--accent); }
+  .tag.nudge { background: #fff3df; color: #8a6000; }
+  .tag.after { background: var(--green-bg); color: var(--green); }
+  @media (prefers-color-scheme: dark) { .tag.nudge { background: #2a2316; color: #e0b56b; } }
+  .when { font-size: 12px; color: var(--faint); margin-left: auto; }
+  .subject { font-size: 14px; margin: 2px 0 10px; }
+  .subject b { color: var(--ink); }
+  .subject span { color: var(--muted); }
+  .body {
+    white-space: pre-wrap; word-wrap: break-word;
+    font-size: 15px; color: var(--ink);
+    background: var(--code-bg); border-radius: 10px; padding: 12px 13px; margin: 0 0 10px;
+  }
+  .copy {
+    -webkit-appearance: none; appearance: none; border: 1px solid var(--line);
+    background: var(--card); color: var(--accent); font-weight: 600; font-size: 14px;
+    padding: 9px 14px; border-radius: 10px; cursor: pointer; min-height: 40px; width: 100%;
+  }
+  .copy:active { background: var(--code-bg); }
+  .copy.done { color: var(--green); border-color: var(--green); }
+  .placeholder-note { font-size: 12.5px; color: var(--faint); margin: 4px 0 18px; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 5px; font-size: 13px; }
+  footer { color: var(--faint); font-size: 12.5px; margin-top: 30px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .signals { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 8px 0 4px; }
+  @media (min-width: 560px) { .signals { grid-template-columns: 1fr 1fr; } }
+  .signal { border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+  .signal.g { background: var(--green-bg); color: var(--green); }
+  .signal.r { background: var(--red-bg); color: var(--red); }
+  .signal b { display: block; margin-bottom: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <div class="eyebrow">PeptideTrust · Discovery · Outreach</div>
+    <h1>Скрипты переписки по ролям</h1>
+    <p class="lead">Письма для набора на проблемные интервью и получения коммитмента. Цель — короткий разговор об их опыте, не продажа. Замените плейсхолдеры в фигурных скобках и нажмите «Копировать».</p>
+  </header>
+
+  <div class="principles">
+    <h3>Правила для всех писем</h3>
+    <ul>
+      <li>Коротко: 60–120 слов, один призыв к действию, читается с телефона за 15 секунд.</li>
+      <li>Первая строка — персональная (их компания, статья, пост). Никаких шаблонных «Уважаемый партнёр».</li>
+      <li>Просим опыт, а не внимание к продукту. «Изучаем, как вы решаете X» — не «у нас есть платформа».</li>
+      <li>Лёгкий выход: «если не вы этим занимаетесь — подскажите, к кому обратиться».</li>
+      <li>Отправка вт–чт, утро. Напоминание — через 3 рабочих дня, не раньше.</li>
+      <li>Плейсхолдеры: <code>{{Имя}}</code>, <code>{{Компания}}</code>, <code>{{Ваше имя}}</code>, <code>{{ссылка на календарь}}</code>.</li>
+    </ul>
+  </div>
+  <p class="placeholder-note">Тексты ниже — research-use-only позиционирование: реестр нейтральный, не маркетплейс, не даёт рекомендаций.</p>
+
+  <!-- ───────────── BUYER ───────────── -->
+  <h2>1. Покупатель / исследователь <span style="color:var(--red);font-size:13px;">P0</span></h2>
+  <p class="role-goal">Гипотеза: не доверяет поставщикам, тратит усилия на проверку и поменяет решение из-за независимого Score.</p>
+
+  <div class="email">
+    <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+    <p class="subject"><b>Тема:</b> <span>20 минут: как вы выбираете поставщиков пептидов?</span></p>
+    <div class="body" data-subject="20 минут: как вы выбираете поставщиков пептидов?">Здравствуйте, {{Имя}}!
+
+Меня зовут {{Ваше имя}}, я из команды PeptideTrust. Мы изучаем, как исследователи и закупщики выбирают надёжных поставщиков пептидов и реагентов — и где с этим возникают проблемы.
+
+Ничего не продаём: собираем реальный опыт. Был бы признателен за 20 минут — расскажете, как вы в последний раз выбирали поставщика и что проверяли перед заказом.
+
+Удобно на этой неделе? Вот календарь: {{ссылка на календарь}}.
+Если этим занимается кто-то другой — подскажете, к кому обратиться?
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+    <p class="subject"><b>Тема:</b> <span>Re: 20 минут о выборе поставщиков</span></p>
+    <div class="body" data-subject="Re: 20 минут о выборе поставщиков">Здравствуйте, {{Имя}}!
+
+Понимаю, что писем много. Поднимаю своё — нам правда ценен ваш опыт выбора поставщиков, даже если он «ничего особенного».
+
+Хватит 20 минут в любое удобное время: {{ссылка на календарь}}. Если тема не ваша — просто ответьте «не я», и я не буду беспокоить.
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag after">Письмо 3 · после звонка</span><span class="when">в тот же день</span></div>
+    <p class="subject"><b>Тема:</b> <span>Спасибо за разговор + ранний доступ</span></p>
+    <div class="body" data-subject="Спасибо за разговор + ранний доступ">{{Имя}}, спасибо за уделённое время — особенно за историю про {{упомянутый случай}}.
+
+Мы готовим ранний доступ к реестру с проверенными профилями поставщиков. Хотите, добавлю вас в список и пришлю, как только будет готово?
+
+И ещё просьба: если среди ваших коллег есть те, кто тоже регулярно выбирает поставщиков, — буду благодарен за интро на короткий разговор.
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="signals">
+    <div class="signal g"><b>Зелёный сигнал</b>Дают email для доступа, приводят коллегу, соглашаются на follow-up.</div>
+    <div class="signal r"><b>Красный сигнал</b>«Спасибо, интересно», но без действий и без конкретных случаев.</div>
+  </div>
+
+  <!-- ───────────── VENDOR ───────────── -->
+  <h2>2. RUO-вендор (витрина/бренд) <span style="color:var(--red);font-size:13px;">P0</span></h2>
+  <p class="role-goal">Гипотеза: воспримет публичный профиль (без согласия) как ценность, захочет заявить и пройти KYB — а не как угрозу.</p>
+
+  <div class="email">
+    <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+    <p class="subject"><b>Тема:</b> <span>Черновик публичного профиля {{Компания}} — ваш отзыв до публикации</span></p>
+    <div class="body" data-subject="Черновик публичного профиля {{Компания}} — ваш отзыв до публикации">Здравствуйте, {{Имя}}!
+
+{{Ваше имя}}, команда PeptideTrust. Мы строим нейтральный публичный реестр доверия поставщиков пептидов (research-use-only) — не маркетплейс, без рекламных денег.
+
+Мы подготовили черновой профиль {{Компания}} на основе открытых данных и хотим показать его вам до публикации: услышать, что верно, что нет, и как вы доказываете качество покупателям.
+
+20 минут на этой неделе? {{ссылка на календарь}}
+Профиль покажу прямо на звонке.
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+    <p class="subject"><b>Тема:</b> <span>Re: профиль {{Компания}} в реестре</span></p>
+    <div class="body" data-subject="Re: профиль {{Компания}} в реестре">Здравствуйте, {{Имя}}!
+
+Возвращаюсь к черновому профилю {{Компания}}. Нам важно, чтобы данные были корректны, поэтому хотим дать вам слово до публикации.
+
+15–20 минут в удобное время: {{ссылка на календарь}}. Если ответственный за это — другой человек, подскажете контакт?
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag after">Письмо 3 · после звонка</span><span class="when">в тот же день</span></div>
+    <p class="subject"><b>Тема:</b> <span>Как заявить профиль {{Компания}} и поднять Trust Score</span></p>
+    <div class="body" data-subject="Как заявить профиль {{Компания}} и поднять Trust Score">{{Имя}}, спасибо за разговор и правки по профилю.
+
+Как договорились: вы можете заявить профиль {{Компания}} и пройти верификацию (KYB) — это поднимает Trust Score и показывает покупателям, что данные подтверждены вами. Документы: {{список}}.
+
+Готовы запустить вас в пилоте верификации? Если да — пришлю короткую форму на 10 минут.
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="signals">
+    <div class="signal g"><b>Зелёный сигнал</b>Хотят заявить/улучшить профиль, дают документы, просят убрать «серых» конкурентов.</div>
+    <div class="signal r"><b>Красный сигнал</b>«Удалите профиль», упоминание юриста/претензии, полное безразличие.</div>
+  </div>
+
+  <!-- ───────────── B2B ───────────── -->
+  <h2>3. B2B-заказчик (монетизация) <span style="color:var(--red);font-size:13px;">P0</span></h2>
+  <p class="role-goal">Гипотеза: организации готовы платить за доступ/мониторинг Trust Score — основной источник выручки.</p>
+
+  <div class="email">
+    <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+    <p class="subject"><b>Тема:</b> <span>Как вы проверяете поставщиков пептидов? 25 минут</span></p>
+    <div class="body" data-subject="Как вы проверяете поставщиков пептидов? 25 минут">Здравствуйте, {{Имя}}!
+
+{{Ваше имя}} из PeptideTrust. Мы изучаем, как организации, регулярно закупающие пептиды и реагенты, проверяют и одобряют поставщиков (комплаенс, due diligence, onboarding).
+
+Не презентация — разговор о вашем процессе. 25 минут с тем, кто отвечает за одобрение поставщиков, очень помогут нам.
+
+Удобно на этой неделе? {{ссылка на календарь}}
+Если этим владеет коллега — буду благодарен за интро.
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+    <p class="subject"><b>Тема:</b> <span>Re: проверка поставщиков — короткий разговор</span></p>
+    <div class="body" data-subject="Re: проверка поставщиков — короткий разговор">Здравствуйте, {{Имя}}!
+
+Поднимаю письмо. Нам важно понять реальный процесс одобрения поставщиков именно в таких организациях, как {{Компания}}.
+
+25 минут, без подготовки с вашей стороны: {{ссылка на календарь}}. Тема не ваша — подскажете, к кому обратиться?
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag after">Письмо 3 · после звонка (запрос на пилот/LOI)</span><span class="when">в тот же день</span></div>
+    <p class="subject"><b>Тема:</b> <span>Следующий шаг: пилот доступа к Trust Score</span></p>
+    <div class="body" data-subject="Следующий шаг: пилот доступа к Trust Score">{{Имя}}, спасибо за детали по процессу одобрения.
+
+Судя по разговору, вам было бы полезно {{конкретная польза из разговора}}. Предлагаю пилот: доступ к мониторингу Trust Score по вашему списку поставщиков на {{срок}}.
+
+Чтобы зафиксировать интерес для нашей команды — достаточно короткого письма о намерениях (LOI) или согласия на платный пилот. Подготовлю шаблон на одну страницу. С кем ещё нужно согласовать?
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="signals">
+    <div class="signal g"><b>Зелёный сигнал</b>Называют владельца бюджета и процесс, просят КП/пилот, дают LOI.</div>
+    <div class="signal r"><b>Красный сигнал</b>«Интересно, но бюджета нет», «пришлите материалы» по кругу.</div>
+  </div>
+
+  <!-- ───────────── LAB ───────────── -->
+  <h2>4. Лаборатория-оракул <span style="color:#8a6000;font-size:13px;">P1</span></h2>
+  <p class="role-goal">Гипотеза: независимые лаборатории согласятся поставлять верификации на устойчивых условиях.</p>
+
+  <div class="email">
+    <div class="email-head"><span class="tag cold">Письмо 1 · холодное</span><span class="when">день 0</span></div>
+    <p class="subject"><b>Тема:</b> <span>Независимые тесты пептидов — условия партнёрства</span></p>
+    <div class="body" data-subject="Независимые тесты пептидов — условия партнёрства">Здравствуйте, {{Имя}}!
+
+{{Ваше имя}} из PeptideTrust. Мы строим нейтральный реестр доверия поставщиков пептидов, где независимые лабораторные верификации повышают оценку участников.
+
+Хотим понять, на каких условиях лаборатории вроде {{Компания}} готовы делиться результатами тестов и что для вас критично (цена, юр-защита, репутация). 20–30 минут.
+
+Удобно на этой неделе? {{ссылка на календарь}}
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag nudge">Письмо 2 · напоминание</span><span class="when">день +3</span></div>
+    <p class="subject"><b>Тема:</b> <span>Re: партнёрство по верификациям</span></p>
+    <div class="body" data-subject="Re: партнёрство по верификациям">Здравствуйте, {{Имя}}!
+
+Возвращаюсь к вопросу о партнёрстве. Для нас важно построить условия так, чтобы лаборатории видели в этом выгоду, а не нагрузку.
+
+Короткий разговор поможет это понять: {{ссылка на календарь}}. Если есть профильный человек — подскажете контакт?
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="email">
+    <div class="email-head"><span class="tag after">Письмо 3 · после звонка</span><span class="when">в тот же день</span></div>
+    <p class="subject"><b>Тема:</b> <span>Пилот по выгрузке верификаций</span></p>
+    <div class="body" data-subject="Пилот по выгрузке верификаций">{{Имя}}, спасибо за разговор и за прозрачность по условиям.
+
+Предлагаю небольшой пилот: тестовая выгрузка верификаций по {{N}} образцам на согласованных условиях ({{модель: оплата/бартер/трафик}}), чтобы обе стороны оценили процесс без больших обязательств.
+
+Подготовить короткое соглашение о пилоте? И — есть ли коллеги-лаборатории, которым это могло бы быть интересно?
+
+Спасибо!
+{{Ваше имя}}</div>
+    <button class="copy">Копировать письмо</button>
+  </div>
+
+  <div class="signals">
+    <div class="signal g"><b>Зелёный сигнал</b>Готовы на пилот/тестовую выгрузку, видят маркетинговую выгоду.</div>
+    <div class="signal r"><b>Красный сигнал</b>Высокая плата без обязательств, юр-страхи без поиска решения.</div>
+  </div>
+
+  <footer>
+    Источник: BA-аудит PeptideTrust · карта допущений · гайды интервью (The Mom Test). Письма — для набора респондентов и фиксации коммитмента; не являются офертой. Перед массовой рассылкой проверьте требования к холодным письмам (GDPR / e-Privacy в EU): идентификация отправителя и явный opt-out.
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var card = btn.closest('.email');
+      var bodyEl = card.querySelector('.body');
+      var subject = bodyEl.getAttribute('data-subject') || '';
+      var text = (subject ? 'Тема: ' + subject + '\n\n' : '') + bodyEl.innerText;
+      var done = function () {
+        btn.classList.add('done');
+        var old = btn.textContent;
+        btn.textContent = 'Скопировано ✓';
+        setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+      } else { fallback(text, done); }
+    });
+  });
+  function fallback(text, done) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+</script>
+</body>
+</html>

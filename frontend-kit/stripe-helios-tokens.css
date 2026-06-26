@@ -1,0 +1,158 @@
+/* =====================================================================
+   PeptideTrust — Design Tokens (Stripe "Helios" DS, извлечено из боевого CSS)
+   ---------------------------------------------------------------------
+   Источник: реальные стили stripe.com/en-pt
+     b.stripecdn.com/mkt-ssr-statics/assets/_next/static/css/0e38726ed39fdb12.css
+     (+ 415824979562eaca / ca9b9809eeb99b6f / e07e144a3b1db9ca)
+   Значения скопированы 1:1 из --hds-* переменных Stripe (НЕ подобраны на глаз).
+   Это база под hi-fi прототип PeptideTrust; светлая тема.
+   Логотип/иллюстрации Stripe НЕ используются — только язык стиля.
+   ===================================================================== */
+
+:root {
+  /* ---------- Шрифты ----------
+     Оригинал Stripe: sohne-var (вариативный, проприетарный, Klim Type Foundry).
+     Открытая замена для v0/прототипа — Inter (var). Подмена на Söhne — 1 строкой при наличии лицензии. */
+  --font-sans: "Inter", "sohne-var", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-code: "Source Code Pro", "SourceCodePro", ui-monospace, monospace;
+
+  /* Веса (Stripe: тонкое начертание) */
+  --fw-light: 300;
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-bold: 600;
+
+  /* ---------- Бренд (индиго) — --hds-color-core-brand-* ---------- */
+  --brand-25:  #f5f5ff;
+  --brand-50:  #e8e9ff;
+  --brand-75:  #e2e4ff;
+  --brand-100: #d6d9fc;
+  --brand-200: #b9b9f9;
+  --brand-300: #9a9afe;
+  --brand-400: #7f7dfc;
+  --brand-500: #665efd;
+  --brand-600: #533afd;  /* primary solid (кнопки/акцент) */
+  --brand-700: #4032c8;
+  --brand-800: #2e2b8c;
+  --brand-900: #1c1e54;
+  --brand-950: #161741;
+  --brand-975: #0f1137;
+  --brand-blurple: #635bff;  /* focus-border / классический Stripe blurple */
+
+  /* ---------- Нейтраль (navy → slate) — --hds-color-core-neutral-* ---------- */
+  --neutral-0:   #ffffff;
+  --neutral-25:  #f8fafd;
+  --neutral-50:  #e5edf5;
+  --neutral-100: #d4dee9;
+  --neutral-200: #bac8da;
+  --neutral-300: #95a4ba;
+  --neutral-400: #7d8ba4;
+  --neutral-500: #64748d;
+  --neutral-600: #50617a;
+  --neutral-700: #3c4f69;
+  --neutral-800: #273951;
+  --neutral-900: #1a2c44;
+  --neutral-950: #11273e;
+  --neutral-975: #0d253d;
+  --neutral-990: #061b31;  /* самый тёмный ink */
+
+  /* ---------- Акценты (для градиент-меша и пиллов) ---------- */
+  --lemon-200:   #f9b900;
+  --orange-350:  #ff6118;
+  --magenta-350: #f44bcc;
+  --ruby-400:    #ea2261;
+
+  /* ---------- Семантика (--hds-color-*, светлая тема) ---------- */
+  --color-bg-page:        var(--neutral-25);   /* #f8fafd — фон страницы (cloud) */
+  --color-surface:        var(--neutral-0);    /* #ffffff — карточки/панели */
+  --color-surface-border: var(--neutral-50);   /* #e5edf5 — тихая граница */
+
+  --color-heading:        var(--neutral-990);  /* #061b31 — заголовки */
+  --color-text:           var(--neutral-600);  /* #50617a — основной body (soft) */
+  --color-text-subdued:   var(--neutral-500);  /* #64748d — приглушённый */
+  --color-text-quiet:     var(--neutral-400);  /* #7d8ba4 — caption/hint */
+
+  --color-action:         var(--brand-600);    /* #533afd — primary action */
+  --color-action-hover:   var(--brand-700);    /* #4032c8 — hover (затемнение) */
+  --color-on-action:      var(--neutral-0);    /* текст на индиго */
+  --color-focus:          var(--brand-blurple);/* #635bff — кольцо фокуса */
+  --color-link:           var(--brand-600);
+
+  --color-input-border:        #44556699;       /* --hds-color-input-border-default */
+  --color-input-border-hover:  var(--brand-500);/* #665efd */
+  --color-input-border-focus:  var(--brand-600);
+  --color-input-bg-hover:      var(--brand-25);
+
+  --color-error:    #d8351e;   /* --hds-color-core-error-500 */
+  --color-error-2:  #f3432a;   /* error-400 */
+  --color-success:  #00b261;   /* success-400 */
+
+  /* ---------- Радиусы — --hds-space-core-radius-* ---------- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 16px;
+  --radius-xl: 32px;
+  --radius-round: 99999px;
+  --radius-button: var(--radius-sm);  /* кнопки Stripe ~4px */
+  --radius-input:  var(--radius-md);
+  --radius-card:   var(--radius-lg);
+
+  /* ---------- Тени Stripe (двухслойные: top rgba(0,55,112) + bottom rgba(0,59,137)) ----------
+     Скопированы из --hds-shadow-* (offset/blur/spread) + --hds-color-shadow-* (alpha). */
+  --shadow-xs: 0 2px 10px 0 rgba(0,55,112,.06), 0 1px 4px 0 rgba(0,59,137,.04);
+  --shadow-sm: 0 5px 14px 0 rgba(0,55,112,.08), 0 2px 8px 0 rgba(0,59,137,.05);
+  --shadow-md: 0 6px 22px 0 rgba(0,55,112,.10), 0 4px 8px 0 rgba(0,59,137,.02);
+  --shadow-lg: 0 15px 40px -2px rgba(0,55,112,.10), 0 5px 20px -2px rgba(0,59,137,.04);
+  --shadow-xl: 0 20px 80px -16px rgba(0,55,112,.14), 0 10px 60px -16px rgba(0,59,137,.06);
+
+  /* ---------- Шкала отступов (4px-сетка) — --hds-space-core-* ---------- */
+  --space-25:  2px;
+  --space-50:  4px;
+  --space-75:  6px;
+  --space-100: 8px;
+  --space-150: 12px;
+  --space-200: 16px;
+  --space-250: 20px;
+  --space-300: 24px;
+  --space-350: 28px;
+  --space-400: 32px;
+  --space-450: 36px;
+  --space-500: 40px;
+  --space-550: 44px;
+  --space-600: 48px;
+  --space-700: 56px;
+  --space-800: 64px;
+  --space-900: 72px;
+  --space-1000: 80px;
+
+  /* ---------- Типошкала (литералы из боевого CSS) ----------
+     Заголовки Stripe — тонкие (300–400) с отрицательным трекингом. */
+  --fs-display: 3.875rem;  /* ~62px hero */
+  --fs-h1:      2.125rem;  /* 34px */
+  --fs-h2:      1.625rem;  /* 26px */
+  --fs-h3:      1.3125rem; /* 21px */
+  --fs-h4:      1.125rem;  /* 18px */
+  --fs-body:    1rem;      /* 16px */
+  --fs-sm:      0.875rem;  /* 14px */
+  --fs-caption: 0.75rem;   /* 12px */
+
+  --ls-display: -0.0308em; /* крупный display */
+  --ls-heading: -0.01em;   /* стандартный заголовок Stripe */
+  --ls-body:    0;
+
+  --lh-tight: 1.15;
+  --lh-base:  1.5;
+}
+
+/* ---------- Сигнатурный градиент-меш Stripe (hero) ----------
+   cream → orange → magenta/ruby → lavender/indigo. Применять в верхней трети hero/баннеров. */
+.stripe-gradient-mesh {
+  background:
+    radial-gradient(60% 80% at 75% 10%, #ffe5da 0%, rgba(255,229,218,0) 55%),
+    radial-gradient(50% 70% at 90% 20%, var(--orange-350) 0%, rgba(255,97,24,0) 50%),
+    radial-gradient(55% 75% at 95% 45%, var(--magenta-350) 0%, rgba(244,75,204,0) 55%),
+    radial-gradient(60% 80% at 80% 60%, var(--ruby-400) 0%, rgba(234,34,97,0) 55%),
+    radial-gradient(70% 90% at 60% 30%, var(--brand-400) 0%, rgba(127,125,252,0) 60%);
+  filter: saturate(1.05);
+}

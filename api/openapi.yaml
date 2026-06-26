@@ -1,0 +1,379 @@
+openapi: 3.1.0
+info:
+  title: PeptideTrust Registry API
+  version: 0.9.0-draft
+  description: >
+    Открытый trust-layer для RUO-рынка. Публичный read бесплатен и без аутентификации;
+    write/protected — API-key + payload-подпись (PKI). Данные off-chain; в L2 анкорятся
+    только анонимные хеши. Параметры провизорны до SME v1.0.
+  contact:
+    name: PeptideTrust (рабочее название)
+servers:
+  - url: https://api.peptidetrust.example/v1
+    description: prod (EU/CH)
+  - url: https://staging-api.peptidetrust.example/v1
+    description: staging
+
+tags:
+  - name: catalog
+    description: Публичный каталог и профили (read, MVP)
+  - name: badge
+    description: Подписанный бейдж (MVP)
+  - name: integrity
+    description: Проверка ончейн-целостности (MVP)
+  - name: onboarding
+    description: Claim-profile и идентичность (MVP)
+  - name: submissions
+    description: Подача данных/артефактов (MVP)
+  - name: appeals
+    description: Апелляции (V1)
+  - name: b2b
+    description: B2B due-diligence, мониторинг, аналитика (V1)
+
+paths:
+  /participants:
+    get:
+      tags: [catalog]
+      summary: Сегментированный каталог
+      security: []
+      parameters:
+        - { name: role, in: query, schema: { type: string }, description: код роли }
+        - { name: tier, in: query, schema: { type: string, enum: [platinum, gold, silver, bronze, watch] } }
+        - { name: factor, in: query, schema: { $ref: '#/components/schemas/FactorCode' } }
+        - { name: verified_legal, in: query, schema: { type: boolean } }
+        - { name: q, in: query, schema: { type: string }, description: поиск по имени/домену }
+        - { name: cursor, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, default: 20, maximum: 100 } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/ParticipantSummary' } }
+                  next_cursor: { type: string, nullable: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /participants/{id}:
+    get:
+      tags: [catalog]
+      summary: Профиль участника
+      security: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParticipantProfile' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /participants/{id}/history:
+    get:
+      tags: [catalog]
+      summary: История Score по algo_version
+      security: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/ScoreEvent' } }
+                  next_cursor: { type: string, nullable: true }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /verify/{anchor_hash}:
+    get:
+      tags: [integrity]
+      summary: Проверка ончейн-якоря
+      security: []
+      parameters:
+        - { name: anchor_hash, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  anchored: { type: boolean }
+                  l2_tx: { type: string, nullable: true }
+                  algo_version: { type: integer }
+                  computed_at: { type: string, format: date-time }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /badge/{id}.svg:
+    get:
+      tags: [badge]
+      summary: Подписанный SVG-бейдж
+      security: []
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: theme, in: query, schema: { type: string, enum: [light, dark], default: light } }
+      responses:
+        '200':
+          description: SVG-изображение (кэшируемо, подписано)
+          content:
+            image/svg+xml:
+              schema: { type: string }
+          headers:
+            Cache-Control: { schema: { type: string }, description: 'public, max-age=TTL' }
+            ETag: { schema: { type: string } }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /claims:
+    post:
+      tags: [onboarding]
+      summary: Claim-profile / онбординг
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClaimRequest' }
+      responses:
+        '202':
+          description: Принято в обработку (верификация у провайдера)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClaimStatus' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /submissions:
+    post:
+      tags: [submissions]
+      summary: Подача данных/артефактов (отзыв, тест, COA)
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/Signature'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SubmissionRequest' }
+      responses:
+        '202':
+          description: Принято; пересчёт асинхронно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submission_id: { type: string, format: uuid }
+                  status: { type: string, example: queued }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/Unprocessable' }
+
+  /appeals:
+    post:
+      tags: [appeals]
+      summary: Подать апелляцию (V1)
+      parameters:
+        - $ref: '#/components/parameters/Signature'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AppealRequest' }
+      responses:
+        '201':
+          description: Создано
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Appeal' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /b2b/webhooks:
+    post:
+      tags: [b2b]
+      summary: Подписка на изменения Score/флагов (V1)
+      parameters:
+        - $ref: '#/components/parameters/Signature'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_id, url, events]
+              properties:
+                target_id: { type: string, format: uuid }
+                url: { type: string, format: uri }
+                events:
+                  type: array
+                  items: { type: string, enum: [score.updated, flag.opened, lot.recalled] }
+      responses:
+        '201':
+          description: Подписка создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription_id: { type: string, format: uuid }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+  security:
+    - ApiKeyAuth: []
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string }
+      description: Уникальный ключ для безопасного ретрая write-запроса
+    Signature:
+      name: X-Signature
+      in: header
+      required: true
+      schema: { type: string }
+      description: Подпись payload (PKI) для protected-эндпоинтов
+
+  schemas:
+    FactorCode:
+      type: string
+      enum: [QEF, PCF, SCIF, TRF, FRF, CCF, CVF, CVF_B, RF]
+    Tier:
+      type: string
+      enum: [platinum, gold, silver, bronze, watch]
+      description: >
+        Полоса Score (пороги — Parameters Registry). Статус new/provisional
+        (недостаток данных) отражается через ParticipantStatus + score:null.
+    ParticipantStatus:
+      type: string
+      enum: [unclaimed, provisional, active, suspended, tombstone]
+    ParticipantSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        display_name: { type: string }
+        role_code: { type: string }
+        status: { $ref: '#/components/schemas/ParticipantStatus' }
+        score: { type: number, nullable: true, description: null для no-TS/provisional }
+        dominant_factor: { $ref: '#/components/schemas/FactorCode' }
+        is_balanced: { type: boolean }
+        tier: { $ref: '#/components/schemas/Tier' }
+        verified_legal: { type: boolean }
+    ParticipantProfile:
+      allOf:
+        - $ref: '#/components/schemas/ParticipantSummary'
+        - type: object
+          properties:
+            kyb_level: { type: string, enum: [L0, L1, L2, L3] }
+            jurisdiction: { type: string, nullable: true }
+            trust_ceiling: { type: string, nullable: true }
+            factors:
+              type: array
+              items:
+                type: object
+                properties:
+                  factor: { $ref: '#/components/schemas/FactorCode' }
+                  value: { type: number }
+                  vi: { type: number }
+                  di_class: { type: string, enum: [A, B, C, D] }
+                  contribution: { type: number }
+            flags:
+              type: array
+              items:
+                type: object
+                properties:
+                  type: { type: string }
+                  severity: { type: string, enum: [INFO, WARNING, CRITICAL] }
+                  status: { type: string }
+            latest_anchor_hash: { type: string, nullable: true }
+            algo_version: { type: integer }
+    ScoreEvent:
+      type: object
+      properties:
+        score: { type: number }
+        dominant_factor: { $ref: '#/components/schemas/FactorCode' }
+        algo_version: { type: integer }
+        anchor_hash: { type: string, nullable: true }
+        computed_at: { type: string, format: date-time }
+    ClaimRequest:
+      type: object
+      required: [participant_id, contact]
+      properties:
+        participant_id: { type: string, format: uuid, description: для claim Unclaimed-профиля }
+        contact: { type: string }
+        requested_level: { type: string, enum: [L1, L2, L3] }
+    ClaimStatus:
+      type: object
+      properties:
+        claim_id: { type: string, format: uuid }
+        status: { type: string, enum: [pending_verification, provisional, rejected] }
+    SubmissionRequest:
+      type: object
+      required: [participant_id, kind]
+      properties:
+        participant_id: { type: string, format: uuid }
+        kind: { type: string, enum: [review, test, coa, artifact] }
+        lot_qr_key: { type: string, nullable: true }
+        factor: { $ref: '#/components/schemas/FactorCode' }
+        value: { type: number, minimum: 0, maximum: 100 }
+        signed_payload: { type: string, nullable: true, description: для COA от оракула }
+        media_ref: { type: string, nullable: true }
+    AppealRequest:
+      type: object
+      required: [subject_id, flag_id, statement]
+      properties:
+        subject_id: { type: string, format: uuid }
+        flag_id: { type: string, format: uuid }
+        statement: { type: string }
+    Appeal:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [submitted, panel_forming, in_review, decided, withdrawn] }
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, description: машиночитаемый код (см. каталог ошибок) }
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
+        request_id: { type: string }
+
+  responses:
+    BadRequest:
+      description: Некорректный запрос
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Unauthorized:
+      description: Нет/неверная аутентификация или подпись
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    NotFound:
+      description: Не найдено
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Conflict:
+      description: Конфликт (напр. claim уже существует)
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Unprocessable:
+      description: Ошибка валидации бизнес-правил
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    RateLimited:
+      description: Превышен лимит запросов
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }

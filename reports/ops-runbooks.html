@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Runbooks / On-call Playbooks</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:260px;min-width:260px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.sb-grp{color:#5a5955;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.8rem 1.1rem .25rem}
+.nav-link{color:#999;font-size:.76rem;padding:.4rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:26px}
+section{margin-bottom:2.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.25rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.rb{background:#fff;border:1px solid #e4e2dc;border-radius:12px;padding:1.1rem 1.3rem;margin:1rem 0}
+.rb-h{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.5rem}
+.rb-id{font-family:ui-monospace,Menlo,monospace;font-size:.72rem;font-weight:800;color:#b8731a}
+.rb-t{font-size:1.02rem;font-weight:800;color:#1a1917}
+.sev{font-size:.64rem;font-weight:800;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.03em}
+.s1{background:#fbe9e9;color:#a5281f}.s2{background:#fdf0e3;color:#b6651a}.s3{background:#eef0fb;color:#3b4a8c}
+.rb dl{margin:.3rem 0}
+.rb dt{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#8a8a82;margin-top:.6rem}
+.rb dd{font-size:.83rem;color:#3a3935;margin:.15rem 0 0}
+.rb ol{margin:.2rem 0 0 1.2rem}.rb ol li{font-size:.83rem;margin-bottom:.2rem;color:#3a3935}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Runbooks / On-call<span class="sb-sub">эксплуатация · инциденты</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">00</span>Обзор и роли</a>
+<a class="nav-link" href="#sev"><span class="nav-num">01</span>Severity и эскалация</a>
+<div class="sb-grp">Инфраструктура</div>
+<a class="nav-link" href="#rb-kyb"><span class="nav-num">RB-01</span>KYB/KYC недоступен</a>
+<a class="nav-link" href="#rb-l2"><span class="nav-num">RB-02</span>Сбой L2 / anchoring</a>
+<a class="nav-link" href="#rb-kms"><span class="nav-num">RB-03</span>KMS/HSM недоступен</a>
+<a class="nav-link" href="#rb-db"><span class="nav-num">RB-04</span>Сбой БД / restore</a>
+<a class="nav-link" href="#rb-badge"><span class="nav-num">RB-05</span>Бейдж/CDN/DDoS</a>
+<a class="nav-link" href="#rb-webhook"><span class="nav-num">RB-06</span>Бэклог вебхуков</a>
+<div class="sb-grp">Безопасность</div>
+<a class="nav-link" href="#rb-oracle"><span class="nav-num">RB-07</span>Компрометация ключа оракула</a>
+<a class="nav-link" href="#rb-signer"><span class="nav-num">RB-08</span>Компрометация подписанта</a>
+<a class="nav-link" href="#rb-breach"><span class="nav-num">RB-09</span>Утечка ПДн</a>
+<a class="nav-link" href="#rb-disclosure"><span class="nav-num">RB-10</span>Responsible disclosure</a>
+<div class="sb-grp">Доверие/данные</div>
+<a class="nav-link" href="#rb-score"><span class="nav-num">RB-11</span>Аномалия Score / баг алгоритма</a>
+<a class="nav-link" href="#rb-collusion"><span class="nav-num">RB-12</span>Кольцо сговора / масс-абьюз</a>
+<a class="nav-link" href="#rb-recall"><span class="nav-num">RB-13</span>Массовый recall</a>
+<div class="sb-grp">Процесс</div>
+<a class="nav-link" href="#postmortem"><span class="nav-num">02</span>Постмортем</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Эксплуатация · Runbooks / On-call Playbooks</div>
+<h1>Runbooks / On-call Playbooks</h1>
+<p class="sec-intro">Пошаговые процедуры для дежурного на инциденты — операционные и security. Каждый runbook: симптом → детект → шаги → эскалация → восстановление → постмортем. Опирается на <a href="../reports/wave4-ux-security-operations.html">Волну 4</a> (incident response, SLA, threat model), <a href="../reports/spec-integration-contracts.html">Integration Contracts</a> (обработка сбоев) и <a href="../reports/architecture-infra-devops.html">Infra &amp; DevOps</a> (бэкапы/DR).</p>
+<table>
+<thead><tr><th>Роль</th><th>Зона ответственности</th></tr></thead>
+<tbody>
+<tr><td>On-call инженер</td><td>Первичный детект, триаж, выполнение runbook, эскалация</td></tr>
+<tr><td>Incident Commander</td><td>Координация S1/S2, коммуникация, решение о публичном статусе</td></tr>
+<tr><td>Security lead</td><td>Security-инциденты (RB-07…RB-10), ротация/ревокация ключей</td></tr>
+<tr><td>DPO / Legal</td><td>Утечка ПДн (RB-09), нотификации регулятору</td></tr>
+<tr><td>Параметрический комитет</td><td>Решения по алгоритму/весам (RB-11, RB-12)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="sev">
+<div class="sec-badge">01 — Severity и эскалация</div>
+<table>
+<thead><tr><th>Уровень</th><th>Критерий</th><th>Реакция / эскалация</th></tr></thead>
+<tbody>
+<tr><td><span class="sev s1">S1</span></td><td>Недоступен публичный read-путь; утечка ПДн; компрометация ключа подписанта</td><td>Немедленно: IC + security lead; публичный статус</td></tr>
+<tr><td><span class="sev s2">S2</span></td><td>Деградация (anchoring/write/вебхуки стоят); сбой одной интеграции</td><td>On-call → IC при затягивании; запись в журнал</td></tr>
+<tr><td><span class="sev s3">S3/S4</span></td><td>Локальные сбои, бэклоги без влияния на read; минорные</td><td>On-call в рабочем порядке</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Инвариант</div><p>Сбой любой внешней интеграции (KYB/L2/KMS/вебхуки) НЕ должен ронять публичный read-путь. Если роняет — это автоматически S1.</p></div>
+</section>
+
+<!-- ===== INFRA ===== -->
+<section id="rb-kyb">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-01</span><span class="rb-t">KYB/KYC-провайдер недоступен</span><span class="sev s2">S2</span></div>
+<dl>
+<dt>Симптом</dt><dd>Claim/верификации зависают; рост <code>pending_verification</code>; ошибки <code>UPSTREAM_UNAVAILABLE</code>.</dd>
+<dt>Детект</dt><dd>Алерт по error-rate провайдера и длине очереди верификаций.</dd>
+</dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Подтвердить, что read-путь и Score не затронуты (только онбординг).</li>
+<li>Проверить статус-страницу провайдера; включить fallback-провайдер по юрисдикции (Wave 2).</li>
+<li>Убедиться, что заявки остаются в очереди (не теряются), ретраи идут.</li>
+<li>Опубликовать баннер «верификация замедлена» при затягивании &gt;SLA.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>После восстановления — дренаж очереди; проверить отсутствие дублей claim (идемпотентность).</dd></dl>
+</div>
+</section>
+
+<section id="rb-l2">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-02</span><span class="rb-t">Сбой L2 RPC / anchoring</span><span class="sev s2">S2</span></div>
+<dl><dt>Симптом</dt><dd>Рост <code>score_events.anchor_status='pending'/'failed'</code>; ошибки RPC.</dd>
+<dt>Детект</dt><dd>Алерт по глубине очереди anchoring и возрасту самого старого pending.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Подтвердить: Score валиден off-chain, целостность догоняется — read не затронут.</li>
+<li>Проверить здоровье RPC-эндпоинта; переключить на резервный provider/endpoint.</li>
+<li>Убедиться, что ретраи с backoff активны (SM anchoring); не сбрасывать batchId (идемпотентность).</li>
+<li>При длительном сбое сети — переключение Base↔Arbitrum через HashAnchor-абстракцию (ADR-004), решение IC.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Дренаж pending-батчей; выборочная проверка <code>/verify/{hash}</code>.</dd></dl>
+</div>
+</section>
+
+<section id="rb-kms">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-03</span><span class="rb-t">KMS/HSM недоступен</span><span class="sev s1">S1→S2</span></div>
+<dl><dt>Симптом</dt><dd>Не подписываются бейджи/лоты/якоря; ошибки signing-сервиса.</dd>
+<dt>Детект</dt><dd>Алерт signing-сервиса и роста ошибок подписи.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Бейджи отдаются из кэша (TTL/ETag) — подтвердить, что публичный показ жив.</li>
+<li>Новые подписи/anchoring ставятся в очередь, не теряются.</li>
+<li>Проверить доступность KMS/HSM-региона; failover на резервный регион/реплику.</li>
+<li>Если недоступность затрагивает read дольше TTL → эскалация до S1.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Дренаж очереди подписей; ротация при подозрении на компрометацию → RB-08.</dd></dl>
+</div>
+</section>
+
+<section id="rb-db">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-04</span><span class="rb-t">Сбой БД / восстановление</span><span class="sev s1">S1</span></div>
+<dl><dt>Симптом</dt><dd>Ошибки чтения/записи, недоступность основного инстанса.</dd>
+<dt>Детект</dt><dd>Health-check БД, репликационный лаг, рост 5xx.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Failover на реплику (read-path в приоритете).</li>
+<li>При повреждении — restore из PITR к точке до инцидента (RPO/RTO цели, Infra &amp; DevOps).</li>
+<li>После restore — реконсиляция <code>event_outbox</code> и anchoring (что не доехало).</li>
+<li>Проверить инварианты скоринга на свежем срезе (golden-датасет).</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Подтвердить целостность; зафиксировать фактический RPO/RTO в постмортеме.</dd></dl>
+</div>
+</section>
+
+<section id="rb-badge">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-05</span><span class="rb-t">Бейдж/CDN перегрузка или DDoS</span><span class="sev s1">S1</span></div>
+<dl><dt>Симптом</dt><dd>Всплеск трафика на <code>/badge</code> и read; рост латентности/5xx.</dd>
+<dt>Детект</dt><dd>Алерт по RPS/латентности; WAF-сигналы.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Убедиться, что бейдж/read за CDN с кэшем — край сети поглощает пик.</li>
+<li>Поднять TTL кэша бейджа; включить усиленные WAF-правила/rate-limit на источники.</li>
+<li>Защитить write/anchoring приоритетными лимитами; оракулам — приоритет.</li>
+<li>При таргетированном DDoS — провайдер anti-DDoS + блок-листы; IC решает о статусе.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Вернуть TTL/лимиты к норме; анализ источников.</dd></dl>
+</div>
+</section>
+
+<section id="rb-webhook">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-06</span><span class="rb-t">Бэклог доставки вебхуков (B2B)</span><span class="sev s3">S3</span></div>
+<dl><dt>Симптом</dt><dd>Рост <code>event_outbox.status='failed'</code>/attempts; жалобы B2B-клиентов.</dd>
+<dt>Детект</dt><dd>Алерт по длине очереди и доле failed.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Определить, общий ли это сбой воркера или конкретный недоступный endpoint подписчика.</li>
+<li>Endpoint подписчика мёртв → авто-пауза подписки + уведомление владельца (Integration Contracts §03).</li>
+<li>Сбой воркера → перезапуск; ретраи по backoff; ручной replay по <code>delivery_id</code>.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Дренаж очереди; подтвердить дедупликацию у получателей (at-least-once).</dd></dl>
+</div>
+</section>
+
+<!-- ===== SECURITY ===== -->
+<section id="rb-oracle">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-07</span><span class="rb-t">Компрометация ключа оракула</span><span class="sev s1">S1</span></div>
+<dl><dt>Симптом</dt><dd>Подозрительные COA/подписи; сигнал от оракула об утечке.</dd>
+<dt>Детект</dt><dd>Аномалии в подачах оракула; внешний репорт.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Немедленная ревокация сертификата через CRL (Wave 2 §04).</li>
+<li>Определить «дату компрометации vs дату подписи»: подписи ДО компрометации остаются валидными, ПОСЛЕ — аннулируются.</li>
+<li>Пометить затронутые <code>factor_inputs</code>/<code>coas</code> на пересчёт; снять их вклад.</li>
+<li>Перевыпуск ключа оракулу после расследования; уведомить затронутых участников.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Пересчёт Score затронутых; запись в governance_log + публичный инцидент-лог.</dd></dl>
+</div>
+</section>
+
+<section id="rb-signer">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-08</span><span class="rb-t">Компрометация ключа подписанта реестра</span><span class="sev s1">S1</span></div>
+<dl><dt>Симптом</dt><dd>Поддельные бейджи/контр-подписи, проходящие проверку.</dd>
+<dt>Детект</dt><dd>Аномалии подписей; внешний репорт; аудит KMS-доступа.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Отозвать скомпрометированный ключ; задействовать резервный из KMS/HSM (промежуточный, корень офлайн).</li>
+<li>Перевыпустить подписи бейджей (серверный рендер — массовая перегенерация по новому ключу).</li>
+<li>Опубликовать новый публичный ключ верификации; старый — в CRL.</li>
+<li>Аудит: что подписано в окне компрометации.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Подтвердить, что валидны только новые подписи; постмортем + публичный лог.</dd></dl>
+</div>
+</section>
+
+<section id="rb-breach">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-09</span><span class="rb-t">Утечка ПДн</span><span class="sev s1">S1</span></div>
+<dl><dt>Симптом</dt><dd>Доступ/эксфильтрация данных из защищённого контура идентичности.</dd>
+<dt>Детект</dt><dd>Аудит-лог доступа, DLP-сигналы, внешний репорт.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Изолировать контур; отозвать скомпрометированные доступы/токены.</li>
+<li>Подключить DPO/Legal: оценка объёма, нотификация регулятору в установленные сроки (GDPR), уведомление субъектов при необходимости.</li>
+<li>Зафиксировать таймлайн и затронутые данные (минимизация off-chain ограничивает объём).</li>
+<li>Закрыть вектор; ротация ключей шифрования при необходимости.</li>
+</ol>
+<dl><dt>Восстановление</dt><dd>Постмортем; публичное раскрытие по политике; меры предотвращения.</dd></dl>
+</div>
+</section>
+
+<section id="rb-disclosure">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-10</span><span class="rb-t">Входящий responsible disclosure</span><span class="sev s2">S2</span></div>
+<dl><dt>Симптом</dt><dd>Сообщение исследователя об уязвимости через disclosure-канал.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Подтвердить получение; завести приватный тикет; присвоить severity.</li>
+<li>Воспроизвести; оценить эксплуатируемость и охват.</li>
+<li>Фикс в окне до публикации; согласовать раскрытие с репортёром.</li>
+<li>Опубликовать в инцидент-логе после фикса; (bug bounty — позже по мере роста).</li>
+</ol>
+</div>
+</section>
+
+<!-- ===== TRUST/DATA ===== -->
+<section id="rb-score">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-11</span><span class="rb-t">Аномалия Score / баг алгоритма</span><span class="sev s1">S1</span></div>
+<dl><dt>Симптом</dt><dd>Массовый необъяснимый сдвиг Score; расхождение с golden-датасетом.</dd>
+<dt>Детект</dt><dd>Регрессия скоринга в CI; алерт по распределению Score; жалобы.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Зафиксировать <code>algo_version</code> и входы; воспроизвести на golden-датасете.</li>
+<li>Если баг в новой версии параметров → откат на предыдущую <code>algo_version</code> (forward-only: ввести корректирующую версию).</li>
+<li>Если баг в коде → rollback релиза (canary/auto-rollback, Infra &amp; DevOps).</li>
+<li>Пересчёт затронутых; уведомление; запись в changelog/governance_log.</li>
+</ol>
+<dl><dt>Эскалация</dt><dd>Изменение параметров/весов — только через параметрический комитет.</dd></dl>
+</div>
+</section>
+
+<section id="rb-collusion">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-12</span><span class="rb-t">Кольцо сговора / массовый абьюз</span><span class="sev s2">S2</span></div>
+<dl><dt>Симптом</dt><dd>Граф-детектор: кластер аффилированных аккаунтов накручивает Vᵢ/отзывы.</dd>
+<dt>Детект</dt><dd>Алерт collusion-ring detector; всплеск регистраций/отзывов.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Заморозить пропагацию по подозрительным циклам (BR-PROP-CYCLE).</li>
+<li>Сверить <code>real_identity_id</code> (скрытый) на аффилированность; пометить кластер.</li>
+<li>Снять вклад накрученных подтверждений; применить Pₛ при подтверждении.</li>
+<li>Спорные суждения — на кросс-сегментную Steward-панель (раздел 07 v2).</li>
+</ol>
+</div>
+</section>
+
+<section id="rb-recall">
+<div class="rb">
+<div class="rb-h"><span class="rb-id">RB-13</span><span class="rb-t">Массовый recall партий</span><span class="sev s2">S2</span></div>
+<dl><dt>Симптом</dt><dd>Множественный отзыв лотов/COA по одному вендору/оракулу.</dd></dl>
+<dt style="font-size:.66rem;font-weight:800;text-transform:uppercase;color:#8a8a82;margin-top:.6rem">Шаги</dt>
+<ol>
+<li>Перевести лоты в <code>recalled</code>; связанные подтверждения теряют положительный вклад (BR-RECALL).</li>
+<li>Немедленный пересчёт (критическое событие, не batch).</li>
+<li>При системном источнике (оракул) — проверить на RB-07.</li>
+<li>Уведомить downstream-контрагентов (каскад через мониторинг-вебхуки).</li>
+</ol>
+</div>
+</section>
+
+<section id="postmortem">
+<div class="sec-badge">02 — Постмортем (для всех S1/S2)</div>
+<table>
+<thead><tr><th>Раздел</th><th>Содержание</th></tr></thead>
+<tbody>
+<tr><td>Таймлайн</td><td>Детект → действия → восстановление (с метками времени)</td></tr>
+<tr><td>Воздействие</td><td>Затронутые участники/данные; фактические RPO/RTO/доступность</td></tr>
+<tr><td>Корневая причина</td><td>5 why; что сработало/не сработало в детекте</td></tr>
+<tr><td>Действия</td><td>Конкретные исправления с владельцем и сроком; новые алерты/тесты</td></tr>
+<tr><td>Прозрачность</td><td>Запись в публичный инцидент-лог по стандарту реестра (Волна 4)</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Связка с тестами</div><p>Каждый постмортем порождает регрессионный тест/алерт, чтобы инцидент не повторился. Security-инциденты пополняют <a href="../reports/spec-security-test-cases.html">Security Test Cases</a>.</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

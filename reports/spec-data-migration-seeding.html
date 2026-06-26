@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Data Migration &amp; Seeding</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;min-width:250px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.25rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.77rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.69rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+ol{margin:.3rem 0 .8rem 1.3rem}ol li{font-size:.85rem;margin-bottom:.3rem;color:#3a3935}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Migration &amp; Seeding<span class="sb-sub">данные · фикстуры</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#migrations"><span class="nav-num">02</span>Миграции схемы</a>
+<a class="nav-link" href="#unclaimed"><span class="nav-num">03</span>Импорт unclaimed</a>
+<a class="nav-link" href="#golden"><span class="nav-num">04</span>Golden-датасеты</a>
+<a class="nav-link" href="#fixtures"><span class="nav-num">05</span>Dev-фикстуры</a>
+<a class="nav-link" href="#algoseed"><span class="nav-num">06</span>Параметры/algo_version</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Транш C · Data Migration &amp; Seeding</div>
+<h1>Data Migration &amp; Seeding Spec</h1>
+<p class="sec-intro">Как наполняются данные: миграции схемы, импорт unclaimed-профилей, эталонные датасеты для регрессии скоринга и dev-фикстуры. Опирается на <a href="../reports/spec-db-physical-schema.html">DB Schema</a> и консервативную политику unclaimed (<a href="../reports/p0-closure.html">P0</a>).</p>
+</section>
+
+<section id="migrations">
+<div class="sec-badge">02 — Миграции схемы</div>
+<ol>
+<li><strong>Forward-only, expand→contract:</strong> сначала добавляем колонки/таблицы, переключаем код, потом удаляем старое.</li>
+<li>Версионируемые файлы миграций; авто на staging, approve на prod.</li>
+<li>Обратимость для откатываемых шагов; необратимые (drop) — отдельным релизом после стабилизации.</li>
+<li>Партиционирование <code>score_events</code>/<code>factor_inputs</code> по времени при росте.</li>
+</ol>
+<div class="rec-box"><div class="rec-t">Связь с algo_version</div><p>Миграции данных НЕ пересчитывают исторические Score. Изменение параметров — новая <code>algo_version</code>; старые события остаются под своей версией (forward-only).</p></div>
+</section>
+
+<section id="unclaimed">
+<div class="sec-badge">03 — Импорт unclaimed-профилей (консервативно)</div>
+<table>
+<thead><tr><th>Правило</th><th>Реализация</th></tr></thead>
+<tbody>
+<tr><td>Только нейтральные факты</td><td>Из легитимных публичных источников; никаких негативных/репутационных Score</td></tr>
+<tr><td>Статус</td><td><code>unclaimed</code>; полноценный TS не считается до claim+верификации</td></tr>
+<tr><td>Возражение/удаление</td><td>Явный механизм: участник может оспорить/удалить до claim</td></tr>
+<tr><td>Происхождение</td><td>Поле источника данных; аудируемость импорта</td></tr>
+<tr><td>Дедупликация</td><td>По домену/имени (trgm) перед вставкой</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Импорт — управляемый пайплайн с ревью, не массовый скрейп. Юридическую рамку (вне scope этого пакета) утверждает counsel.</p>
+</section>
+
+<section id="golden">
+<div class="sec-badge">04 — Golden-датасеты (регрессия скоринга)</div>
+<table>
+<thead><tr><th>Набор</th><th>Содержание</th></tr></thead>
+<tbody>
+<tr><td>GD-basic</td><td>Типовой вендор по всем 9 факторам → ожидаемый Score (worked example)</td></tr>
+<tr><td>GD-edge</td><td>Границы Fᵢ (0/100), missing data, balanced, no-TS, provisional</td></tr>
+<tr><td>GD-prop</td><td>Связи: одиночная, концентрация &gt;0.6, blind (λ), цикл (запрет), мульти-источник (max)</td></tr>
+<tr><td>GD-penalty</td><td>Один/несколько флагов, CRITICAL-потолок тира, истёкший флаг</td></tr>
+<tr><td>GD-decay</td><td>Возраст наблюдений по классам A–D, проверка floor</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Использование</div><p>Каждый набор привязан к <code>algo_version</code>. CI прогоняет их при каждом изменении ядра; расхождение = красный гейт (<a href="../reports/spec-test-strategy.html">Test Strategy</a>).</p></div>
+</section>
+
+<section id="fixtures">
+<div class="sec-badge">05 — Dev-фикстуры (seed)</div>
+<ol>
+<li>Участники по всем 22 ролям, разные тиры/статусы (unclaimed/provisional/active/suspended/tombstone).</li>
+<li>Оракулы с dev-сертификатами; один «отозванный» (для CRL-тестов).</li>
+<li>Лоты + COA: валидные и заведомо битые (custody incomplete, media reuse).</li>
+<li>Связи контрагентов, включая заведомый цикл и кластер «сговора».</li>
+<li>Флаги Pₛ разных severity; апелляция в каждом статусе.</li>
+<li>B2B-подписка + локальный webhook-sink.</li>
+</ol>
+<p>Команда: <code>pnpm db:seed</code> (см. <a href="../reports/dev-onboarding-local.html">Dev Onboarding</a>).</p>
+</section>
+
+<section id="algoseed">
+<div class="sec-badge">06 — Сидирование параметров / algo_version</div>
+<ol>
+<li>Засеять <code>algo_versions</code> (version=1, is_current=true).</li>
+<li>Загрузить <code>role_factor_weights</code> (матрица 22×9) и полосы факторов из <a href="../reports/spec-config-parameters.html">Parameters Registry</a>.</li>
+<li>Зафиксировать decay-классы, λ_blind, cap, пороги тиров.</li>
+<li>При SME-апруве (v0.9→v1.0) — новая версия, без пересчёта истории.</li>
+</ol>
+</section>
+
+</main>
+</div>
+</body>
+</html>

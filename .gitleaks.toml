@@ -1,0 +1,15 @@
+# gitleaks config — extends the bundled default ruleset.
+# https://github.com/gitleaks/gitleaks
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Project-level allowlist"
+paths = [
+  # Templates and docs contain placeholder/example values, not real secrets.
+  '''\.env\.example$''',
+]
+# Common non-secret placeholders used in templates/docs.
+regexes = [
+  '''dev-insecure-secret-change-me''',
+]

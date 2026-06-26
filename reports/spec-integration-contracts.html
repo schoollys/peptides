@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Integration Contracts</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.2rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.3rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+pre{background:#0f0e0d;border-radius:10px;padding:1rem 1.1rem;margin:1rem 0;overflow-x:auto;font-family:ui-monospace,Menlo,monospace;font-size:.75rem;color:#cfcfc7;line-height:1.5}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Integration Contracts<span class="sb-sub">вебхуки · retry · сбои</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#outbound"><span class="nav-num">02</span>Исходящие вебхуки (B2B)</a>
+<a class="nav-link" href="#retry"><span class="nav-num">03</span>Retry и доставка</a>
+<a class="nav-link" href="#inbound"><span class="nav-num">04</span>Входящие (оракулы/KYB)</a>
+<a class="nav-link" href="#failure"><span class="nav-num">05</span>Обработка сбоев</a>
+<a class="nav-link" href="#l2"><span class="nav-num">06</span>L2 anchoring</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Технические спецификации · Integration Contracts</div>
+<h1>Integration Contracts</h1>
+<p class="sec-intro">Детальные контракты интеграций: форматы вебхуков, retry-логика, обработка сбоев третьей стороны. Дополняет <a href="../reports/architecture-integration-map.html">Integration Map</a> (что/где) конкретными payload и политиками.</p>
+</section>
+
+<section id="outbound">
+<div class="sec-badge">02 — Исходящие вебхуки (B2B-мониторинг)</div>
+<p>Подписка через <code>POST /b2b/webhooks</code>. События: <code>score.updated</code>, <code>flag.opened</code>, <code>lot.recalled</code>.</p>
+<pre>POST {subscriber_url}
+Headers:
+  Content-Type: application/json
+  X-PT-Event: score.updated
+  X-PT-Delivery: 9f1c...           # уникальный id доставки (идемпотентность у получателя)
+  X-PT-Signature: sha256=...       # HMAC payload ключом подписки
+  X-PT-Timestamp: 1718800000
+
+{
+  "event": "score.updated",
+  "delivery_id": "9f1c-...",
+  "occurred_at": "2026-06-19T21:00:00Z",
+  "subscription_id": "sub_...",
+  "data": {
+    "participant_id": "uuid",
+    "score": 78.4,
+    "previous_score": 82.0,
+    "dominant_factor": "QEF",
+    "algo_version": 1,
+    "anchor_hash": "0x..."
+  }
+}</pre>
+<table>
+<thead><tr><th>Поле</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td>X-PT-Signature</td><td>HMAC-SHA256 тела ключом подписки — получатель верифицирует подлинность</td></tr>
+<tr><td>X-PT-Delivery</td><td>Уникальный id — получатель дедуплицирует (at-least-once доставка)</td></tr>
+<tr><td>X-PT-Timestamp</td><td>Защита от replay (отклонять старые)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="retry">
+<div class="sec-badge">03 — Retry и гарантии доставки</div>
+<table>
+<thead><tr><th>Параметр</th><th>Политика</th></tr></thead>
+<tbody>
+<tr><td>Семантика</td><td>At-least-once; получатель обязан дедуплицировать по <code>delivery_id</code></td></tr>
+<tr><td>Успех</td><td>HTTP 2xx в течение таймаута (напр. 5с)</td></tr>
+<tr><td>Ретраи</td><td>Экспоненциальный backoff с джиттером: напр. 1м → 5м → 30м → 2ч → 6ч (до N попыток)</td></tr>
+<tr><td>Хранение</td><td><code>event_outbox</code> (status, attempts, next_retry_at) — transactional outbox</td></tr>
+<tr><td>Исчерпание</td><td>После N неудач — пометка <code>failed</code>, алерт владельцу подписки, ручной replay</td></tr>
+<tr><td>Отключение</td><td>Долго недоступный endpoint → авто-пауза подписки + уведомление</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Transactional outbox</div><p>Событие пишется в <code>event_outbox</code> в одной транзакции с изменением данных — гарантия, что доставка не потеряется при сбое после коммита (паттерн из схемы БД).</p></div>
+</section>
+
+<section id="inbound">
+<div class="sec-badge">04 — Входящие интеграции</div>
+<table>
+<thead><tr><th>Источник</th><th>Контракт</th></tr></thead>
+<tbody>
+<tr><td>Оракул (COA)</td><td>Подача через <code>POST /submissions</code> kind=coa с <code>signed_payload</code> (PKI); сервер верифицирует подпись по сертификату оракула (не отозван в CRL)</td></tr>
+<tr><td>KYB/KYC провайдер</td><td>Async-результат верификации: callback/поллинг; мы сохраняем только статус/уровень + provider_ref</td></tr>
+<tr><td>SMS/OTP</td><td>Запрос/проверка кода (PoP L0); rate-limit на отправку</td></tr>
+<tr><td>Перевозчики (V1)</td><td>Трекинг-события custody → ingestion (CCF); идемпотентность по tracking id</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="failure">
+<div class="sec-badge">05 — Обработка сбоев третьей стороны</div>
+<table>
+<thead><tr><th>Сценарий</th><th>Поведение</th></tr></thead>
+<tbody>
+<tr><td>KYB-провайдер недоступен</td><td>Claim → состояние <code>pending_verification</code>; ретраи; read-путь не затронут; fallback-провайдер по юрисдикции</td></tr>
+<tr><td>KMS/HSM недоступен</td><td>Бейджи — из кэша (TTL); новые подписи/anchoring ставятся в очередь; алерт on-call</td></tr>
+<tr><td>L2 RPC сбой</td><td>Anchoring остаётся <code>pending</code>, ретраи с backoff; Score валиден off-chain, целостность догоняется</td></tr>
+<tr><td>Получатель вебхука падает</td><td>Ретраи по политике §03; пауза подписки при длительном отказе</td></tr>
+<tr><td>Платёжный провайдер (B2B)</td><td>Изолирован; влияет только на биллинг, не на ядро/доверие</td></tr>
+</tbody>
+</table>
+<p style="font-size:.8rem;color:#888">Общий инвариант: сбой любой внешней интеграции (кроме БД/кэша) не должен ронять критичный публичный read-путь. Запись/anchoring/доставка — асинхронны и устойчивы к сбоям через очереди и ретраи (Integration Map §05).</p>
+</section>
+
+<section id="l2">
+<div class="sec-badge">06 — L2 anchoring contract</div>
+<pre>HashAnchor.anchor(merkleRoot: bytes32, batchId: uint) -> txHash
+  // батч хешей score-событий/COA/custody за интервал
+  // Merkle-доказательство хранится off-chain, проверяется через /verify/{hash}</pre>
+<table>
+<thead><tr><th>Аспект</th><th>Контракт</th></tr></thead>
+<tbody>
+<tr><td>Батчинг</td><td>Merkle-root за интервал → одна L2-транзакция (минимизация газа)</td></tr>
+<tr><td>Идемпотентность</td><td>batchId предотвращает двойную отправку</td></tr>
+<tr><td>Подтверждение</td><td>Ожидание N блоков → статус <code>anchored</code> (см. SM anchoring в TDD)</td></tr>
+<tr><td>Абстракция</td><td>Интерфейс HashAnchor отвязывает от сети (ADR-004): смена Base↔Arbitrum без переписывания</td></tr>
+</tbody>
+</table>
+</section>
+
+</main>
+</div>
+</body>
+</html>

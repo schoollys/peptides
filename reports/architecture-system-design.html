@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — System Architecture Document</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.6rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.7rem 0 .6rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.diagram{background:#0f0e0d;border-radius:10px;padding:1.1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.74rem;color:#cfcfc7;line-height:1.55;overflow-x:auto;white-space:pre}
+.diagram .o{color:#e8935a}.diagram .g{color:#7fb88a}.diagram .b{color:#7fa8d8}.diagram .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>System Architecture<span class="sb-sub">SAD · monolith-first</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">01</span>Назначение и драйверы</a>
+<a class="nav-link" href="#style"><span class="nav-num">02</span>Стиль: monolith vs microservices</a>
+<a class="nav-link" href="#context"><span class="nav-num">03</span>Контекст (C4-L1)</a>
+<a class="nav-link" href="#containers"><span class="nav-num">04</span>Контейнеры (C4-L2)</a>
+<a class="nav-link" href="#modules"><span class="nav-num">05</span>Модули монолита</a>
+<a class="nav-link" href="#flows"><span class="nav-num">06</span>Ключевые потоки</a>
+<a class="nav-link" href="#data"><span class="nav-num">07</span>Хранилища данных</a>
+<a class="nav-link" href="#scale"><span class="nav-num">08</span>Масштабирование</a>
+<a class="nav-link" href="#evo"><span class="nav-num">09</span>Путь эволюции</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">Архитектурный трек · System/Solution Architecture Document</div>
+<h1>System Architecture Document</h1>
+<p class="sec-intro">Общая схема компонентов и их связей, стиль архитектуры и путь эволюции. Обоснования отдельных решений — в <a href="../reports/architecture-decision-records.html">ADR</a>. Внешние интеграции — в <a href="../reports/architecture-integration-map.html">Integration Map</a>. Данные/безопасность — в <a href="../reports/architecture-erd-security.html">ERD &amp; Security</a>.</p>
+<h4>Архитектурные драйверы</h4>
+<table>
+<thead><tr><th>Драйвер</th><th>Следствие для архитектуры</th></tr></thead>
+<tbody>
+<tr><td>Read-путь критичен (pull-стратегия)</td><td>Чтение (каталог/профиль/бейдж) отделено, кэшируемо, за CDN; доступность 99.9%</td></tr>
+<tr><td>Целостность данных публична</td><td>Анкоринг хешей в L2; неизменяемая история по algo_version</td></tr>
+<tr><td>Lean-команда на старте</td><td>Минимум операционной сложности → модульный монолит, не микросервисы</td></tr>
+<tr><td>Тяжёлые batch-пересчёты + событийные</td><td>Отдельный воркер/очередь, не в request-пути</td></tr>
+<tr><td>Криптография (PKI, подписи, ключи)</td><td>Изоляция ключей в KMS/HSM; выделенный сервис подписи бейджа/COA-верификации</td></tr>
+<tr><td>EU/CH правовой режим</td><td>Хостинг и данные в EU/CH; data-residency by design</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="style">
+<div class="sec-badge">02 — Стиль архитектуры</div>
+<h2>Решение: модульный монолит first</h2>
+<div class="rec-box">
+<div class="rec-t">Решение (см. ADR-001)</div>
+<p>MVP/V1 — <strong>модульный монолит</strong> (modular monolith) с чёткими границами модулей и выделением только двух процессов вне ядра: асинхронный <strong>worker</strong> (batch/события) и <strong>signing-сервис</strong> (изоляция ключей). Микросервисы — отложенная эволюция при доказанной необходимости (нагрузка/команда), а не стартовая позиция.</p>
+</div>
+<table>
+<thead><tr><th>Критерий</th><th>Монолит-first</th><th>Микросервисы</th></tr></thead>
+<tbody>
+<tr><td>Скорость разработки (lean-команда)</td><td>✓ высокая</td><td>✗ накладные расходы</td></tr>
+<tr><td>Операционная сложность</td><td>✓ низкая</td><td>✗ оркестрация, сеть, observability</td></tr>
+<tr><td>Транзакционная целостность скоринга</td><td>✓ единая БД, ACID</td><td>✗ распределённые транзакции</td></tr>
+<tr><td>Независимое масштабирование частей</td><td>◐ через реплики + воркеры</td><td>✓ по сервисам</td></tr>
+<tr><td>Риск «переписать через полгода»</td><td>✓ модульность даёт швы для выноса</td><td>✗ преждевременная сложность</td></tr>
+</tbody>
+</table>
+<p>Монолит делается <em>модульным</em> намеренно: границы модулей = будущие швы для выделения в сервисы. Это даёт преимущества монолита сейчас и опцион на микросервисы позже без переписывания.</p>
+</section>
+
+<section id="context">
+<div class="sec-badge">03 — Контекст (C4 уровень 1)</div>
+<h2>Система и внешние акторы</h2>
+<div class="diagram"><span class="c">// C4-L1: System Context</span>
+
+   <span class="b">[Покупатель]</span> <span class="b">[Вендор]</span> <span class="b">[Лаборатория-оракул]</span> <span class="b">[B2B-клиент]</span> <span class="b">[GB-организатор]</span>
+        \         |              |                |              /
+         \________|______________|________________|____________/
+                              |
+                    <span class="o">┌─────────────────────────┐</span>
+                    <span class="o">│   PeptideTrust Registry  │</span>  <span class="c">← наша система</span>
+                    <span class="o">│  (trust-layer, не маркет)│</span>
+                    <span class="o">└─────────────────────────┘</span>
+                       |        |        |         |
+                  <span class="g">[KYB/KYC]</span> <span class="g">[L2 chain]</span> <span class="g">[KMS/HSM]</span> <span class="g">[SMS/Email]</span>
+                  <span class="c">провайдер</span>  <span class="c">Base/Arb</span>  <span class="c">ключи</span>    <span class="c">нотифик.</span>
+</div>
+<p>Полный список внешних сервисов и точек интеграции — в <a href="../reports/architecture-integration-map.html">Integration Map</a>.</p>
+</section>
+
+<section id="containers">
+<div class="sec-badge">04 — Контейнеры (C4 уровень 2)</div>
+<h2>Развёртываемые единицы</h2>
+<div class="diagram"><span class="c">// C4-L2: Containers</span>
+
+  <span class="b">CDN / Edge cache</span> ──► <span class="o">Web App (SSR)</span>  ──┐
+        │                                │
+        ▼                                ▼
+  <span class="o">Badge endpoint</span> ◄──────────────  <span class="o">API Gateway / BFF</span>
+  <span class="c">(signed SVG/PNG)</span>                      │  (read public / write protected)
+                                         ▼
+                            <span class="o">┌──────────────────────────┐</span>
+                            <span class="o">│   Modular Monolith (API)  │</span>
+                            <span class="o">│  catalog·scoring·identity │</span>
+                            <span class="o">│  ingestion·anchoring·appeal│</span>
+                            <span class="o">└──────────────────────────┘</span>
+                              │        │            │
+                     <span class="g">PostgreSQL</span>   <span class="g">Redis</span>      <span class="g">Object Storage</span>
+                     <span class="c">(primary)</span>   <span class="c">cache/queue</span>  <span class="c">(артефакты)</span>
+                              ▲        │
+                              │        ▼
+                    <span class="o">Async Worker</span> ◄── очередь ── <span class="o">Signing Service</span> ──► <span class="g">KMS/HSM</span>
+                    <span class="c">(batch decay,</span>                <span class="c">(подпись бейджа,</span>
+                    <span class="c"> события, anchoring)</span>           <span class="c"> COA-верификация)</span>
+                              │
+                              ▼
+                          <span class="g">L2 (Base/Arbitrum)</span>  <span class="c">via HashAnchor</span>
+</div>
+<table>
+<thead><tr><th>Контейнер</th><th>Ответственность</th></tr></thead>
+<tbody>
+<tr><td>Web App (SSR)</td><td>Каталог, профиль, онбординг, апелляции; server-side rendering для скорости/SEO</td></tr>
+<tr><td>API Gateway / BFF</td><td>Маршрутизация, auth, rate-limit; public read vs protected write</td></tr>
+<tr><td>Badge endpoint</td><td>Рендер подписанного SVG/PNG; высоко-кэшируемый, отдельно масштабируется</td></tr>
+<tr><td>Modular Monolith (API)</td><td>Бизнес-логика по модулям (см. §05)</td></tr>
+<tr><td>Async Worker</td><td>Batch decay, событийный пересчёт, anchoring, нотификации, anomaly-детект</td></tr>
+<tr><td>Signing Service</td><td>Изоляция ключей; подпись бейджа, верификация COA/PKI; доступ к KMS/HSM</td></tr>
+<tr><td>PostgreSQL / Redis / Object Storage</td><td>Первичные данные / кэш+очередь / медиа-артефакты</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="modules">
+<div class="sec-badge">05 — Модули монолита</div>
+<h2>Границы модулей (13 модулей, будущие швы)</h2>
+<table>
+<thead><tr><th>Модуль</th><th>Ответственность</th><th>Зависит от</th></tr></thead>
+<tbody>
+<tr><td>catalog</td><td>Каталог, сегментация, фильтры, ранжирование, профиль (read)</td><td>scoring (read)</td></tr>
+<tr><td>scoring</td><td>Расчёт TS, факторы Fᵢ, Wᵢ, Dᵢ, Pₛ, доминирующий фактор, algo_version</td><td>data, propagation, ingestion</td></tr>
+<tr><td>propagation</td><td>Граф контрагентов, исключение циклов, агрегация Vᵢ, коллузия-сигналы</td><td>scoring, identity</td></tr>
+<tr><td>ingestion</td><td>Приём данных: отзывы, тесты, COA, артефакты; валидация; lot-QR</td><td>identity, signing</td></tr>
+<tr><td>identity</td><td>KYB/KYC уровни, PoP, claim-profile, статусы (Provisional/Active/Tombstone)</td><td>внешний KYB</td></tr>
+<tr><td>oracles</td><td>PKI оракулов, верификация подписи COA, CRL, аккредитация лабораторий</td><td>identity, governance</td></tr>
+<tr><td>custody</td><td>Лоты, chain-of-custody, lot-QR, привязка тестов к партии</td><td>ingestion, identity</td></tr>
+<tr><td>anchoring</td><td>Формирование анонимных хешей, Merkle-батчинг, отправка в L2</td><td>signing, L2</td></tr>
+<tr><td>appeals</td><td>Апелляции, VRF-отбор Steward, conflict-screening, решения</td><td>identity</td></tr>
+<tr><td>governance</td><td>Lifecycle Steward/оракулов, публичный лог управления, аккредитация</td><td>identity</td></tr>
+<tr><td>badge</td><td>Серверный рендер SVG/PNG бейджа, подпись endpoint, кэш</td><td>scoring (read), signing</td></tr>
+<tr><td>b2b</td><td>Due-diligence, мониторинг-API/вебхуки, аналитика (V1+)</td><td>catalog, scoring</td></tr>
+<tr><td>notifications</td><td>Алерты, события, нотификации (in-app/email/webhook)</td><td>—</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Правило границ</div>
+<p>Модули общаются через явные интерфейсы (не лезут в чужие таблицы напрямую). Это сохраняет возможность вынести любой модуль в отдельный сервис без переписывания вызывающих. Кандидаты №1 на вынос при росте: <code>badge/rendering</code>, <code>scoring-worker</code>, <code>b2b</code>.</p>
+</div>
+</section>
+
+<section id="flows">
+<div class="sec-badge">06 — Ключевые потоки</div>
+<h2>Как данные проходят систему</h2>
+<h4>Чтение профиля (горячий путь)</h4>
+<div class="diagram">Покупатель → CDN (hit?) → SSR/BFF → catalog (read, кэш Redis) → ответ
+<span class="c">// p95 < 300мс; при miss — чтение из PostgreSQL реплики</span></div>
+<h4>Подача независимого теста</h4>
+<div class="diagram">Оракул → API (protected, PKI) → ingestion (валидация, lot-QR, custody)
+   → событие в очередь → Worker: scoring пересчёт (сразу) → anchoring (L2)
+   → notifications (алерты затронутым)</div>
+<h4>Batch decay (раз в сутки)</h4>
+<div class="diagram">Cron → Worker → scoring: применить Dᵢ ко всем профилям → пересчёт пропагации
+   → пакетный anchoring (Merkle) → обновить кэш каталога</div>
+</section>
+
+<section id="data">
+<div class="sec-badge">07 — Хранилища данных</div>
+<table>
+<thead><tr><th>Хранилище</th><th>Что хранит</th><th>Почему</th></tr></thead>
+<tbody>
+<tr><td>PostgreSQL</td><td>Participant, ScoreEvent, FactorInput, PenaltyFlag, Lot, Custody, COA, Appeal, Steward, GovernanceLog</td><td>Реляционная модель (см. ERD), ACID для скоринга, зрелость (ADR-002)</td></tr>
+<tr><td>Redis</td><td>Кэш каталога/профиля/бейджа; очередь задач воркера</td><td>Скорость read-пути, простая очередь для MVP</td></tr>
+<tr><td>Object Storage</td><td>Медиа-артефакты (фото, PDF COA)</td><td>Дёшево для блобов; хеши в БД, целостность в L2</td></tr>
+<tr><td>L2 (Base/Arbitrum)</td><td>Анонимные хеши Score-событий/COA/custody</td><td>Публичная целостность (ADR-004, ADR-005)</td></tr>
+</tbody>
+</table>
+<p>Полная ERD — в <a href="../reports/architecture-erd-security.html">ERD &amp; Security Architecture</a>.</p>
+</section>
+
+<section id="scale">
+<div class="sec-badge">08 — Масштабирование</div>
+<ul>
+<li><strong>Read-путь:</strong> stateless SSR/BFF за CDN + read-реплики PostgreSQL + Redis-кэш. Масштабируется горизонтально.</li>
+<li><strong>Badge:</strong> кэшируемые подписанные изображения с TTL; CDN поглощает основную нагрузку.</li>
+<li><strong>Write/пересчёт:</strong> очередь + воркеры; пиковые события не блокируют read.</li>
+<li><strong>Batch:</strong> decay-пересчёт масштабируется по числу профилей (шардинг по диапазону id при росте).</li>
+<li><strong>Anchoring:</strong> Merkle-батчинг снижает число и стоимость L2-транзакций.</li>
+</ul>
+</section>
+
+<section id="evo">
+<div class="sec-badge">09 — Путь эволюции</div>
+<h2>Когда и что выносить в сервисы</h2>
+<table>
+<thead><tr><th>Триггер</th><th>Действие</th></tr></thead>
+<tbody>
+<tr><td>Нагрузка на бейдж >> остального</td><td>Вынести badge/signing в отдельный сервис (уже изолирован)</td></tr>
+<tr><td>Тяжёлый скоринг тормозит API</td><td>Вынести scoring-worker в отдельный сервис со своей репликой данных</td></tr>
+<tr><td>B2B растёт независимо</td><td>Вынести b2b-модуль (API/вебхуки/аналитика) в сервис</td></tr>
+<tr><td>Команда выросла (>2 команды)</td><td>Резать по границам модулей §05, по одному, с контрактами</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Принцип эволюции</div>
+<p>Выделение сервисов — реакция на доказанную боль (нагрузка/организация), а не упреждающее усложнение. Модульные границы и контракты, заложенные сейчас, делают выделение дешёвым тогда, когда оно действительно понадобится.</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

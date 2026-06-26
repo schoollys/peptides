@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — P1: финализация ядра алгоритма</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:780px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.fbox{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:#e8935a;line-height:1.7;overflow-x:auto;white-space:pre-wrap}
+.fbox .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ex{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.ex-t{font-size:.74rem;font-weight:800;color:#5b78a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ex p{font-size:.82rem;margin-bottom:.3rem}
+.val{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.72rem;font-weight:700;background:#fef3e8;color:#c06a1a;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>P1 — финал ядра<span class="sb-sub">Dᵢ · пропагация Vᵢ · комбинирование Vᵢ</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">00</span>Контекст и решения</a>
+<a class="nav-link" href="#decay"><span class="nav-num">01</span>Dᵢ по классам распада</a>
+<a class="nav-link" href="#prop"><span class="nav-num">02</span>Агрегация пропагации Vᵢ</a>
+<a class="nav-link" href="#combine"><span class="nav-num">03</span>Комбинирование Vᵢ</a>
+<a class="nav-link" href="#next"><span class="nav-num">04</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">00 — Контекст и принятые решения</div>
+<h1>P1: финализация ядра алгоритма</h1>
+<p class="sec-intro">Три последних формальных пробела ядра из аудита полноты. Структура TS = Σ(Fᵢ·Wᵢ·Dᵢ·Vᵢ)·(1−Pₛ) не меняется — уточняются Dᵢ (распад) и Vᵢ (доверенность) для случаев, ранее заданных качественно.</p>
+<table>
+<thead><tr><th>Развилка</th><th>Принятое решение</th></tr></thead>
+<tbody>
+<tr><td>Dᵢ по типам данных</td><td>Небольшой набор классов распада (4) с half-life; глобальная таблица = дефолт</td></tr>
+<tr><td>Агрегация пропагации Vᵢ</td><td>Среднее субскоров, взвешенное по доле партий, + насыщение покрытием + штраф за концентрацию + cap вклада</td></tr>
+<tr><td>Комбинирование Vᵢ</td><td>max по независимым источникам + явная обработка противоречий</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="decay">
+<div class="sec-badge">01 — Dᵢ по классам распада</div>
+<h2>Разные данные стареют с разной скоростью</h2>
+<p class="sec-intro">Единая кривая искажала бы и долгоживущие факты (сертификация), и короткоживущие (логистика конкретной поставки). Вводим 4 класса с периодом полураспада; внутри класса распад непрерывный.</p>
+
+<h4>Формула распада</h4>
+<div class="fbox">Dᵢ = clamp(floor_class, 1.0, 0.5 ^ (age_days / t_half_class))
+<span class="c">// непрерывный экспоненциальный распад; 0–30 дней ≈ почти 1.0 для всех классов</span></div>
+
+<h4>Классы <span class="val">provisional v0.9</span></h4>
+<table>
+<thead><tr><th>Класс</th><th>Типы данных</th><th>t½ (дн)</th><th>Floor</th><th>Обоснование</th></tr></thead>
+<tbody>
+<tr><td>A — Долгоживущие</td><td>GMP/GDP/ISO-сертификаты, лицензии, KYB</td><td>365</td><td>0.30</td><td>Действуют до истечения; медленно теряют актуальность</td></tr>
+<tr><td>B — Качество</td><td>COA/лаб-тесты чистоты, раскрытие провенанса (SCIF)</td><td>120</td><td>0.20</td><td>Качество дрейфует от партии к партии — нужно обновлять</td></tr>
+<tr><td>C — Логистика поставки</td><td>IoT холодовой цепи, доставка конкретного лота</td><td>45</td><td>0.10</td><td>Привязано к одной поставке — быстро теряет значимость</td></tr>
+<tr><td>D — Поведение</td><td>Отзывы (CVF), claim-достоверность (TRF), исполнение (FRF), отклик (RF), B2B-связи (CVF-B)</td><td>90</td><td>0.15</td><td>Поведение меняется; средний горизонт</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Глобальная банд-таблица v2 (0–30→1.0 … &gt;365→0.15) остаётся <strong>дефолтом</strong> для сигналов без явного класса. t½ и floor — под валидацию SME (чек-лист §03 закрытия P0).</p>
+
+<div class="ex">
+<div class="ex-t">Примеры</div>
+<p>COA возрастом 120 дн (класс B): Dᵢ = 0.5^(120/120) = <strong>0.50</strong>.</p>
+<p>GMP-сертификат 365 дн (класс A): 0.5^(365/365) = 0.50 (выше floor 0.30) → <strong>0.50</strong>.</p>
+<p>IoT-лог поставки 45 дн (класс C): 0.5^(45/45) = <strong>0.50</strong>, но через 180 дн → 0.5^4 = 0.0625 → floor <strong>0.10</strong>.</p>
+</div>
+<div class="rec-box">
+<div class="rec-t">Почему классы, а не per-signal</div>
+<p>4 класса покрывают реальную разницу горизонтов (сертификат vs поставка) без раздувания калибровки до десятков отдельных half-life. Каждый сигнал маппится в класс; при необходимости класс переопределяется на конкретный фактор. Баланс точности и поддерживаемости.</p>
+</div>
+</section>
+
+<section id="prop">
+<div class="sec-badge">02 — Агрегация пропагации Vᵢ</div>
+<h2>Перетекание доверия от нескольких контрагентов</h2>
+<p class="sec-intro">Когда участник раскрывает несколько источников по фактору, их субскоры сворачиваются в надбавку к Vᵢ — но так, чтобы нельзя было «спрятаться» за одним сильным источником и чтобы непокрытая доля не получала бонус.</p>
+
+<h4>Обозначения</h4>
+<ul>
+<li><strong>kₙ</strong> — раскрытые и верифицированные контрагенты по фактору; <strong>sₖ</strong> — релевантный субскор контрагента (0–100); <strong>wₖ</strong> — доля партий участника от k.</li>
+<li><strong>coverage</strong> = Σwₖ — доля партий с раскрытым+верифицированным источником (остаток — на базовом Vᵢ=0.40).</li>
+<li><strong>top_share</strong> — доля крупнейшего источника среди раскрытых (концентрация).</li>
+</ul>
+
+<h4>Формула</h4>
+<div class="fbox">S_prop = Σ(wₖ·sₖ) / Σ(wₖ)                 <span class="c">// средний субскор, взвеш. по доле партий</span>
+δ = CONC_PENALTY (0.90) если top_share &gt; 0.60, иначе 1.0  <span class="c">// плоский штраф за концентрацию (как в spec-algorithm)</span>
+V_prop = [0.40 + (S_prop/100)·0.55] · λ_blind · δ <span class="c">// λ_blind=0.85 для blind, иначе 1.0</span>
+V_prop = min(V_prop, 0.85)                <span class="c">// cap: пропагация слабее прямого blind-теста (1.0)</span>
+Vᵢ(фактор) = coverage·V_prop + (1 − coverage)·0.40  <span class="c">// непокрытые партии = базовый 0.40</span></div>
+<p style="font-size:.78rem;color:#888">Порог концентрации (0.60), CONC_PENALTY (0.90) и cap (0.85) — provisional v0.9. Циклические/взаимные связи в пропагацию не входят (раздел 05 v2); субскоры берутся как демпфированное 30-дн среднее (v2).</p>
+
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>Вендор: источник A (s=80, доля 0.5), источник B (s=70, доля 0.3), нераскрыто 0.2. Не blind.</p>
+<p>coverage = 0.8; S_prop = (0.5·80 + 0.3·70)/0.8 = 61/0.8 = 76.25.</p>
+<p>top_share = 0.5/0.8 = 0.625 &gt; 0.60 → δ = CONC_PENALTY = 0.90.</p>
+<p>V_prop = (0.40 + 0.7625·0.55)·1.0·0.90 = 0.819·0.90 = 0.737 (≤0.85 ок).</p>
+<p>Vᵢ = 0.8·0.737 + 0.2·0.40 = 0.590 + 0.08 = <strong>0.670</strong>.</p>
+</div>
+<div class="rec-box">
+<div class="rec-t">Что обеспечивает формула</div>
+<p>Покрытие не даёт «один Gold-источник прикрыть скрытый объём»; штраф за концентрацию вознаграждает диверсификацию (несколько проверенных источников надёжнее одного); cap гарантирует, что косвенное доверие через контрагента всегда слабее прямого независимого теста.</p>
+</div>
+</section>
+
+<section id="combine">
+<div class="sec-badge">03 — Комбинирование Vᵢ из нескольких источников</div>
+<h2>Один факт подтверждён источниками разной доверенности</h2>
+<p class="sec-intro">Когда один и тот же фактор подтверждён несколькими <em>независимыми</em> источниками (blind-тест, verified-buyer, self), итоговую доверенность определяет сильнейшее независимое подтверждение — а не их смесь.</p>
+
+<h4>Правило</h4>
+<div class="fbox">Vᵢ = max(V_source) по ВЗАИМНО НЕЗАВИСИМЫМ источникам
+<span class="c">// независимость обязательна: COA вендора + самодекларация вендора = НЕ два источника</span>
+
+Если источники ПРОТИВОРЕЧАТ (напр. blind-тест fail vs vendor-COA pass):
+  → значение фактора замораживается до разбора
+  → при признаках подмены — инцидент Pₛ (sample-swap, раздел 02 v2)
+  → НЕ берём молча max</div>
+
+<h4>Почему max, а не среднее</h4>
+<table>
+<thead><tr><th>Подход</th><th>Проблема</th></tr></thead>
+<tbody>
+<tr><td>Среднее/смесь</td><td>Слабый источник (self 0.40) «разбавлял» бы сильное независимое подтверждение (blind 1.0) — наказание за наличие доп.данных</td></tr>
+<tr><td>Минимум</td><td>Наличие любого слабого источника обрушивало бы доверие — демотивирует подавать что-либо сверх минимума</td></tr>
+<tr><td><strong>max (принято)</strong></td><td>Сильнейшее независимое подтверждение определяет доверие; слабые источники не вредят, но и не поднимают выше своего independent-потолка</td></tr>
+</tbody>
+</table>
+
+<div class="ex">
+<div class="ex-t">Пример</div>
+<p>QEF подтверждён blind-тестом (V=1.0) и фото verified-buyer (V=0.75), результаты согласованы → Vᵢ = max(1.0, 0.75) = <strong>1.0</strong>.</p>
+<p>Если blind-тест противоречит vendor-COA → фактор <strong>замораживается</strong> + расследование на sample-swap, а не усреднение.</p>
+</div>
+
+<div class="warn">
+<div class="warn-t">Разведение с другими правилами</div>
+<p>Это не то же, что <strong>мульти-оракульный cap Fᵢ</strong> (Волна 1 §03): тот требует ≥2 источника, чтобы высоковесовой фактор вообще засчитался. Здесь — какой Vᵢ применить, когда источники уже есть. И не то же, что <strong>пропагация</strong> (§02): там Vᵢ растёт от субскора контрагента, здесь — от прямых подтверждений самого факта.</p>
+</div>
+</section>
+
+<section id="next">
+<div class="sec-badge">04 — Что дальше</div>
+<h2>Ядро алгоритма полностью формализовано</h2>
+<p>P1-формализация закрывает последние качественные места ядра:</p>
+<ol>
+<li><strong>Dᵢ</strong> (§01) — 4 класса распада с half-life + непрерывная формула; глобальная таблица как дефолт.</li>
+<li><strong>Пропагация Vᵢ</strong> (§02) — взвешивание по долям + насыщение покрытием + штраф за концентрацию + cap.</li>
+<li><strong>Комбинирование Vᵢ</strong> (§03) — max по независимым источникам + заморозка при противоречии.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Статус ядра — готово к сборке PRD</div>
+<p>Все компоненты TS определены формулами: Fᵢ (9 факторов, Волна 1 §04–07), Wᵢ (матрица 22×9, §08), Dᵢ (классы распада, здесь §01), Vᵢ (оракулы + пропагация §02 + комбинирование §03), Pₛ (каталог + свёртка + потолок тира, v2). Остаётся подстановка чисел (валидация SME, чек-лист P0 §03) — структура завершена.</p>
+</div>
+<p style="font-size:.78rem;color:#5a5955;margin-top:1rem"><strong>Статус на дату ревизии:</strong> описанный ниже «следующий шаг» (сборка единого PRD, закрытие P1 право/идентичность/экономика и P2-приложений) впоследствии выполнен — это исторический phase-closure отчёт. Актуальный сводный статус — в <a href="../reports/PRD.html">PRD</a>.</p>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Следующий шаг — сборка единого PRD-документа из всех волн + закрытие оставшихся P1 (право/идентичность/экономика) и P2-приложений. Все числовые коэффициенты — provisional под валидацию SME/комитета.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

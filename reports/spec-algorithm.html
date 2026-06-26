@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Algorithm Specification</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:255px;min-width:255px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.25rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+pre{background:#0f0e0d;border-radius:10px;padding:1rem 1.1rem;margin:1rem 0;overflow-x:auto;font-family:ui-monospace,Menlo,monospace;font-size:.74rem;color:#cfcfc7;line-height:1.55}
+.formula{background:#1a1917;color:#f2efe9;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.86rem;text-align:center}
+.formula b{color:#e8935a}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.77rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.69rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Algorithm Spec<span class="sb-sub">консолидированная · псевдокод</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#master"><span class="nav-num">02</span>Мастер-формула</a>
+<a class="nav-link" href="#factors"><span class="nav-num">03</span>Fᵢ — нормализация</a>
+<a class="nav-link" href="#decay"><span class="nav-num">04</span>Dᵢ — decay</a>
+<a class="nav-link" href="#vi"><span class="nav-num">05</span>Vᵢ — верификация</a>
+<a class="nav-link" href="#prop"><span class="nav-num">06</span>Пропагация</a>
+<a class="nav-link" href="#penalty"><span class="nav-num">07</span>Pₛ — штрафы</a>
+<a class="nav-link" href="#damper"><span class="nav-num">08</span>Демпфер</a>
+<a class="nav-link" href="#dominant"><span class="nav-num">09</span>Доминирующий фактор</a>
+<a class="nav-link" href="#pseudo"><span class="nav-num">10</span>Псевдокод пересчёта</a>
+<a class="nav-link" href="#complexity"><span class="nav-num">11</span>Сложность и edge</a>
+<a class="nav-link" href="#example"><span class="nav-num">12</span>Worked example</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Транш A · Algorithm Specification</div>
+<h1>Algorithm Specification</h1>
+<p class="sec-intro">Единый авторитетный документ по расчёту Trust Score. Консолидирует математику, разбросанную по <a href="../reports/wave1-data-model-and-scoring.html">Wave 1</a>, <a href="../reports/p1-algorithm-finalization.html">P1-алгоритм</a> и <a href="../reports/prd-business-rules-edge-cases.html">Business Rules</a>, в форму, по которой движок реализуется без додумывания. Все числа — <code>provisional v0.9</code> до SME (источник значений: <a href="../reports/spec-config-parameters.html">Parameters Registry</a>).</p>
+</section>
+
+<section id="master">
+<div class="sec-badge">02 — Мастер-формула</div>
+<div class="formula">TS = ( Σᵢ <b>Fᵢ</b> · <b>Wᵢ</b> · <b>Dᵢ</b> · <b>Vᵢ</b> ) · ( 1 − <b>Pₛ</b> )</div>
+<table>
+<thead><tr><th>Терм</th><th>Диапазон</th><th>Смысл</th></tr></thead>
+<tbody>
+<tr><td>Fᵢ</td><td>0–100</td><td>Внутреннее качество по фактору i (абсолютные полосы)</td></tr>
+<tr><td>Wᵢ</td><td>0–1, ΣWᵢ=1</td><td>Вес фактора для роли (матрица 22×9, по algo_version)</td></tr>
+<tr><td>Dᵢ</td><td>floor–1</td><td>Свежесть (экспоненциальный спад по классу)</td></tr>
+<tr><td>Vᵢ</td><td>0–1</td><td>Верифицируемость источника (с пропагацией)</td></tr>
+<tr><td>Pₛ</td><td>0–&lt;1</td><td>Штрафной множитель (с потолками по тиру)</td></tr>
+</tbody>
+</table>
+<p>Итоговый TS ∈ [0,100]. Отображается с доминирующим фактором (§09) и тиром (platinum/gold/silver/bronze/watch; пороги — см. <a href="../reports/spec-config-parameters.html">Parameters Registry</a>) либо статусом new/provisional при недостатке данных.</p>
+</section>
+
+<section id="factors">
+<div class="sec-badge">03 — Fᵢ: нормализация (9 факторов)</div>
+<p>Принципы: абсолютные полосы (не относительный ранг); отсутствующие данные = 0 (не штраф, а отсутствие вклада); мульти-оракульный потолок. Полные таблицы полос — в <a href="../reports/wave1-data-model-and-scoring.html">Wave 1</a>.</p>
+<table>
+<thead><tr><th>Код</th><th>Фактор</th><th>Базовый вход</th></tr></thead>
+<tbody>
+<tr><td>QEF</td><td>Quality / чистота синтеза</td><td>HPLC/MS-результаты vs пороги чистоты</td></tr>
+<tr><td>PCF</td><td>Process / контроль производства</td><td>Стандарты, повторяемость партий</td></tr>
+<tr><td>SCIF</td><td>Supply-chain integrity</td><td>Прослеживаемость происхождения</td></tr>
+<tr><td>TRF</td><td>Test reliability</td><td>Доля независимых/random-тестов</td></tr>
+<tr><td>FRF</td><td>Fulfilment reliability</td><td>Своевременность, целостность доставки</td></tr>
+<tr><td>CCF</td><td>Cold-chain</td><td>Соблюдение температурного режима</td></tr>
+<tr><td>CVF</td><td>Customer verification</td><td>Подтверждённые покупатели (с артефактами)</td></tr>
+<tr><td>CVF-B</td><td>Customer verification (blind)</td><td>Подтверждения через blind-связи</td></tr>
+<tr><td>RF</td><td>Responsiveness</td><td>Скорость/качество реакции на инциденты</td></tr>
+</tbody>
+</table>
+<pre>function normalizeFactor(factor, rawInputs, algoVersion):
+  bands = PARAMS[algoVersion].bands[factor]   # абсолютные полосы
+  if rawInputs is empty: return 0              # missing = 0
+  raw = aggregateRaw(factor, rawInputs)        # напр. медиана чистоты
+  Fi  = mapToBand(raw, bands)                  # 0..100
+  # мульти-оракульный потолок: без ≥N независимых источников — cap
+  if independentSources(rawInputs) < bands.minSources:
+      Fi = min(Fi, bands.cappedMax)
+  return clamp(Fi, 0, 100)</pre>
+</section>
+
+<section id="decay">
+<div class="sec-badge">04 — Dᵢ: затухание свежести</div>
+<div class="formula">Dᵢ = max( <b>floor</b>, 2^( −Δt / T½(class) ) )</div>
+<table>
+<thead><tr><th>Класс</th><th>T½</th><th>Применяется к</th></tr></thead>
+<tbody>
+<tr><td>A</td><td>365 дн</td><td>Медленно меняющееся (процесс, лицензии)</td></tr>
+<tr><td>B</td><td>120 дн</td><td>Качество синтеза, supply-chain</td></tr>
+<tr><td>C</td><td>45 дн</td><td>Логистика, cold-chain, отзывчивость</td></tr>
+<tr><td>D</td><td>90 дн</td><td>Подтверждения покупателей</td></tr>
+</tbody>
+</table>
+<pre>function decay(observedAt, class, now):
+  dtDays = (now - observedAt).days
+  d = pow(2, -dtDays / HALF_LIFE[class])
+  return max(FLOOR[class], d)</pre>
+<p style="font-size:.78rem;color:#888">Δt — возраст наблюдения. floor не даёт вкладу занулиться полностью (история частично значима).</p>
+</section>
+
+<section id="vi">
+<div class="sec-badge">05 — Vᵢ: множитель верификации</div>
+<div class="formula">Vᵢ(base) = <b>0.40</b> + ( Sub_counterparty,factor / 100 ) · <b>0.55</b></div>
+<p>Базовый Vᵢ зависит от субскора контрагента-источника по тому же фактору. Для blind-связей множится на <code>λ_blind = 0.85</code>. Самостоятельный сэмплинг вендора никогда не даёт Vᵢ=1.0.</p>
+<pre>function baseVi(sourceSubscore, isBlind):
+  vi = 0.40 + (sourceSubscore/100) * 0.55
+  if isBlind: vi *= LAMBDA_BLIND        # 0.85
+  return clamp(vi, 0, 1)</pre>
+</section>
+
+<section id="prop">
+<div class="sec-badge">06 — Пропагация Vᵢ (one-hop, взвешенная)</div>
+<p>Bounded одношаговая пропагация субскора контрагентов в Vᵢ. Запрещены циклы; штраф за концентрацию источников; жёсткий потолок.</p>
+<div class="formula">S_prop = Σⱼ ( lot_shareⱼ · subⱼ ) / Σⱼ lot_shareⱼ &nbsp;&nbsp;→&nbsp;&nbsp; Vᵢ = min( <b>0.85</b>, blend(base, S_prop) ) · concPenalty</div>
+<pre>function propagatedVi(node, factor, graph):
+  neighbors = graph.incoming(node, factor)
+  neighbors = excludeCycles(neighbors, node)        # BR-PROP-CYCLE
+  if neighbors is empty: return baseViOnly(node)
+  num = 0; den = 0; shares = []
+  for e in neighbors:
+      s = e.lotShare * lambdaFor(e)                 # λ_blind для blind
+      num += s * subscore(e.from, factor)
+      den += s; shares.append(s)
+  Sprop = num / den
+  vi = blend(baseViOnly(node), Sprop)               # по покрытию
+  topShare = max(shares) / den
+  if topShare > CONC_THRESHOLD:                      # 0.60
+      vi *= CONC_PENALTY                             # штраф концентрации
+  return min(VI_CAP, vi)                             # 0.85</pre>
+<div class="rec-box"><div class="rec-t">Мульти-источник</div><p>Если фактор подтверждён несколькими <b>независимыми</b> источниками — берётся <code>max</code> Vᵢ (сильнейшее независимое подтверждение). При конфликте источников — заморозка/расследование, а не усреднение.</p></div>
+</section>
+
+<section id="penalty">
+<div class="sec-badge">07 — Pₛ: штрафной множитель</div>
+<div class="formula">Pₛ = 1 − ∏ₖ ( 1 − pₖ ) &nbsp;&nbsp;(с жёсткими потолками тира)</div>
+<pre>function penalty(flags, tier):
+  prod = 1
+  for f in flags where f.status == 'upheld' and not expired(f):
+      prod *= (1 - f.pk)
+  Ps = 1 - prod
+  # жёсткий потолок: при CRITICAL-флаге тир не выше cap
+  if anyCritical(flags): tier = min(tier, TIER_CAP_ON_CRITICAL)
+  return Ps, tier</pre>
+<p>Подтверждённые флаги хранятся на срок наказания, затем tombstone. INFO-флаги информативны и не входят в произведение до подтверждения.</p>
+</section>
+
+<section id="damper">
+<div class="sec-badge">08 — Демпфер (30-дн скользящее среднее + отмена буфера)</div>
+<p>Субскор контрагента в пропагации берётся как 30-дневное среднее — резкое падение у поставщика не обрушивает Score мгновенно. НО: если после алерта участник продолжает сорсинг у флагнутого контрагента — буфер аннулируется, пересчёт немедленный.</p>
+<pre>function dampedSub(counterparty, factor, now):
+  return movingAverage(subscoreSeries(counterparty, factor), window=30d)
+
+function onAlert(node, flaggedCounterparty, severity):
+  notify(node, severity)                             # INFO/WARNING/CRITICAL
+  if continuesSourcing(node, flaggedCounterparty, afterAlert=true):
+      cancelBuffer(node, flaggedCounterparty)        # отмена 30-дн сглаживания
+      recomputeNow(node)                             # немедленный пересчёт вниз</pre>
+</section>
+
+<section id="dominant">
+<div class="sec-badge">09 — Доминирующий фактор</div>
+<pre>function dominantFactor(contributions):
+  # contribution_i = Fi*Wi*Di*Vi
+  total = sum(contributions.values)
+  if total == 0: return null                         # no-TS/provisional
+  leader = argmax(contributions)
+  share  = contributions[leader] / total
+  if share < BALANCED_THRESHOLD: return BALANCED     # сбалансированный профиль
+  return leader</pre>
+<p>Отображение: «82 — преимущественно качество» (по leader) либо «82 — сбалансированный профиль». Глоссарий 9 факторов — в <a href="../artifacts/v2-peptide-trust-registry.html#algorithm">v2-документе</a>.</p>
+</section>
+
+<section id="pseudo">
+<div class="sec-badge">10 — Полный псевдокод пересчёта Score</div>
+<pre>function computeTrustScore(participant, now, algoVersion):
+  P = PARAMS[algoVersion]
+  weights = P.weights[participant.role]              # ΣW = 1
+  contributions = {}
+  for factor in FACTORS:
+      inputs = loadInputs(participant, factor)
+      Fi = normalizeFactor(factor, inputs, algoVersion)
+      Di = decay(latestObservedAt(inputs), classOf(factor), now)
+      Vi = propagatedVi(participant, factor, graph)  # включает damper, λ, cap
+      contributions[factor] = Fi * weights[factor] * Di * Vi
+  rawScore = sum(contributions.values)
+  flags = loadUpheldFlags(participant)
+  Ps, tier = penalty(flags, tierFromScore(rawScore))
+  score = rawScore * (1 - Ps)
+  dom = dominantFactor(contributions)
+  emit ScoreEvent(participant, score, dom, algoVersion,
+                  inputsHash=hash(inputs), anchor=schedule)
+  return {score, dom, tier, algoVersion}</pre>
+<p style="font-size:.8rem">Триггеры: критические события (флаг, новый независимый тест, отмена буфера) → пересчёт немедленно; decay/пропагация → суточный batch (см. <a href="../reports/spec-tdd-sequence-statemachines.html">TDD</a>).</p>
+</section>
+
+<section id="complexity">
+<div class="sec-badge">11 — Сложность и граничные случаи</div>
+<table>
+<thead><tr><th>Аспект</th><th>Значение</th></tr></thead>
+<tbody>
+<tr><td>Пересчёт одного участника</td><td>O(F · deg) — F=9 факторов, deg = число входящих связей</td></tr>
+<tr><td>Суточный batch</td><td>O(N · F · avgDeg); граф разрежен — линейно по числу связей</td></tr>
+<tr><td>Исключение циклов</td><td>DFS/visited по входящим рёбрам фактора</td></tr>
+<tr><td>Нет данных по фактору</td><td>Fᵢ=0 → нулевой вклад, не штраф</td></tr>
+<tr><td>no-TS роль</td><td>TS не считается; репутационная заметка</td></tr>
+<tr><td>Provisional</td><td>Ограниченный TS до KYB + N независимых подтверждений</td></tr>
+<tr><td>Конфликт источников Vᵢ</td><td>Заморозка фактора + расследование</td></tr>
+<tr><td>Изменение параметров</td><td>Новая algo_version; исторические события неизменны (forward-only)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="example">
+<div class="sec-badge">12 — Worked example (RUO-вендор, сокращённо)</div>
+<table>
+<thead><tr><th>Фактор</th><th>Fᵢ</th><th>Wᵢ</th><th>Dᵢ</th><th>Vᵢ</th><th>Вклад</th></tr></thead>
+<tbody>
+<tr><td>QEF</td><td>88</td><td>0.35</td><td>0.92</td><td>0.80</td><td>22.7</td></tr>
+<tr><td>TRF</td><td>75</td><td>0.20</td><td>0.85</td><td>0.78</td><td>9.9</td></tr>
+<tr><td>SCIF</td><td>70</td><td>0.15</td><td>0.95</td><td>0.65</td><td>6.5</td></tr>
+<tr><td>FRF</td><td>80</td><td>0.15</td><td>0.70</td><td>0.72</td><td>6.0</td></tr>
+<tr><td>CVF</td><td>60</td><td>0.15</td><td>0.88</td><td>0.60</td><td>4.8</td></tr>
+</tbody>
+</table>
+<p>rawScore ≈ <strong>49.9</strong> · допустим 1 WARNING-флаг p=0.05 → Pₛ=0.05 → TS ≈ 49.9 · 0.95 ≈ <strong>47.4</strong>. Доминанта: QEF (22.7/49.9 ≈ 45% &gt; порога) → «47 — преимущественно качество».</p>
+<div class="rec-box"><div class="rec-t">Источник истины</div><p>Полный воспроизводимый пример с реальными полосами — в <a href="../reports/wave1-data-model-and-scoring.html">Wave 1</a>; конкретные значения параметров — в <a href="../reports/spec-config-parameters.html">Parameters Registry</a>. Этот пример иллюстративен.</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

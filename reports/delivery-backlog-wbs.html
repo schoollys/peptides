@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Product Backlog &amp; WBS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;min-width:250px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.25rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.76rem}
+thead th{background:#1a1917;color:#eee;padding:6px 9px;text-align:left;font-weight:600;font-size:.68rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:6px 9px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.mono{font-family:ui-monospace,Menlo,monospace;font-size:.72rem}
+.epic-row{background:#1a1917 !important;color:#fff}
+.epic-row td{color:#fff;font-weight:700}
+.story-row td:first-child{padding-left:1.2rem}
+.task-row td:first-child{padding-left:2.2rem;font-weight:400;color:#5a5955}
+.pill{display:inline-block;padding:1px 7px;border-radius:8px;font-size:.62rem;font-weight:700}
+.p-mvp{background:#e7f3ec;color:#15673f}.p-v1{background:#eef0fb;color:#3b4a8c}.p-v2{background:#f3eafb;color:#7a3b8c}
+.file{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:.78rem;background:#1a1917;color:#e8935a;padding:.4rem .8rem;border-radius:8px}
+.rec-box{background:#fef7ef;border:1px solid #f0d9bd;border-left:4px solid #c06a1a;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#c06a1a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Backlog &amp; WBS<span class="sb-sub">Epics→Stories→Tasks</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#wbs"><span class="nav-num">02</span>WBS (декомпозиция)</a>
+<a class="nav-link" href="#backlog"><span class="nav-num">03</span>Product Backlog</a>
+<a class="nav-link" href="#summary"><span class="nav-num">04</span>Сводка по фазам</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Бэклог · Product Backlog &amp; WBS</div>
+<h1>Product Backlog &amp; WBS</h1>
+<p class="sec-intro">Декомпозиция Epics → Stories → Tasks с фазами, оценками (story points, <span style="color:#c06a1a;font-weight:700">provisional</span>) и зависимостями. Истории и AC — из <a href="../reports/prd-user-stories-acceptance.html">User Stories</a>. Готово к импорту в трекер.</p>
+<a class="file" href="../backlog/backlog.csv">📄 backlog/backlog.csv — import-ready (Jira/Linear)</a>
+<div class="rec-box" style="margin-top:1rem"><div class="rec-t">Оговорка по оценкам</div><p>Story points — относительные и провизорные, привязаны к референсной команде (см. <a href="../reports/delivery-release-plan.html">Release Plan</a>). Реальные оценки даёт команда на грумминге; калибруются по фактической velocity.</p></div>
+</section>
+
+<section id="wbs">
+<div class="sec-badge">02 — WBS (Work Breakdown Structure)</div>
+<p>Иерархия работ: продукт → эпики (фазы) → истории → задачи. Полная таблица — в §03 и CSV.</p>
+<table>
+<thead><tr><th>Уровень</th><th>Состав</th></tr></thead>
+<tbody>
+<tr><td>1. Продукт</td><td>PeptideTrust Registry</td></tr>
+<tr><td>2. Фазы</td><td>MVP (E1–E5) · V1 (E6–E10) · V2 (E11–E12)</td></tr>
+<tr><td>3. Эпики</td><td>12 эпиков</td></tr>
+<tr><td>4. Истории</td><td>20 историй (US-*): MVP 10 · V1 7 · V2 3</td></tr>
+<tr><td>5. Задачи</td><td>~35 задач (T-*) — backend, frontend, db, scoring, security, integration, qa</td></tr>
+<tr><td>Сквозные</td><td>Инфра/DevOps, безопасность, QA, документация — параллельные дорожки (не отдельный эпик)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="backlog">
+<div class="sec-badge">03 — Product Backlog (Epics → Stories → Tasks)</div>
+<table>
+<thead><tr><th>ID / Summary</th><th>Фаза</th><th>SP</th><th>Зависит</th></tr></thead>
+<tbody>
+<tr class="epic-row"><td>E1 — Каталог и просмотр профиля</td><td><span class="pill p-mvp">MVP</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-1.1 Просмотр сегментированного каталога</td><td>MVP</td><td>5</td><td>—</td></tr>
+<tr class="task-row"><td class="mono">T-1.1.1 API GET /participants · T-1.1.2 UI каталога · T-1.1.3 индексы/trgm</td><td></td><td>3/3/2</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-1.2 Страница профиля</td><td>MVP</td><td>5</td><td>US-1.1</td></tr>
+<tr class="task-row"><td class="mono">T-1.2.1 API профиль/history · T-1.2.2 UI профиля</td><td></td><td>3/3</td><td></td></tr>
+
+<tr class="epic-row"><td>E2 — Score и доминирующий фактор</td><td><span class="pill p-mvp">MVP</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-2.1 Расчёт и показ Score</td><td>MVP</td><td>8</td><td>—</td></tr>
+<tr class="task-row"><td class="mono">T-2.1.1 Fᵢ-нормализации · 2.1.2 матрица весов · 2.1.3 Dᵢ/Pₛ · 2.1.4 доминанта · 2.1.5 golden</td><td></td><td>8/3/5/3/3</td><td></td></tr>
+
+<tr class="epic-row"><td>E3 — Бейдж и публичное API</td><td><span class="pill p-mvp">MVP</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-3.1 Серверный SVG-бейдж</td><td>MVP</td><td>5</td><td>US-2.1</td></tr>
+<tr class="task-row"><td class="mono">T-3.1.1 рендер · 3.1.2 подпись KMS+кэш</td><td></td><td>3/3</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-3.2 Public read API</td><td>MVP</td><td>3</td><td>US-1.1</td></tr>
+<tr class="task-row"><td class="mono">T-3.2.1 rate-limit/conventions/ошибки</td><td></td><td>3</td><td></td></tr>
+
+<tr class="epic-row"><td>E4 — Онбординг и идентичность</td><td><span class="pill p-mvp">MVP</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-4.1 Claim-profile + KYB</td><td>MVP</td><td>5</td><td>—</td></tr>
+<tr class="task-row"><td class="mono">T-4.1.1 POST /claims+KYB · 4.1.2 состояния/UX</td><td></td><td>5/3</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-4.2 PoP L0</td><td>MVP</td><td>3</td><td>—</td></tr>
+<tr class="task-row"><td class="mono">T-4.2.1 SMS/OTP+device</td><td></td><td>3</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-4.3 KYB fallback</td><td>MVP</td><td>3</td><td>US-4.1</td></tr>
+<tr class="task-row"><td class="mono">T-4.3.1 ceiling/веса</td><td></td><td>3</td><td></td></tr>
+
+<tr class="epic-row"><td>E5 — Тесты, оракулы, ончейн</td><td><span class="pill p-mvp">MVP</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-5.1 Подача COA оракулом</td><td>MVP</td><td>5</td><td>US-4.1</td></tr>
+<tr class="task-row"><td class="mono">T-5.1.1 PKI/CRL · 5.1.2 анти-reuse</td><td></td><td>5/3</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-5.2 Anchoring в L2</td><td>MVP</td><td>5</td><td>US-2.1</td></tr>
+<tr class="task-row"><td class="mono">T-5.2.1 HashAnchor/Merkle · 5.2.2 /verify+SM</td><td></td><td>5/3</td><td></td></tr>
+
+<tr class="epic-row"><td>E6 — Trust-пропагация и алерты</td><td><span class="pill p-v1">V1</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-6.1 Пропагация Vᵢ</td><td>V1</td><td>8</td><td>US-2.1</td></tr>
+<tr class="task-row"><td class="mono">T-6.1.1 граф/циклы · 6.1.2 агрегация/штраф</td><td></td><td>5/5</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-6.2 Демпфер и отмена буфера</td><td>V1</td><td>5</td><td>US-6.1</td></tr>
+<tr class="task-row"><td class="mono">T-6.2.1 dempfer/алерты</td><td></td><td>5</td><td></td></tr>
+
+<tr class="epic-row"><td>E7 — Chain Pull</td><td><span class="pill p-v1">V1</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-7.1 Приглашение и кредит</td><td>V1</td><td>5</td><td>US-4.1</td></tr>
+
+<tr class="epic-row"><td>E8 — Апелляции и Steward-панели</td><td><span class="pill p-v1">V1</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-8.1 Апелляция через панель</td><td>V1</td><td>8</td><td>US-2.1</td></tr>
+<tr class="task-row"><td class="mono">T-8.1.1 поток/SM · 8.1.2 VRF/conflict-screen</td><td></td><td>5/5</td><td></td></tr>
+
+<tr class="epic-row"><td>E9 — B2B-продукты</td><td><span class="pill p-v1">V1</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-9.1 Due-diligence · US-9.2 Мониторинг-вебхуки</td><td>V1</td><td>5/5</td><td>US-1.2/US-2.1</td></tr>
+
+<tr class="epic-row"><td>E10 — Lot-QR и chain-of-custody</td><td><span class="pill p-v1">V1</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-10.1 Lot-QR + custody</td><td>V1</td><td>8</td><td>US-5.1</td></tr>
+
+<tr class="epic-row"><td>E11 — ZK и приватность</td><td><span class="pill p-v2">V2</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-11.1 ZK-доказательство blind-связи</td><td>V2</td><td>13</td><td>US-6.1</td></tr>
+
+<tr class="epic-row"><td>E12 — Аналитика, VaaS, охват</td><td><span class="pill p-v2">V2</span></td><td>—</td><td></td></tr>
+<tr class="story-row"><td class="mono">US-12.1 Агрегаты · US-12.2 VaaS</td><td>V2</td><td>8/5</td><td>US-2.1/US-9.1</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="summary">
+<div class="sec-badge">04 — Сводка по фазам (provisional SP)</div>
+<table>
+<thead><tr><th>Фаза</th><th>Эпики</th><th>Истории</th><th>~Story Points</th></tr></thead>
+<tbody>
+<tr><td><span class="pill p-mvp">MVP</span></td><td>E1–E5</td><td>10</td><td>~47</td></tr>
+<tr><td><span class="pill p-v1">V1</span></td><td>E6–E10</td><td>7</td><td>~44</td></tr>
+<tr><td><span class="pill p-v2">V2</span></td><td>E11–E12</td><td>3</td><td>~26</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">SP включают сумму story-уровня; задачи детализируют распределение. Перевод в недели — в Release Plan на основе допущения о velocity.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

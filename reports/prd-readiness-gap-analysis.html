@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — анализ готовности к PRD (отчёт о пробелах)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;min-width:230px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:760px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.79rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.gap{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:1rem 1.2rem;margin-bottom:10px;border-left:4px solid #c0392b}
+.gap.p1{border-left-color:#c07c16}
+.gap.p2{border-left-color:#5b78a8}
+.gap-h{font-size:.86rem;font-weight:700;margin-bottom:.4rem;color:#1a1917;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.pill{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:20px}
+.p0p{background:#fbe3df;color:#c0392b}
+.p1p{background:#fbeedd;color:#b06d0e}
+.p2p{background:#e8eef7;color:#3f5d8c}
+.gap p{font-size:.82rem;margin-bottom:.4rem}
+.gap .have{color:#15673f}
+.gap .need{color:#a4341f}
+.gap .rec{color:#1a1917;background:#f6f8f4;border:1px solid #cfe3d4;border-radius:7px;padding:.5rem .7rem;font-size:.8rem;display:block;margin-top:.4rem}
+.lbl{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;margin-right:.3rem}
+.lbl.h{color:#15673f}.lbl.n{color:#c0392b}.lbl.r{color:#b06d0e}
+.summary-box{background:#0f0e0d;border-radius:12px;padding:1.4rem 1.5rem;margin:1.2rem 0;color:#ddd}
+.summary-box h3{color:#e8935a;border:none;margin:.2rem 0 .6rem}
+.summary-box p{color:#cfcdc8;font-size:.84rem}
+.summary-box strong{color:#fff}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:1rem 0}
+.kpi-c{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.9rem 1rem;border-top:3px solid #e8935a}
+.kpi-n{font-size:1.5rem;font-weight:800;color:#c0392b}
+.kpi-l{font-size:.73rem;color:#7a7970;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Анализ готовности к PRD<span class="sb-sub">отчёт о пробелах документа v2</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">00</span>Резюме и метод</a>
+<a class="nav-link" href="#scope"><span class="nav-num">01</span>Продукт и скоуп</a>
+<a class="nav-link" href="#users"><span class="nav-num">02</span>Пользователи и сценарии</a>
+<a class="nav-link" href="#func"><span class="nav-num">03</span>Функциональные требования</a>
+<a class="nav-link" href="#algo"><span class="nav-num">04</span>Алгоритм: точные параметры</a>
+<a class="nav-link" href="#data"><span class="nav-num">05</span>Данные и идентичность</a>
+<a class="nav-link" href="#chain"><span class="nav-num">06</span>Блокчейн, крипто, ZK</a>
+<a class="nav-link" href="#gov"><span class="nav-num">07</span>Управление и финансирование</a>
+<a class="nav-link" href="#sec"><span class="nav-num">08</span>Безопасность и анти-фрод</a>
+<a class="nav-link" href="#legal"><span class="nav-num">09</span>Приватность и комплаенс</a>
+<a class="nav-link" href="#ux"><span class="nav-num">10</span>UX и интерфейсы</a>
+<a class="nav-link" href="#metrics"><span class="nav-num">11</span>Метрики и аналитика</a>
+<a class="nav-link" href="#ops"><span class="nav-num">12</span>Операции и интеграции</a>
+<a class="nav-link" href="#risks"><span class="nav-num">13</span>Стратегические риски</a>
+<a class="nav-link" href="#matrix"><span class="nav-num">14</span>Сводная матрица вопросов</a>
+<a class="nav-link" href="#next"><span class="nav-num">15</span>Рекомендуемая структура PRD</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">00 — Резюме и метод</div>
+<h1>Анализ готовности к PRD: что недораскрыто в документе v2</h1>
+<p class="sec-intro">Документ <strong>v2-peptide-trust-registry.html</strong> — это сильный концептуальный и стратегический дизайн: он отлично отвечает на вопросы «зачем», «почему так» и «какая философия». Но PRD требует ответов на «что именно строим», «по каким точным правилам», «какие экраны, API, данные и параметры». Ниже — систематический разбор по 13 доменам PRD: что в документе уже есть, чего не хватает, и конкретная рекомендация по каждому пробелу.</p>
+
+<div class="kpi">
+<div class="kpi-c"><div class="kpi-n">9</div><div class="kpi-l">P0-блокеров — без них PRD не закрыть</div></div>
+<div class="kpi-c"><div class="kpi-n">13</div><div class="kpi-l">доменов с пробелами разной глубины</div></div>
+<div class="kpi-c"><div class="kpi-n">~40</div><div class="kpi-l">открытых вопросов к уточнению</div></div>
+</div>
+
+<div class="summary-box">
+<h3>Короткий вывод</h3>
+<p>Документ закрывает <strong>«видение и механику доверия»</strong> примерно на 85%. Для исчерпывающего PRD критически недостаёт четырёх вещей: <strong>(1)</strong> как сырые данные превращаются в баллы факторов Fᵢ (нормализация) и полная матрица весов роль×фактор; <strong>(2)</strong> модель данных, идентичности (KYB/KYC) и верификации артефактов покупки; <strong>(3)</strong> управление, версионирование параметров алгоритма и <strong>модель финансирования</strong> (кто платит за хостинг, газ, арбитров); <strong>(4)</strong> юридический/комплаенс-слой (ответственность за рейтинг в серой зоне, GDPR vs неизменяемость). Остальное — это полнота спецификаций (UX-экраны, API, метрики), которая достраивается уже на основе принятых принципов.</p>
+</div>
+
+<p style="font-size:.78rem;color:#888">Легенда приоритетов: <span class="pill p0p">P0</span> блокер для PRD · <span class="pill p1p">P1</span> важно, влияет на архитектуру · <span class="pill p2p">P2</span> можно зафиксировать допущением и уточнить позже.</p>
+
+<div style="background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1.2rem 0">
+<div style="color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem">Статус на дату ревизии — пробелы закрыты</div>
+<p style="font-size:.83rem;margin:0;color:#2a4a38">Это <strong>раунд-1</strong> gap-снимок документа v2 (самый ранний аудит). Перечисленные ниже пробелы впоследствии закрыты: стратегия — <a href="../reports/wave0-foundational-decisions.html">Волна 0</a>; ядро алгоритма (нормализация Fᵢ, матрица весов 22×9, субскор, Pₛ, worked example) — <a href="../reports/wave1-data-model-and-scoring.html">Волна 1</a> и <a href="../reports/spec-algorithm.html">Algorithm Spec</a>; идентичность/ончейн/PKI/ZK — <a href="../reports/wave2-identity-verification-onchain.html">Волна 2</a>; продукт/API/каталог — <a href="../reports/wave3-product-specs.html">Волна 3</a>; UX/безопасность/операции — <a href="../reports/wave4-ux-security-operations.html">Волна 4</a>; 5 P0/12 P1/13 P2 — закрытия <a href="../reports/p0-closure.html">P0</a>/<a href="../reports/p1-algorithm-finalization.html">P1</a>/<a href="../reports/p2-appendices-edge-cases.html">P2</a>; сводно — <a href="../reports/PRD.html">PRD</a>. Реально открыты лишь внешние зависимости (SME, юрист, DPO, числа экономики) — реестр <a href="../reports/PRD.html">PRD §14</a>.</p>
+</div>
+</section>
+
+<section id="scope">
+<div class="sec-badge">01 — Продукт и скоуп</div>
+<h2>Границы продукта, релизы и критерии готовности</h2>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Нет измеримого problem statement и определения успеха</div>
+<p><span class="lbl h">Есть:</span><span class="have">Позиционирование «реестр, не маркетплейс», аналоги (Carfax, D&amp;B), описание болей рынка.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Формулировки проблемы в измеримых терминах (масштаб рынка, % контрафакта, объём аудитории) и определения, что считается успехом продукта.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Добавить раздел «Проблема и цель» с количественными ориентирами и North-Star-метрикой (см. §11).</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Скоуп MVP не отделён от «вне скоупа»</div>
+<p><span class="lbl h">Есть:</span><span class="have">Дорожная карта по фазам (MVP → V3) с фичами на каждой.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Явного списка «в скоупе / вне скоупа» для первого релиза, целевой географии и юрисдикции запуска, целевого сегмента (какие из 22 ролей онбордим первыми и почему).</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Зафиксировать MVP-scope таблицей in/out, выбрать 1 географию запуска и 3–4 «якорные» роли.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>У фаз нет критериев приёмки (acceptance criteria)</div>
+<p><span class="lbl n">Нет:</span><span class="need">Условий «фаза считается завершённой, если…» — каждая фаза описана как набор фич без порогов и Definition of Done.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>К каждой фазе добавить 3–5 проверяемых критериев (напр. «≥15 онбордингов, ≥3 оракула, время разрешения апелляции уровня 1 &lt; 1 мин»).</span>
+</div>
+</section>
+
+<section id="users">
+<div class="sec-badge">02 — Пользователи и сценарии</div>
+<h2>Персоны, JTBD, user stories и приоритизация</h2>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Роли описаны как «боли/выгоды», но нет user stories и journey</div>
+<p><span class="lbl h">Есть:</span><span class="have">22 роли с болями, выгодами, данными для подачи, весами факторов — очень богатая база персон.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Формальных user stories («как X, я хочу Y, чтобы Z»), пользовательских путей (онбординг → подача данных → получение Score → встраивание бейджа → апелляция) и приоритизации персон для MVP.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Превратить каждую роль в набор user stories с acceptance criteria; построить journey map для 3–4 якорных ролей MVP.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Не описан онбординг и первичная регистрация</div>
+<p><span class="lbl n">Нет:</span><span class="need">Сценария регистрации участника: какие шаги, какие данные обязательны, как проходит KYB/KYC, что видит пустой профиль, как присваивается роль (само-выбор? верификация?).</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать flow онбординга отдельно для бизнес-ролей (KYB) и для community-ролей (псевдонимная идентичность).</span>
+</div>
+</section>
+
+<section id="func">
+<div class="sec-badge">03 — Функциональные требования</div>
+<h2>Каталог, профиль, подача данных, бейдж, API</h2>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Каталог как ядро продукта не специфицирован</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Открытый каталог с фильтрами по категории/региону/Score, сравнение, сортировка по Score».</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Полного списка фильтров и фасетов, правил ранжирования (что при равных Score? как учитывается доминирующий фактор, New/Provisional, Verified-Legal сегмент?), пагинации, дедупликации, поведения для ролей без TS, поиска по продукту/пептиду.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Специфицировать каталог как отдельную фичу: модель сортировки, фасеты, дефолтные представления, edge-состояния.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Public Verify API описан одним эндпоинтом</div>
+<p><span class="lbl h">Есть:</span><span class="have">GET /trust/{id} → JSON audit trail; бейдж и виджеты.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Полной спецификации: список эндпоинтов (каталог, профиль, история, сравнение, оракул-публикация, submission), схемы ответов, аутентификация для записи, rate limits, версионирование, форматы бейджа (размеры, темы, кеширование), защита live-бейджа от подделки/DDoS.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Подготовить OpenAPI-черновик: публичные read-эндпоинты + защищённые write-эндпоинты (оракулы, участники).</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Формы подачи данных и личный кабинет не описаны как фичи</div>
+<p><span class="lbl h">Есть:</span><span class="have">Дашборд упоминается (полнота профиля, decay-уведомления, аналитика обращений, конкурентный контекст, clickthrough).</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Какие именно формы подачи (COA, тест, IoT, раскрытие партии, отзыв), их поля, валидация, процесс хеширования при загрузке, состояния «на проверке/подтверждено/отклонено».</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать ЛК как набор модулей и формы submission с их полями и состояниями.</span>
+</div>
+
+<div class="gap p2">
+<div class="gap-h"><span class="pill p2p">P2</span>Уведомления (алерты) без спецификации каналов</div>
+<p><span class="lbl n">Нет:</span><span class="need">Каналов (email/push/in-app/Telegram?), частоты, шаблонов, согласий — при том что вся механика давления (decay, алерты о падении контрагента, reaction window) держится на уведомлениях.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать систему уведомлений: типы событий, каналы, частота, opt-in.</span>
+</div>
+</section>
+
+<section id="algo">
+<div class="sec-badge">04 — Алгоритм: точные параметры</div>
+<h2>Самый важный технический пробел</h2>
+<p class="sec-intro">Формула TS = Σ(Fᵢ·Wᵢ·Dᵢ·Vᵢ)·(1−Pₛ) определена концептуально, но для реализации не хватает точных правил по каждому компоненту.</p>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Fᵢ — как сырые данные превращаются в балл 0–100</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Fᵢ = балл по фактору (0–100)».</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Самого главного — функции нормализации. Как из COA/теста получить число QEF? Как из IoT-логов CCF? Как из набора отзывов CVF? Без этого Score невозможно вычислить.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Для каждого из 9 факторов задать формулу/рубрику преобразования сырых сигналов в 0–100 с примерами.</span>
+</div>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Нет полной матрицы весов роль × фактор</div>
+<p><span class="lbl h">Есть:</span><span class="have">Веса Wᵢ указаны в карточках части ролей (напр. «QEF 40%, PCF 25%…»).</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Единой проверенной матрицы 22 роли × 9 факторов с гарантией ΣWᵢ=1.0 для каждой; для ряда ролей веса не приведены вовсе; не указано, кто и как утверждает/меняет веса.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Свести единую таблицу весов, провалидировать суммы, привязать к governance-процессу изменения (см. §07).</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>«Профильный субскор» Sub формально не определён</div>
+<p><span class="lbl h">Есть:</span><span class="have">Vᵢ = 0.40 + (Sub/100)·0.55; перетекание по релевантному фактору; λ_blind=0.85; таблица тиров→Vᵢ.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Точного определения, что такое «субскор по фактору» (это Fᵢ контрагента? нормированный вклад? как агрегируется по нескольким партиям?), и как он соотносится с 30-дневным скользящим средним численно.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Дать формальное определение субскора по фактору и пример расчёта Vᵢ end-to-end.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Каталог штрафов Pₛ неполон, пороги серьёзности — словесные</div>
+<p><span class="lbl h">Есть:</span><span class="have">Часть штрафов с величинами/сроками, агрегация 1−∏(1−pₖ), жёсткий потолок тира, sample-swap −0.40; уровни алерта INFO/WARNING/CRITICAL.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Исчерпывающего каталога нарушений с величинами и сроками; численных порогов, отделяющих INFO/WARNING/CRITICAL; точных «потолков тира» по каждому типу умысла.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Завершить таблицу Pₛ и задать численные пороги серьёзности и потолков.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Мульти-оракульное требование не сведено с формулой</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Факторы с весом ≥20% требуют 2 независимых источника».</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Как именно это влияет на Fᵢ/Vᵢ (обнуление? кэп? понижающий множитель?) при одном источнике; что считается «независимым».</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Формализовать правило (напр. кэп фактора без второго источника) и критерий независимости.</span>
+</div>
+
+<div class="gap p2">
+<div class="gap-h"><span class="pill p2p">P2</span>Параметры доминирующего фактора и New/Provisional численно мягкие</div>
+<p><span class="lbl n">Нет:</span><span class="need">Точного порога «двух близких лидеров» (указано «~10%»), величины и срока временного буста New/Provisional, точной привязки decay к типам данных (тест vs отзыв vs IoT — сейчас одна таблица на всё).</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Зафиксировать численные пороги; рассмотреть разные кривые decay по типам данных.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Нет сквозного worked example</div>
+<p><span class="lbl n">Нет:</span><span class="need">Полного численного примера расчёта Score одного участника от сырых данных до итогового TS и подписи доминирующего фактора — это и валидация модели, и спецификация для разработки.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Добавить 1–2 эталонных расчёта (вендор, логист) как «золотой тест» для реализации.</span>
+</div>
+</section>
+
+<section id="data">
+<div class="sec-badge">05 — Данные и идентичность</div>
+<h2>Модель данных, KYB/KYC, верификация артефактов</h2>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Нет модели данных (сущности и связи)</div>
+<p><span class="lbl n">Нет:</span><span class="need">Перечня сущностей (Участник, Профиль, Роль, Связь/Партия, COA, Тест, Отзыв, Артефакт покупки, Оракул, Инцидент, Апелляция, Событие-хеш) и их атрибутов/связей. Это фундамент схемы БД и API.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Составить ER-модель с ключевыми атрибутами и кардинальностью связей.</span>
+</div>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>KYB/KYC: провайдер и совмещение с псевдонимностью не решены</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Один участник — один профиль», KYB/KYC как замена депозита; псевдонимная верифицированная идентичность для неформальных продавцов.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Кто провайдер KYB/KYC, что именно проверяется по ролям, как серый бизнес проходит KYB (ключевой риск принятия!), как псевдонимность сочетается с «реальной юр. идентичностью» из анти-сговора, что с физлицами без юрлица.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать уровни верификации идентичности по ролям и провайдера; провалидировать готовность серых игроков к KYB на интервью.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Верификация покупки и lot-identity — без технической схемы</div>
+<p><span class="lbl h">Есть:</span><span class="have">Артефакты: трекинг, подписанный QR партии, фото флакона с лот-номером; сверка с COA.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Как именно сверяется трекинг с перевозчиком (какие интеграции/API), схема подписи QR (кто эмитент ключей лота), защита фото от повторного использования/подделки, кто генерирует лот-номера.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать схему lot-QR (PKI), список интеграций перевозчиков и анти-реюз для медиа-доказательств.</span>
+</div>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Конфликт «право на удаление» ↔ неизменяемость не доспецифицирован</div>
+<p><span class="lbl h">Есть:</span><span class="have">«On-chain только хеши; связи и идентичности off-chain с правом удаления».</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Что происходит со Score и историей при удалении данных участником (пересчёт? замораживание? остаётся ли хеш-«призрак»?), как это согласуется с аудитом и с GDPR-правом на забвение (см. §09).</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать политику удаления/ретеншена и её влияние на Score и аудит-трейл.</span>
+</div>
+</section>
+
+<section id="chain">
+<div class="sec-badge">06 — Блокчейн, крипто, ZK</div>
+<h2>Ончейн-слой, ключи оракулов, ZK-доказательства</h2>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Конкретика L2, что хешируется и кто платит газ</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Ethereum L2», хеши событий пересчёта и меток времени.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Выбора конкретного L2 и обоснования, схемы данных хеша, есть ли смарт-контракты или только anchoring, throughput, и — кто оплачивает газ (это вопрос финансирования, §07).</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Зафиксировать выбор сети, модель anchoring и носителя расходов на газ.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>PKI оракулов: выдача и ревокация ключей лабораторий</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Криптографически подписанные COA», сверка QR с on-chain хешем.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Кто выдаёт лаборатории ключ-подписант, как происходит ревокация при компрометации/потере статуса оракула, как отзывается доверие к ранее подписанным COA.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать жизненный цикл ключей оракулов (выдача, ротация, ревокация).</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>ZK-proof — реализуемость и стоимость не оценены</div>
+<p><span class="lbl h">Есть:</span><span class="have">Концепт ZK-style: «доказать субскор ≥ X, не называя поставщика».</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Конкретной схемы, кто генерирует/проверяет доказательство, его стоимости и латентности, есть ли это в MVP или позже. Сейчас это самая технически рискованная заявка.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Оценить ZK как R&amp;D-трек; для MVP допустить упрощение (доверенный аттестатор реестра вместо полноценного ZK).</span>
+</div>
+</section>
+
+<section id="gov">
+<div class="sec-badge">07 — Управление и финансирование</div>
+<h2>Самый недораскрытый стратегический слой</h2>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Кто оператор и как обеспечивается нейтральность институционально</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Нейтральность как актив», «реестр не берёт денег ни с одной стороны».</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Кто юридически управляет реестром (фонд/НКО/компания), как структура собственности гарантирует отсутствие конфликта, кто устанавливает и меняет параметры алгоритма (веса, штрафы, пороги) и как это защищено от захвата.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать модель управления (орган, процесс изменения параметров, версионирование алгоритма, публичный changelog).</span>
+</div>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Модель финансирования самого реестра не определена</div>
+<p><span class="lbl h">Есть:</span><span class="have">Честно отложено: «финансирование — на фазе 4, если понадобится для масштаба»; платная инфраструктура — опционально позже.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Кто платит за хостинг, разработку, газ L2, KYB-провайдера, арбитров, mystery-shopping — даже на MVP. «Не берём денег с оцениваемых» ≠ «нет расходов». Без базовой модели устойчивости PRD неполон.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Определить источник финансирования MVP (грант/фонд/донат/B2B-API для непредвзятых потребителей отчётов — модель Carfax «платит тот, кто принимает решение»), не нарушающий нейтральность.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Отбор и оплата внешних арбитров (обсуждено, но не в документе)</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Обязателен внешний независимый арбитр без коммерческой ставки».</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">В документе — механизма формирования пула, жребия (VRF), скрининга конфликтов, отвода сторон, вознаграждения из нейтрального фонда. (Предложение проработано в чате, но не внесено в v2.)</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Внести в раздел 07 механизм «пул → VRF-жребий → скрининг → отвод → оплата вне исхода → подотчётность governance».</span>
+</div>
+</section>
+
+<section id="sec">
+<div class="sec-badge">08 — Безопасность и анти-фрод</div>
+<h2>За пределами экономических атак на Score</h2>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Прикладная модель угроз отсутствует</div>
+<p><span class="lbl h">Есть:</span><span class="have">Глубокая защита от гейминга Score (Sybil, сговор, sample-swap, селективное раскрытие, спам отзывов/апелляций).</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Классической AppSec-модели: аутентификация/авторизация в ЛК, защита API на запись, анти-DDoS для бейджа/каталога, защита форм от спама, секьюрность хранилища off-chain, аудит доступа.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Провести STRIDE-моделирование угроз приложения и описать контрмеры.</span>
+</div>
+
+<div class="gap p2">
+<div class="gap-h"><span class="pill p2p">P2</span>Граф-детектор сговора: ложные срабатывания и разбор</div>
+<p><span class="lbl n">Нет:</span><span class="need">Порогов детектора, доли ложных срабатываний, процедуры ручного разбора и апелляции «помеченного кластера» (легальная плотная цепочка может выглядеть как кольцо).</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать пороги, human-in-the-loop и право кластера на апелляцию.</span>
+</div>
+</section>
+
+<section id="legal">
+<div class="sec-badge">09 — Приватность и комплаенс</div>
+<h2>Юридический слой — почти не покрыт</h2>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Юридическая ответственность за рейтинг в серой/нелегальной зоне</div>
+<p><span class="lbl h">Есть:</span><span class="have">«Не превращать граф в карту для прокурора», Verified-Legal сегментация, RUO-формулировки.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Анализа рисков: ответственность за публичный низкий Score (клевета/деловая репутация), правовой статус ведения реестра о потенциально нелегальной деятельности, юрисдикция оператора, дисклеймеры, политика «не консультируем по применению».</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Отдельный раздел правовых рисков и выбор юрисдикции; юридическая экспертиза до запуска.</span>
+</div>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>GDPR/персональные данные vs неизменяемость</div>
+<p><span class="lbl n">Нет:</span><span class="need">Как обрабатываются ПДн участников и покупателей (отзывы, идентичности), право на забвение против on-chain хешей, согласия, политика приватности, трансграничная передача.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать data-protection-режим (роль контролёра/процессора, минимизация, off-chain удаление, хеши без ПДн).</span>
+</div>
+
+<div class="gap p2">
+<div class="gap-h"><span class="pill p2p">P2</span>Платёжные attestation и whistleblower — правовые нюансы</div>
+<p><span class="lbl n">Нет:</span><span class="need">Регуляторного статуса опциональных платёжных attestation; правовых рисков системы доносов (whistleblower) и защиты заявителей.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Зафиксировать как открытые юридические вопросы к модулям.</span>
+</div>
+</section>
+
+<section id="ux">
+<div class="sec-badge">10 — UX и интерфейсы</div>
+<h2>Экраны, информационная архитектура, состояния</h2>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Нет описания экранов и потоков</div>
+<p><span class="lbl h">Есть:</span><span class="have">Перечислены поверхности: каталог, профиль, ЛК/дашборд, API, бейдж, портал апелляций, виджеты, сравнение.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Информационной архитектуры, вайрфреймов, состояний (пустой/New-Provisional/under-watch профиль, вид бейджа по тирам), конструктора бейджа, экрана сравнения, портала апелляций как UI.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Сделать карту экранов + low-fi вайрфреймы ключевых поверхностей MVP.</span>
+</div>
+
+<div class="gap p2">
+<div class="gap-h"><span class="pill p2p">P2</span>Локализация и доступность</div>
+<p><span class="lbl n">Нет:</span><span class="need">Языков (ru/en?), требований доступности (a11y), мобильного поведения каталога/бейджа.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Зафиксировать языки запуска и базовые a11y-требования.</span>
+</div>
+</section>
+
+<section id="metrics">
+<div class="sec-badge">11 — Метрики и аналитика</div>
+<h2>KPI, North Star, антифрод-метрики</h2>
+
+<div class="gap">
+<div class="gap-h"><span class="pill p0p">P0</span>Нет системы метрик успеха</div>
+<p><span class="lbl h">Есть:</span><span class="have">Оценки виральности бейджа (показы/CTR), идея «потока обращений» как измеримой ценности.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">North-Star-метрики и дерева KPI: рост участников, плотность Chain Pull-связей, % полностью верифицированных цепочек, объём и время разрешения апелляций, доля верифицированных отзывов, антифрод-показатели, удержание. Нет и определения «доверия/нейтральности» как измеримой величины.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Определить North Star (напр. «кол-во верифицированных связей в графе») и дерево метрик по фазам.</span>
+</div>
+</section>
+
+<section id="ops">
+<div class="sec-badge">12 — Операции и интеграции</div>
+<h2>Онбординг оракулов, SLA, внешние зависимости</h2>
+
+<div class="gap p1">
+<div class="gap-h"><span class="pill p1p">P1</span>Онбординг лабораторий-оракулов как процесс не описан</div>
+<p><span class="lbl h">Есть:</span><span class="have">«API-партнёрства с лабораториями», статус Verified Oracle как маркетинг.</span></p>
+<p><span class="lbl n">Нет:</span><span class="need">Процесса аккредитации оракула, договорной части, API-спеки публикации результатов, что делать, если лаборатория не хочет интегрироваться по API (ручной ввод?), bootstrap первых данных.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Описать аккредитацию оракула и fallback-ввод данных без API.</span>
+</div>
+
+<div class="gap p2">
+<div class="gap-h"><span class="pill p2p">P2</span>Внешние зависимости и SLA не перечислены</div>
+<p><span class="lbl n">Нет:</span><span class="need">Списка зависимостей (KYB-провайдер, API перевозчиков, IoT-вендоры, L2-инфраструктура) и их рисков; SLA самого реестра, инцидент-менеджмент, модерация, штат поддержки апелляций.</span></p>
+<span class="rec"><span class="lbl r">Рекомендация:</span>Составить реестр зависимостей с рисками и планом на отказ каждого.</span>
+</div>
+</section>
+
+<section id="risks">
+<div class="sec-badge">13 — Стратегические риски</div>
+<h2>Нерешённые вопросы, ставящие модель под вопрос</h2>
+<ul>
+<li><strong>Финансирование без монетизации (P0).</strong> Нейтральность требует не брать денег с оцениваемых, но расходы (газ, KYB, арбитры, хостинг) реальны уже на MVP. Нужна модель устойчивости, не нарушающая нейтралитет.</li>
+<li><strong>Готовность серого рынка к KYB/идентичности (P0).</strong> Вся анти-Sybil и анти-сговор логика опирается на реальную идентичность, но ниша ценит анонимность. Это центральное противоречие принятия — требует валидации на интервью с реальными игроками.</li>
+<li><strong>Юридическая ответственность за рейтинги (P0).</strong> Публичная оценка участников серой/нелегальной зоны несёт риски (клевета, содействие, юрисдикция). До запуска нужна юр-экспертиза.</li>
+<li><strong>Cold start данных и оракулов (P1).</strong> Ценность реестра ≈ нулю до достижения плотности; нужен явный план первичного наполнения (откуда первые Score, первые лаборатории).</li>
+<li><strong>Мотивация арбитров без денег (P1).</strong> Качественный независимый разбор требует экспертов; чисто волонтёрская модель хрупка.</li>
+<li><strong>Реализуемость ZK в заявленном виде (P1).</strong> Самая технически амбициозная часть; риск, что в MVP придётся упростить.</li>
+</ul>
+</section>
+
+<section id="matrix">
+<div class="sec-badge">14 — Сводная матрица вопросов</div>
+<h2>Открытые вопросы по приоритету</h2>
+<table>
+<thead><tr><th>Приоритет</th><th>Домен</th><th>Открытый вопрос</th></tr></thead>
+<tbody>
+<tr><td>P0</td><td>Алгоритм</td><td>Как сырые данные → балл фактора Fᵢ (нормализация) для каждого из 9 факторов?</td></tr>
+<tr><td>P0</td><td>Алгоритм</td><td>Полная матрица весов 22 роли × 9 факторов с ΣWᵢ=1.0?</td></tr>
+<tr><td>P0</td><td>Данные</td><td>Модель данных (сущности/связи) и схема хранения?</td></tr>
+<tr><td>P0</td><td>Идентичность</td><td>Провайдер KYB/KYC и как серый бизнес его проходит; совмещение с псевдонимностью?</td></tr>
+<tr><td>P0</td><td>Данные</td><td>Право на удаление vs неизменяемость: что со Score и аудитом при удалении?</td></tr>
+<tr><td>P0</td><td>Управление</td><td>Кто оператор, как меняются параметры алгоритма, защита от захвата?</td></tr>
+<tr><td>P0</td><td>Финансы</td><td>Кто платит за газ/хостинг/KYB/арбитров на MVP без нарушения нейтральности?</td></tr>
+<tr><td>P0</td><td>Право</td><td>Ответственность за рейтинг в серой зоне; юрисдикция; дисклеймеры?</td></tr>
+<tr><td>P0</td><td>Каталог</td><td>Правила ранжирования/фильтров/сравнения как ядра продукта?</td></tr>
+<tr><td>P1</td><td>Алгоритм</td><td>Определение «субскора по фактору» и сквозной worked example?</td></tr>
+<tr><td>P1</td><td>Алгоритм</td><td>Полный каталог Pₛ + численные пороги INFO/WARNING/CRITICAL?</td></tr>
+<tr><td>P1</td><td>API</td><td>Полная спека эндпоинтов, auth на запись, rate limits, форматы бейджа?</td></tr>
+<tr><td>P1</td><td>Крипто</td><td>Выбор L2, PKI оракулов (выдача/ревокация), реализуемость ZK?</td></tr>
+<tr><td>P1</td><td>Идентичность</td><td>Схема lot-QR, интеграции перевозчиков, анти-реюз медиа-доказательств?</td></tr>
+<tr><td>P1</td><td>Управление</td><td>Пул/жребий/оплата внешних арбитров — внести в документ?</td></tr>
+<tr><td>P1</td><td>UX</td><td>Карта экранов и вайрфреймы ключевых поверхностей?</td></tr>
+<tr><td>P1</td><td>Метрики</td><td>North Star и дерево KPI по фазам?</td></tr>
+<tr><td>P1</td><td>Операции</td><td>Процесс аккредитации оракулов и fallback без API?</td></tr>
+<tr><td>P2</td><td>Алгоритм</td><td>Точные пороги доминирующего фактора и параметры New/Provisional?</td></tr>
+<tr><td>P2</td><td>Уведомления</td><td>Каналы/частота/согласия для алертов?</td></tr>
+<tr><td>P2</td><td>Безопасность</td><td>Пороги граф-детектора и разбор ложных срабатываний?</td></tr>
+<tr><td>P2</td><td>UX</td><td>Локализация и a11y?</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="next">
+<div class="sec-badge">15 — Рекомендуемая структура PRD</div>
+<h2>Что собрать, чтобы PRD стал исчерпывающим</h2>
+<p>Документ v2 закрывает разделы «Видение/Принципы/Механика доверия». Поверх него для PRD рекомендую добавить:</p>
+<ol style="margin-left:1.1rem">
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Проблема, цель, North Star, метрики успеха</strong> (§01, §11).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Скоуп MVP</strong>: in/out, гео, якорные роли, критерии приёмки по фазам (§01).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Персоны и user stories</strong> с journey maps (§02).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Функциональная спецификация</strong>: каталог, профиль, ЛК, формы, бейдж, API (§03).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Алгоритм как инженерная спека</strong>: нормализация Fᵢ, матрица весов, субскор, полный Pₛ, worked example (§04).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Модель данных + идентичность + верификация артефактов</strong> (§05).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Ончейн/крипто-спека</strong>: L2, PKI оракулов, ZK-трек (§06).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Управление + модель финансирования + арбитраж</strong> (§07).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Безопасность (модель угроз) и приватность/комплаенс/право</strong> (§08, §09).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>UX</strong>: карта экранов и вайрфреймы (§10).</li>
+<li style="font-size:.84rem;margin-bottom:.35rem"><strong>Операции, интеграции, зависимости, риски</strong> (§12, §13).</li>
+</ol>
+
+<div class="summary-box">
+<h3>Если двигаться по приоритету</h3>
+<p>Сначала закрыть <strong>9 P0-вопросов</strong> — они блокируют не только PRD, но и принципиальную жизнеспособность (особенно финансирование, готовность к KYB и правовой статус). Параллельно достроить инженерную спеку алгоритма (нормализация Fᵢ + матрица весов) — это переводит сильную концепцию в техзадание. UX, метрики и операционка достраиваются быстро, как только зафиксированы P0/P1-решения.</p>
+</div>
+
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Отчёт сформирован на основе полного прочтения v2-peptide-trust-registry.html. Оценки «есть/нет» отражают текущее состояние документа без додумывания.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

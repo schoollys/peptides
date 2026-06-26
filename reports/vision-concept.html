@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Vision / Concept</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;min-width:240px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:960px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:2rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.12}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.lead{font-size:1.05rem;color:#2a2925;line-height:1.7;margin-bottom:1.2rem;font-weight:500}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.persona{background:#fff;border:1px solid #e4e2dc;border-radius:12px;padding:1.1rem 1.3rem;margin:1.1rem 0}
+.persona-h{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.5rem;border-bottom:1px solid #eee;padding-bottom:.5rem}
+.persona-name{font-size:1.05rem;font-weight:800;color:#0f0e0d}
+.persona-tag{font-size:.7rem;font-weight:700;color:#c06a1a;background:#fef3e8;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em}
+.persona p{font-size:.82rem;margin-bottom:.4rem}
+.jtbd{background:#f4f6fa;border-left:3px solid #5b78a8;border-radius:0 8px 8px 0;padding:.5rem .8rem;margin:.5rem 0;font-size:.82rem;color:#2e3a4d;font-style:italic}
+.phase{display:inline-block;padding:1px 8px;border-radius:10px;font-size:.7rem;font-weight:700}
+.p-mvp{background:#e7f3ec;color:#15673f}.p-v1{background:#eef0fb;color:#3b4a8c}.p-v2{background:#f7eef8;color:#7a3b7a}
+.cjm{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.78rem;color:#e8935a;line-height:1.8;overflow-x:auto;white-space:pre-wrap}
+.cjm .c{color:#8a8a82}
+.scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+@media(max-width:700px){.scope-grid{grid-template-columns:1fr}}
+.scope-col{border-radius:10px;padding:.9rem 1.1rem}
+.scope-in{background:#f6faf7;border:1px solid #cfe3d4}
+.scope-out{background:#fbf3f3;border:1px solid #e8cccc}
+.scope-col h4{margin-top:0}
+.scope-in h4{color:#15673f}.scope-out h4{color:#a33}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Vision / Concept<span class="sb-sub">стратегический слой над PRD</span></div>
+<a class="nav-link" href="#prob"><span class="nav-num">01</span>Проблема и контекст</a>
+<a class="nav-link" href="#audience"><span class="nav-num">02</span>Аудитория и сегменты</a>
+<a class="nav-link" href="#personas"><span class="nav-num">03</span>Personas + JTBD</a>
+<a class="nav-link" href="#value"><span class="nav-num">04</span>Ценностное предложение</a>
+<a class="nav-link" href="#market"><span class="nav-num">05</span>Рынок и альтернативы</a>
+<a class="nav-link" href="#goals"><span class="nav-num">06</span>Бизнес-цели и OKR/KPI</a>
+<a class="nav-link" href="#cjm"><span class="nav-num">07</span>Customer Journey Map</a>
+<a class="nav-link" href="#scope"><span class="nav-num">08</span>Границы продукта</a>
+<a class="nav-link" href="#roadmap"><span class="nav-num">09</span>Roadmap по фазам</a>
+<a class="nav-link" href="#next"><span class="nav-num">10</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="prob">
+<div class="sec-badge">Vision / Concept — стратегический слой над PRD</div>
+<h1>PeptideTrust: trust-layer для RUO-рынка</h1>
+<p class="lead">Открытый, прозрачный, верифицируемый реестр доверия для рынка пептидов. Не маркетплейс и не эскроу — слой доверия, который агрегирует и проверяет данные о качестве, логистике и поведении участников, чтобы решения принимались на основе доказательств, а не слухов.</p>
+
+<h3>Проблема</h3>
+<p>Рынок research-use-only (RUO) пептидов работает в условиях системного дефицита доверия:</p>
+<ul>
+<li><strong>Информация фрагментирована и недостоверна:</strong> качество и репутация продавцов обсуждаются в Reddit-тредах, закрытых форумах и чатах — анекдотично, анонимно, без верификации.</li>
+<li><strong>COA (сертификаты анализа) разрознены и подделываемы:</strong> их публикуют сами продавцы, без привязки к партии и без независимой цепочки происхождения образца.</li>
+<li><strong>Нет связи между «словами» и «делами»:</strong> заявления о чистоте, логистике, холодовой цепи нечем проверить; покупатель узнаёт о проблеме постфактум.</li>
+<li><strong>Добросовестные игроки не могут отстроиться:</strong> честный вендор/лаборатория тонут в общем шуме, потому что их репутацию негде доказуемо зафиксировать.</li>
+</ul>
+<div class="warn">
+<div class="warn-t">Суть боли</div>
+<p>Покупатель не может отличить надёжного поставщика от опасного до сделки. Добросовестный поставщик не может доказать свою надёжность дешевле, чем «нарабатывать репутацию годами в чатах». Рынок платит за это здоровьем покупателей и упущенной выручкой честных игроков.</p>
+</div>
+</section>
+
+<section id="audience">
+<div class="sec-badge">02 — Аудитория и сегментация</div>
+<h2>Кто пользуется реестром</h2>
+<p class="sec-intro">Полная таксономия — 22 роли в 11 категориях (см. <a href="../artifacts/v2-peptide-trust-registry.html#roles">оценку 22 ролей рынка</a>). Для Vision важны три макро-стороны и приоритет MVP.</p>
+<table>
+<thead><tr><th>Макро-сторона</th><th>Кто входит</th><th>Роль в системе</th></tr></thead>
+<tbody>
+<tr><td>Спрос</td><td>Конечные покупатели, сообщество, клиники/prescribers, дистрибьюторы</td><td>Потребители Score; источник отзывов/артефактов</td></tr>
+<tr><td>Предложение</td><td>Заводы-синтез, вендоры (RUO), бренды, дропшипперы, аптеки (Verified-Legal)</td><td>Объекты оценки; подают данные, встраивают бейдж</td></tr>
+<tr><td>Верификация / инфраструктура</td><td>Независимые лаборатории (оракулы), GB-организаторы, аудиторы, кураторы, логистика</td><td>Источники доказательств (Vᵢ); естественные оракулы</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Приоритет MVP: спрос первым (pull-стратегия)</div>
+<p>Cold-start решаем со стороны спроса: бесплатный прозрачный каталог + встраиваемый бейдж создают видимость и спрос покупателей. Это вынуждает предложение (вендоров/лаборатории) присоединяться, чтобы «быть на витрине» и не выглядеть подозрительно по отсутствию (absence-as-red-flag). Chain Pull усиливает: участники втягивают контрагентов.</p>
+</div>
+</section>
+
+<section id="personas">
+<div class="sec-badge">03 — Personas + Jobs-to-be-Done</div>
+<h2>5 ключевых персон</h2>
+<p class="sec-intro">Детально — 5 персон, покрывающих обе стороны и верификацию. Остальные 17 ролей разобраны в <a href="../artifacts/v2-peptide-trust-registry.html#roles">оценке 22 ролей рынка</a>. Формат: кто, боль, JTBD, что даёт реестр.</p>
+
+<div class="persona">
+<div class="persona-h"><span class="persona-name">Алекс — конечный покупатель</span><span class="persona-tag">Спрос · приоритет MVP</span></div>
+<p><strong>Контекст:</strong> покупает RUO-пептиды для личных исследований; ориентируется на разрозненные отзывы, боится подделок и примесей.</p>
+<p><strong>Боль:</strong> невозможно проверить продавца до оплаты; страх за здоровье и деньги; информация противоречива.</p>
+<div class="jtbd">«Когда я выбираю поставщика, я хочу за минуту убедиться в его доказанной надёжности, чтобы не рисковать здоровьем и деньгами.»</div>
+<p><strong>Что даёт реестр:</strong> Score с доминирующим фактором, независимые тесты, история — бесплатно, без регистрации. Бейдж прямо на сайте продавца.</p>
+</div>
+
+<div class="persona">
+<div class="persona-h"><span class="persona-name">Мария — вендор (RUO)</span><span class="persona-tag">Предложение</span></div>
+<p><strong>Контекст:</strong> добросовестный продавец, конкурирует с серыми игроками, демпингующими на качестве.</p>
+<p><strong>Боль:</strong> честность не конвертируется в продажи — её нечем доказать; репутация нарабатывается годами в чатах.</p>
+<div class="jtbd">«Когда я честно работаю, я хочу доказуемо отстроиться от недобросовестных конкурентов, чтобы расти на доверии, а не на маркетинге.»</div>
+<p><strong>Что даёт реестр:</strong> верифицируемый Score, бейдж-конверсия, видимость в каталоге, New/Provisional fast-track для старта.</p>
+</div>
+
+<div class="persona">
+<div class="persona-h"><span class="persona-name">Др. Лаб — независимая лаборатория (оракул)</span><span class="persona-tag">Верификация</span></div>
+<p><strong>Контекст:</strong> делает анализы; хочет поток заказов и репутацию как доверенный источник.</p>
+<p><strong>Боль:</strong> её COA подделывают и используют не по назначению; нет признания статуса «доверенного оракула».</p>
+<div class="jtbd">«Когда я выдаю заключение, я хочу, чтобы оно было неподделываемым и приносило мне поток заказов как аккредитованному оракулу.»</div>
+<p><strong>Что даёт реестр:</strong> статус Verified Oracle, криптоподпись COA (PKI), поток заказов, защита репутации (sample-swap бьёт по вендору, не по лаборатории).</p>
+</div>
+
+<div class="persona">
+<div class="persona-h"><span class="persona-name">Глеб — GB-организатор (групповые закупки)</span><span class="persona-tag">Верификация · спрос</span></div>
+<p><strong>Контекст:</strong> организует совместные закупки; отвечает репутацией перед участниками.</p>
+<p><strong>Боль:</strong> вся ответственность на личной репутации; нет инструмента доказать честность распределения и качество партии.</p>
+<div class="jtbd">«Когда я веду закупку, я хочу доказуемо подтвердить качество партии и свою честность, чтобы участники доверяли мне без эскроу.»</div>
+<p><strong>Что даёт реестр:</strong> роль естественного оракула (отбор образца до распределения, Vᵢ=1.0), репутационный Score, Chain Pull-кредит.</p>
+</div>
+
+<div class="persona">
+<div class="persona-h"><span class="persona-name">Клиника / prescriber</span><span class="persona-tag">Спрос · B2B</span></div>
+<p><strong>Контекст:</strong> принимает решения о закупке у поставщиков; нужна due-diligence.</p>
+<p><strong>Боль:</strong> высокая цена ошибки (регуляторика, пациенты); нет систематизированной проверки поставщика.</p>
+<div class="jtbd">«Когда я выбираю поставщика, я хочу глубокую проверенную историю его надёжности, чтобы снизить регуляторный и репутационный риск.»</div>
+<p><strong>Что даёт реестр:</strong> due-diligence отчёты (B2B-SKU), мониторинг-API изменений Score, Verified-Legal сегментация.</p>
+</div>
+
+<h4>Остальные роли (кратко)</h4>
+<p>Бренды и дропшипперы (blind-disclosure по умолчанию), логистика (CCF — холодовая цепь), инфлюенсеры (Transparent Affiliate), кураторы/модераторы (Verified Curator), аптеки (Verified-Legal), исследователи/инвесторы/регуляторы (потребители аналитики), неформальные продавцы (репутационная заметка без полного Score), платёжные процессинги (опциональный модуль инфра-надёжности). Полный разбор — в <a href="../artifacts/v2-peptide-trust-registry.html#roles">оценке 22 ролей рынка</a>.</p>
+</section>
+
+<section id="value">
+<div class="sec-badge">04 — Ценностное предложение</div>
+<h2>Что и кому мы обещаем</h2>
+<table>
+<thead><tr><th>Сегмент</th><th>Ценностное предложение</th></tr></thead>
+<tbody>
+<tr><td>Покупатель</td><td>«Проверь любого поставщика за минуту — бесплатно, на доказательствах, а не слухах»</td></tr>
+<tr><td>Вендор</td><td>«Преврати свою честность в конкурентное преимущество и конверсию»</td></tr>
+<tr><td>Лаборатория</td><td>«Стань доверенным оракулом: неподделываемые заключения и поток заказов»</td></tr>
+<tr><td>GB-организатор</td><td>«Докажи честность и качество без эскроу — репутацией, подтверждённой данными»</td></tr>
+<tr><td>Клиника/B2B</td><td>«Снизь риск закупки глубокой проверенной due-diligence»</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Единый стержень</div>
+<p>Доверие как проверяемый публичный актив. Покупатель получает уверенность бесплатно; добросовестный поставщик — отстройку; верификатор — признание и поток. Реестр нейтрален: платит «решающий», не оцениваемый — что структурно исключает конфликт интересов рейтинговых агентств.</p>
+</div>
+</section>
+
+<section id="market">
+<div class="sec-badge">05 — Рынок и альтернативы</div>
+<h2>С чем мы конкурируем</h2>
+<p class="sec-intro">Прямого аналога «trust-layer для RUO-рынка» нет — мы конкурируем со <strong>status quo</strong> (текущими способами, которыми люди добывают доверие). Это создание новой категории поверх существующих суррогатов.</p>
+<table>
+<thead><tr><th>Текущая альтернатива</th><th>Чем плоха</th><th>Наше преимущество</th></tr></thead>
+<tbody>
+<tr><td>Reddit / форумы / чаты</td><td>Анонимно, неверифицируемо, манипулируемо, фрагментарно</td><td>Агрегация + независимая верификация + неизменяемая история</td></tr>
+<tr><td>Самопубликуемые COA вендоров</td><td>Подделываемы, без привязки к партии и цепочке образца</td><td>PKI-подпись, lot-QR, chain-of-custody, sample-swap → Pₛ</td></tr>
+<tr><td>Разовые lab-testing сервисы</td><td>Точечно, не агрегируется в репутацию, дорого для покупателя</td><td>Оракул-сеть, Vᵢ-пропагация, бесплатный публичный Score</td></tr>
+<tr><td>Сарафанное радио / личные связи</td><td>Не масштабируется, закрыто для новичков</td><td>Открытый каталог + бейдж + Chain Pull</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Стратегическое следствие</div>
+<p>Главный конкурент — не другой продукт, а инерция «и так сойдёт» (доверие по слухам). Поэтому ключ к принятию — снизить трение до нуля на стороне спроса (бесплатно, без регистрации, бейдж везде) и сделать отсутствие в реестре подозрительным.</p>
+</div>
+</section>
+
+<section id="goals">
+<div class="sec-badge">06 — Бизнес-цели и метрики</div>
+<h2>North Star, OKR и KPI по фазам</h2>
+
+<h4>North Star</h4>
+<p class="lead">«Проверенные решения» — число проверок Score перед сделкой (просмотры профиля + клики по бейджу с целью оценки поставщика). Это прямой прокси доставленной ценности: люди реально опираются на реестр при решениях.</p>
+
+<h4>OKR по фазам</h4>
+<table>
+<thead><tr><th>Фаза</th><th>Objective</th><th>Key Results (KPI)</th></tr></thead>
+<tbody>
+<tr><td><span class="phase p-mvp">Bootstrap</span></td><td>Доказать ценность для спроса</td><td>Покрытие топ-N поставщиков ниши; первые встроенные бейджи; рост проверок Score нед/нед</td></tr>
+<tr><td><span class="phase p-mvp">MVP</span></td><td>Запустить маховик доверия</td><td>North Star (проверки/мес) ↑; доля профилей с ≥1 независимым подтверждением (Vᵢ); активные податели данных</td></tr>
+<tr><td><span class="phase p-v1">Growth (V1)</span></td><td>Самоподдерживающийся рост</td><td>Доля рынка с подтверждёнными данными; виральный коэффициент (Chain Pull); первая B2B-выручка (due-diligence/API)</td></tr>
+<tr><td><span class="phase p-v2">Scale (V2)</span></td><td>Устойчивость и охват</td><td>Самоокупаемость (B2B-SKU покрывают burn); расширение категорий; снижение CAC</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Конкретные числовые таргеты — параметр под валидацию (юнит-экономика P0-closure, KPI Волны 3); здесь зафиксирована структура целей, не финальные значения.</p>
+</section>
+
+<section id="cjm">
+<div class="sec-badge">07 — Customer Journey Map</div>
+<h2>Ключевые сценарии</h2>
+
+<h4>Покупатель (Алекс)</h4>
+<div class="cjm">Узнал о поставщике → <span class="c">видит бейдж на его сайте / гуглит</span> → открывает профиль в реестре
+  → смотрит Score + доминирующий фактор + независимые тесты → сравнивает в сегменте
+  → принимает решение → (после сделки) оставляет отзыв/артефакт → получает алерты по контрагенту</div>
+
+<h4>Вендор (Мария)</h4>
+<div class="cjm">Видит, что покупатели проверяют реестр → claim-profile → KYB + первый blind-тест (Provisional)
+  → накапливает независимые подтверждения → выходит в полный Score → встраивает бейдж
+  → конверсия растёт → втягивает контрагентов (Chain Pull)</div>
+
+<h4>Лаборатория (Др. Лаб)</h4>
+<div class="cjm">Аккредитация (Root CA) → статус Verified Oracle → подписывает COA (PKI, lot-QR)
+  → получает поток заказов → репутация защищена (sample-swap → Pₛ вендора)</div>
+</section>
+
+<section id="scope">
+<div class="sec-badge">08 — Границы продукта</div>
+<h2>In scope / Out of scope</h2>
+<div class="scope-grid">
+<div class="scope-col scope-in">
+<h4>✓ В границах</h4>
+<ul>
+<li>Открытый реестр доверия и публичный Score</li>
+<li>Агрегация и верификация данных (оракулы, тесты, артефакты)</li>
+<li>Встраиваемый бейдж и публичное read-API</li>
+<li>Идентичность (KYB/KYC), PKI, ончейн-якоря целостности</li>
+<li>Апелляции и управление (Steward-панели)</li>
+<li>B2B-продукты для «решающих» (due-diligence, мониторинг, аналитика, VaaS)</li>
+</ul>
+</div>
+<div class="scope-col scope-out">
+<h4>✗ Вне границ</h4>
+<ul>
+<li>Маркетплейс / продажа товара</li>
+<li>Эскроу / удержание средств / платежи за сделки</li>
+<li>Медицинские рекомендации / дозировки</li>
+<li>Продажа влияния на Score оцениваемым сторонам</li>
+<li>Гарантия качества товара (мы фиксируем доказательства, не страхуем сделку)</li>
+</ul>
+</div>
+</div>
+<div class="rec-box">
+<div class="rec-t">Позиционирование</div>
+<p>RUO-positioning строго: реестр о прозрачности и доказательствах, не о медицине и не о торговле. Это критично и юридически (ToS/defamation framework), и для нейтралитета. Границы — якорь против scope creep в PRD.</p>
+</div>
+</section>
+
+<section id="roadmap">
+<div class="sec-badge">09 — Roadmap по фазам</div>
+<h2>MVP → V1 → V2</h2>
+<table>
+<thead><tr><th>Возможность</th><th>Фаза</th></tr></thead>
+<tbody>
+<tr><td>Публичный каталог + профили + Score с доминирующим фактором</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td>Встраиваемый подписанный бейдж + публичное read-API</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td>Claim-profile + KYB/KYC + New/Provisional fast-track</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td>Независимые тесты (оракулы) + базовый Vᵢ + COA с PKI</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td>Ончейн-якоря целостности (L2)</td><td><span class="phase p-mvp">MVP</span></td></tr>
+<tr><td>Trust-пропагация Vᵢ + Chain Pull + алерты по контрагентам</td><td><span class="phase p-v1">V1</span></td></tr>
+<tr><td>Апелляции + Steward-панели + управление</td><td><span class="phase p-v1">V1</span></td></tr>
+<tr><td>B2B-SKU (due-diligence, мониторинг-API)</td><td><span class="phase p-v1">V1</span></td></tr>
+<tr><td>Lot-QR chain-of-custody + анти-reuse артефактов</td><td><span class="phase p-v1">V1</span></td></tr>
+<tr><td>Shielded assertion / ZK-раскрытие, аналитика-SKU, VaaS</td><td><span class="phase p-v2">V2</span></td></tr>
+<tr><td>Расширение категорий/регионов, опциональный инфра-модуль процессингов</td><td><span class="phase p-v2">V2</span></td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Фазировка опирается на Волны 0–4 и pull-стратегию: сначала спрос-инструменты (каталог/бейдж/API), затем маховик доверия (пропагация, управление), затем монетизация и продвинутая приватность.</p>
+</section>
+
+<section id="next">
+<div class="sec-badge">10 — Что дальше</div>
+<h2>Vision готов → собираем PRD</h2>
+<p>Зафиксированные стратегические решения этого документа:</p>
+<ul>
+<li><strong>5 ключевых персон</strong> детально + остальные кратко (§03).</li>
+<li><strong>Спрос-first (pull)</strong> как стратегия cold-start (§02, §05).</li>
+<li><strong>Англоязычный глобальный RUO-рынок</strong> (US/EU ядро) для MVP.</li>
+<li><strong>North Star = «проверенные решения»</strong> (проверки Score перед сделкой) (§06).</li>
+<li><strong>Конкуренция со status quo</strong>, создание новой категории (§05).</li>
+</ul>
+<div class="rec-box">
+<div class="rec-t">Следующий шаг</div>
+<p>Теперь стратегический слой задаёт рамку для <strong>сборки единого PRD</strong>: Vision (зачем/для кого/куда) + Волны 0–4 + закрытия P0/P1/P2 + v2-реестр → один структурированный документ. Открытые внешние зависимости остаются как явные «to be confirmed»: числа экономики, подпись SME, юрист (ToS/defamation), DPO (DPIA/состав хешей).</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

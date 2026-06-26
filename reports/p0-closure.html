@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — закрытие 5 P0-пробелов</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:780px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.fbox{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:#e8935a;line-height:1.7;overflow-x:auto;white-space:pre-wrap}
+.fbox .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ex{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.ex-t{font-size:.74rem;font-weight:800;color:#5b78a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ex p{font-size:.82rem;margin-bottom:.3rem}
+.val{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.72rem;font-weight:700;background:#fef3e8;color:#c06a1a;white-space:nowrap}
+.prov{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.69rem;font-weight:700;background:#eef0f5;color:#5b6b8c;white-space:nowrap}
+.allow{color:#15673f;font-weight:700}
+.forbid{color:#c0392b;font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Закрытие 5 P0<span class="sb-sub">версии · Unclaimed · SME · экономика · право</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">00</span>Контекст и решения</a>
+<a class="nav-link" href="#versioning"><span class="nav-num">01</span>Версионирование Score</a>
+<a class="nav-link" href="#unclaimed"><span class="nav-num">02</span>Политика Unclaimed</a>
+<a class="nav-link" href="#sme"><span class="nav-num">03</span>Чек-лист валидации SME</a>
+<a class="nav-link" href="#econ"><span class="nav-num">04</span>Юнит-экономика</a>
+<a class="nav-link" href="#legal"><span class="nav-num">05</span>ToS / клевета / ответ</a>
+<a class="nav-link" href="#next"><span class="nav-num">06</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">00 — Контекст и принятые решения</div>
+<h1>Закрытие 5 P0-пробелов</h1>
+<p class="sec-intro">Из аудита полноты: пять пробелов, которые нельзя оставлять на потом (логика, риск, право, экономика). Ниже — проектные решения и артефакты по каждому, по принятым вами вариантам.</p>
+<table>
+<thead><tr><th>P0</th><th>Принятое решение</th></tr></thead>
+<tbody>
+<tr><td>Версионирование Score</td><td>Forward-only: Score привязан к algo_version; новые веса «вперёд»; ретро-пересчёт только для исправления ошибок</td></tr>
+<tr><td>Unclaimed-профили</td><td>Консервативно: только нейтральные факты, без негатива до claim, механизм возражения/удаления</td></tr>
+<tr><td>Валидация чисел</td><td>Чек-лист параметров (provisional v0.9) для подписи SME позже</td></tr>
+<tr><td>Юнит-экономика</td><td>Параметрическая модель с явными допущениями/диапазонами</td></tr>
+<tr><td>ToS/клевета/ответ</td><td>Черновик policy-фреймворка как вход для юриста (не юр.консультация)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="versioning">
+<div class="sec-badge">01 — Версионирование Score (forward-only)</div>
+<h2>Смена весов не переписывает прошлое</h2>
+<p class="sec-intro">Параметрический комитет периодически меняет веса/пороги. Чтобы это не конфликтовало с неизменяемой ончейн-историей и сравнимостью во времени, каждый Score жёстко привязан к версии параметров, под которой посчитан.</p>
+
+<h4>Модель</h4>
+<div class="fbox">algo_version = монотонный идентификатор набора параметров (веса, банды, штрафы, Dᵢ, Vᵢ)
+ScoreEvent { participant, ts, algo_version, inputs_hash, score, dominant_factor }
+  → хеш-якорь в L2 включает algo_version
+
+При публикации новой версии комитетом (changelog + comment-period):
+  • активные профили пересчитываются «вперёд» под новой версией (плановый батч)
+  • событие «algo vN → vN+1 applied» само анкорится в L2
+  • прежние ScoreEvent остаются валидными и помечены своей версией
+  • старые ончейн-якоря НЕ трогаются</div>
+
+<h4>Правила</h4>
+<table>
+<thead><tr><th>Ситуация</th><th>Поведение</th></tr></thead>
+<tbody>
+<tr><td>Рутинная перекалибровка весов</td><td>Forward-only: применяется к будущим расчётам + плановый пересчёт активных профилей под новой версией</td></tr>
+<tr><td>Исторические Score</td><td>Остаются валидными под своей algo_version; в профиле показываются с пометкой версии и даты</td></tr>
+<tr><td>Исправление ошибки (errata)</td><td>Единственный случай ретро-пересчёта; сам версионируется и публично логируется — никогда не тихо</td></tr>
+<tr><td>Сравнимость во времени</td><td>Каталог показывает текущую версию; сравнение исторических точек — только в рамках одной версии</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Почему forward-only</div>
+<p>Ретро-пересчёт всей истории при каждой перекалибровке сломал бы аудит («Gold в марте вдруг стал Silver») и доверие. Заморозка совсем (без forward-применения) заперла бы участников в устаревших весах. Forward-only сохраняет и неизменность прошлого, и актуальность настоящего; версия — это «правила игры, действовавшие тогда».</p>
+</div>
+</section>
+
+<section id="unclaimed">
+<div class="sec-badge">02 — Политика Unclaimed (консервативная)</div>
+<h2>Предзаполнять можно — но без репутационного риска</h2>
+<p class="sec-intro">Предзаполнение профилей о реальных бизнесах решает cold-start, но создаёт экспозицию по клевете/GDPR. Консервативная политика: только нейтральные факты, никакой оценки до подтверждения владельцем.</p>
+
+<h4>Что можно и что нельзя в Unclaimed</h4>
+<table>
+<thead><tr><th class="allow">Разрешено (нейтральные факты)</th><th class="forbid">Запрещено до claim+верификации</th></tr></thead>
+<tbody>
+<tr><td>Название/бренд из публичных источников</td><td>Любой Trust Score или тир</td></tr>
+<tr><td>Роль/категория (по публичной деятельности)</td><td>Негативные репутационные заметки, жалобы</td></tr>
+<tr><td>Публичные лицензии/регистрации</td><td>Pₛ-флаги, пометки «под расследованием»</td></tr>
+<tr><td>Публично опубликованные самим участником COA</td><td>Community-оценки, рейтинги, «звёзды»</td></tr>
+<tr><td>Ссылка на первоисточник (provenance каждого поля)</td><td>Производные суждения о качестве</td></tr>
+</tbody>
+</table>
+
+<h4>Отображение и права субъекта</h4>
+<ul>
+<li>Явные пометки: <strong>«Не заявлен»</strong>, <strong>«Данные из публичных источников, не подтверждены»</strong>, <strong>«Trust Score не рассчитывается»</strong>.</li>
+<li><strong>Механизм возражения без аккаунта:</strong> субъект может потребовать исправления или удаления Unclaimed-профиля до claim — обрабатывается в SLA (раздел операций Волны 4).</li>
+<li><strong>Whitelist источников</strong> + хранение provenance по каждому полю (откуда взято) — для проверяемости и юр-защиты.</li>
+<li>При claim+верификации профиль переходит в New/Provisional и только тогда начинает накапливать факторы/Score.</li>
+</ul>
+<div class="warn">
+<div class="warn-t">Связь с правом (§05)</div>
+<p>Правовое основание для нейтральных <em>небизнес-неперсональных</em> данных — законный интерес + публичность источника. Как только появляется привязка к физлицу — применяется минимизация ПДн и основания обработки (DPIA, §05/Волна 2). Финальную границу «что допустимо в Unclaimed» утверждает юрист вместе с ToS/defamation-политикой.</p>
+</div>
+<div class="rec-box">
+<div class="rec-t">Компромисс cold-start</div>
+<p>Консервативный режим слабее «горячего» прелоада, но сохраняет ключевую ценность: каталог не пуст, участник видит «ваш профиль уже существует — заберите его», и при этом реестр не публикует ни одного негативного суждения о том, кто не давал согласия и не верифицирован.</p>
+</div>
+</section>
+
+<section id="sme">
+<div class="sec-badge">03 — Чек-лист валидации параметров (SME)</div>
+<h2>Все числа в одном месте — статус provisional v0.9</h2>
+<p class="sec-intro">Структура и формулы зафиксированы и от чисел не зависят; но конкретные пороги — инженерные дефолты. Этот чек-лист собирает их в один артефакт для подписи аналитическим химиком / harm-reduction экспертом. До подписи все значения помечены <span class="prov">provisional v0.9</span>.</p>
+
+<table>
+<thead><tr><th>Параметр</th><th>Текущий дефолт</th><th>Где</th><th>Вопрос к SME</th></tr></thead>
+<tbody>
+<tr><td>QEF — банды чистоты HPLC</td><td>≥99→100; 98–99→90; 95–98→75; 90–95→55; 80–90→30; &lt;80→0</td><td>Волна 1 §04</td><td>Корректны ли пороги и шаг для пептидов?</td></tr>
+<tr><td>QEF — веса компонентов</td><td>0.60 purity / 0.25 label / 0.15 safety</td><td>§04</td><td>Верен ли баланс чистоты vs точности дозы vs безопасности?</td></tr>
+<tr><td>QEF — safety (endotoxin/sterility)</td><td>гейт для инъекционных</td><td>§04</td><td>Пороги эндотоксина/стерильности для инъекций?</td></tr>
+<tr><td>CVF — точка насыщения k</td><td>5</td><td>§05</td><td>Сколько verified-отзывов = «достаточно уверенно»?</td></tr>
+<tr><td>CVF — штраф за жалобу</td><td>−12 за нерешённую</td><td>§05</td><td>Адекватна ли величина?</td></tr>
+<tr><td>TRF — штрафы</td><td>−25 противоречие / −15 нераскрытие</td><td>§06</td><td>Соразмерны ли удары?</td></tr>
+<tr><td>PCF — лестница сертификаций</td><td>GMP-аудит 100…нет 0; recall −20</td><td>§07.1</td><td>Верна ли иерархия сертификаций и штраф за отзыв?</td></tr>
+<tr><td>SCIF — коэффициенты</td><td>0.6 база/0.4 глубина; target_hops=2</td><td>§07.2</td><td>Какова целевая глубина прослеживаемости?</td></tr>
+<tr><td>FRF — банды completed + штраф</td><td>≥0.98→100…; −25 за пропажу средств</td><td>§07.3</td><td>Реалистичны ли пороги завершённости?</td></tr>
+<tr><td>CCF — демпфер IoT</td><td>0.5+0.5·iot_coverage; −15 за нарушение</td><td>§07.4</td><td>Правильна ли «скидка за непокрытие»?</td></tr>
+<tr><td>CVF-B — k_b</td><td>3</td><td>§07.5</td><td>Точка насыщения по B2B-партнёрам?</td></tr>
+<tr><td>RF — банды времени/разрешения</td><td>≤24ч→100…; res ≥0.95→100…</td><td>§07.6</td><td>Реалистичны ли SLA реакции для ниши?</td></tr>
+<tr><td>Dᵢ — кривая распада</td><td>0–30→1.0; 31–90→0.85; 91–180→0.65; 181–365→0.40; &gt;365→0.15</td><td>v2</td><td>Скорость устаревания? Нужны ли разные half-life по типам данных (P1)?</td></tr>
+<tr><td>Pₛ — каталог штрафов</td><td>COA-фальш −0.40/24м; клон −0.60/беср; swap −0.40/24м; cold −0.15/6м; исчезновение −0.20/12м; Sybil −0.35/18м</td><td>v2</td><td>Соразмерны ли величины и сроки?</td></tr>
+<tr><td>Тиры — границы</td><td>Plat 88–100; Gold 72–87; Silver 55–71; Bronze 35–54; watch &lt;35</td><td>v2</td><td>Корректны ли отсечки?</td></tr>
+<tr><td>Vᵢ — значения оракулов</td><td>blind 1.0; vendor-COA 0.70; IoT 0.85; verified-buyer 0.75; no-artifact 0.45; self 0.40; λ_blind 0.85</td><td>v2 / Волна 2</td><td>Верна ли иерархия доверенности источников?</td></tr>
+<tr><td>Мульти-оракульный cap Fᵢ</td><td>фактор ≥20% веса → нужно ≥2 источника</td><td>Волна 1 §03</td><td>Правильный ли порог требования второго источника?</td></tr>
+<tr><td>New/Provisional буст</td><td>KYB + 1 blind-тест → временный буст</td><td>v2</td><td>Величина и срок буста (P2)?</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Блок подписи</div>
+<p>После валидации значения утверждаются как <strong>параметры v1.0</strong> Параметрического комитета (с указанием SME-валидатора и даты), и снимается статус provisional. До этого MVP может работать на v0.9 в закрытом пилоте, но публичные Score выходят только после подписи.</p>
+</div>
+</section>
+
+<section id="econ">
+<div class="sec-badge">04 — Юнит-экономика (параметрическая)</div>
+<h2>Модель устойчивости с явными допущениями</h2>
+<p class="sec-intro">Финмодель решена (гранты+founder/angel → B2B позже), но нужны числа, чтобы проверить runway. Модель параметрическая: формулы фиксированы, значения — плейсхолдеры под ваши реальные данные.</p>
+
+<h4>Допущения (заполнить реальными) <span class="prov">placeholder</span></h4>
+<table>
+<thead><tr><th>Параметр</th><th>Обозн.</th><th>Ориентир-диапазон</th></tr></thead>
+<tbody>
+<tr><td>Стоимость KYB на бизнес</td><td>c_kyb</td><td>$1–5</td></tr>
+<tr><td>Стоимость KYC на физлицо</td><td>c_kyc</td><td>$0.5–2</td></tr>
+<tr><td>Газ за анкоринг (батч merkle-root)</td><td>c_gas</td><td>≈$0 при батчинге N событий в 1 запись</td></tr>
+<tr><td>Хостинг/инфра в месяц</td><td>c_host</td><td>$200–2000 (зависит от стадии)</td></tr>
+<tr><td>Один независимый blind-тест</td><td>c_test</td><td>$50–300</td></tr>
+<tr><td>Событий на участника в месяц</td><td>e_pm</td><td>2–10</td></tr>
+<tr><td>Активных участников</td><td>N</td><td>цель фазы (Волна 3: ≥15 → рост)</td></tr>
+<tr><td>Тестов, финансируемых реестром/мес</td><td>T</td><td>bootstrap-объём</td></tr>
+<tr><td>Бюджет гранта</td><td>G</td><td>ваш реальный</td></tr>
+</tbody>
+</table>
+
+<h4>Формулы</h4>
+<div class="fbox">Переменные расходы/мес ≈ N·e_pm·c_gas_amortized + T·c_test + c_host
+CAC онборда ≈ c_kyb (или c_kyc) + операционная стоимость верификации
+Месячный burn ≈ переменные + фиксированные (команда — вне числовой модели)
+Runway (мес) ≈ G / месячный burn
+<span class="c">// доминирующая переменная — T·c_test: независимые тесты дороже всего</span></div>
+
+<div class="ex">
+<div class="ex-t">Иллюстрация (плейсхолдеры, не прогноз)</div>
+<p>N=50, e_pm=4, c_gas≈0 (батч), c_host=$800, T=20 тестов × c_test=$150 = $3000, → переменные ≈ $3800/мес. При гранте G=$60k и фиксированных (вне модели) → runway оценивается простой подстановкой.</p>
+<p><strong>Вывод модели:</strong> при батчинге газ ничтожен; <strong>главная статья — финансирование независимых тестов</strong> (T·c_test), от неё зависит и качество данных, и burn.</p>
+</div>
+
+<h4>Финансирование независимых тестов (ключевая развилка)</h4>
+<ul>
+<li><strong>GB-кофинансирование:</strong> организаторы групповых закупок и так заказывают тесты — реестр интегрирует их результаты как независимые (дёшево для реестра).</li>
+<li><strong>Грант на bootstrap-тесты:</strong> целевая статья гранта на первичное наполнение Vᵢ=1.0 данными.</li>
+<li><strong>Опциональный краудтест:</strong> покупатели скидываются на тест интересующего лота, результат публичен.</li>
+</ul>
+<div class="warn">
+<div class="warn-t">Что нужно от вас для финализации</div>
+<p>Подставить реальные c_test (прайс лабораторий-партнёров), размер гранта G и целевой T. Тогда модель даёт конкретный runway и точку, где нужен B2B-слой. До этого — параметрический каркас готов.</p>
+</div>
+</section>
+
+<section id="legal">
+<div class="sec-badge">05 — ToS / клевета / право на ответ (фреймворк)</div>
+<h2>Черновик структуры для юриста — не юридическая консультация</h2>
+<p class="sec-intro">Стратегия Волны 0 («мнение по открытой методологии + право на ответ + не содействуем сделкам») переведена в структуру документов и процессов. Финализирует юрист по CH/EU+US.</p>
+
+<h4>Terms of Service — ключевые разделы</h4>
+<ul>
+<li><strong>Принятие и право-применимость:</strong> регулирующее право CH (Волна 0), порядок изменений.</li>
+<li><strong>Eligibility и роли:</strong> требования к идентичности по уровням (L0–L3, Волна 2).</li>
+<li><strong>Acceptable use:</strong> запрет накрутки, фальсификации, клонирования COA; санкции = Pₛ (v2).</li>
+<li><strong>Природа Score:</strong> «мнение по открытой методологии», не утверждение о виновности/факте; не медицинская и не инвестиционная рекомендация.</li>
+<li><strong>RUO-позиционирование:</strong> исследовательское назначение, отказ от содействия сделкам/медицинских советов.</li>
+<li><strong>Споры:</strong> апелляция обязательна внутри реестра (кросс-сегментная панель, v2), но не лишает права на суд.</li>
+<li><strong>Ограничение ответственности</strong> и дисклеймеры точности данных.</li>
+</ul>
+
+<h4>Политика контента / клеветы</h4>
+<ul>
+<li><strong>Фактические утверждения</strong> — только из проверяемых источников с provenance; <strong>оценочные</strong> — выводимы из опубликованной методологии.</li>
+<li><strong>Право на ответ</strong> (процесс ниже).</li>
+<li><strong>Коррекция/ретракция:</strong> исправление публикуется открыто, рядом с исходным фактом (стандарт неизменности v2 — без тихих правок).</li>
+<li><strong>Takedown:</strong> для незаконного контента — процесс ниже.</li>
+<li><strong>Unclaimed:</strong> только нейтральные факты (§02), без оценок до верификации.</li>
+</ul>
+
+<h4>Процесс «право на ответ»</h4>
+<div class="fbox">1. Участник оспаривает факт/оценку → подаёт ответ через портал
+2. Ответ публикуется РЯДОМ с оспариваемым фактом (видим всем), в SLA
+3. Если спор по существу → эскалация в апелляцию (L1→L3, v2)
+4. Итог апелляции публикуется открыто; правок «задним числом» нет
+<span class="c">// право на ответ ≠ удаление: факт остаётся, позиция стороны видна рядом</span></div>
+
+<h4>Процесс takedown (незаконный контент)</h4>
+<div class="fbox">Запрос (субъект/регулятор/суд) → юр-ревью основания → действие (скрыть/удалить/исправить)
+→ запись в публичный журнал инцидентов БЕЗ раскрытия содержания (Волна 4)
+→ для ПДн — tombstone-модель (§06 Волны 2)</div>
+
+<div class="warn">
+<div class="warn-t">Дисклеймер</div>
+<p>Это инженерно-продуктовый каркас политик, <strong>не юридическая консультация</strong>. Конкретные формулировки, основания обработки, трансграничные механизмы и соответствие defamation-праву по каждой юрисдикции (CH/EU+US) утверждает квалифицированный юрист до запуска.</p>
+</div>
+</section>
+
+<section id="next">
+<div class="sec-badge">06 — Что дальше</div>
+<h2>5 P0 закрыты на уровне проектных решений</h2>
+<ol>
+<li><strong>Версионирование Score</strong> (§01) — forward-only, algo_version, политика ретро только для errata.</li>
+<li><strong>Unclaimed</strong> (§02) — консервативная политика, allow/forbid-таблица, права субъекта.</li>
+<li><strong>Чек-лист SME</strong> (§03) — все числа в одном месте, provisional v0.9, блок подписи.</li>
+<li><strong>Юнит-экономика</strong> (§04) — параметрическая модель + ключевая статья (финансирование тестов).</li>
+<li><strong>ToS/клевета/ответ</strong> (§05) — фреймворк документов и процессов для юриста.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Остаются зависимости от вас (не блокируют структуру)</div>
+<p>Реальные числа для юнит-экономики (c_test, G, T), сессия с SME для подписи параметров v1.0, финализация ToS/defamation у юриста, утверждение состава хешируемой нагрузки у DPO. Дальше по плану — <strong>P1 алгоритма одним математическим заходом</strong> (Dᵢ по типам данных, формула агрегации пропагации Vᵢ, комбинирование Vᵢ из нескольких источников), затем сборка единого PRD.</p>
+</div>
+<p style="font-size:.78rem;color:#5a5955;margin-top:1rem"><strong>Статус на дату ревизии:</strong> упомянутые «дальше по плану» шаги (P1-алгоритм, сборка единого PRD) впоследствии выполнены — это исторический phase-closure отчёт. Актуальный сводный статус — в <a href="../reports/PRD.html">PRD</a>.</p>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Правовые, числовые и экономические пункты — инженерные каркасы под подтверждение профильными специалистами (юрист, DPO, аналитический химик, финансовая модель на реальных данных) до продакшена.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

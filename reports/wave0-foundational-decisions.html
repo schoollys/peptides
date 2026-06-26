@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Волна 0: фундаментальные решения (варианты и рекомендации)</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:230px;min-width:230px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:760px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.79rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.opt{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.9rem 1.1rem;margin-bottom:8px;border-left:4px solid #b9c6dd}
+.opt.rec{border-left-color:#15673f;background:#f6faf7}
+.opt-h{font-size:.84rem;font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.opt p{font-size:.81rem;margin-bottom:.3rem}
+.tag{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:20px;background:#e8eef7;color:#3f5d8c}
+.tag.rec{background:#dff0e6;color:#15673f}
+.pro{color:#15673f;font-size:.79rem}
+.con{color:#a4341f;font-size:.79rem}
+.rec-box{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;color:#ddd}
+.rec-box .rec-t{color:#7fd1a0;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
+.rec-box p{color:#d8d6d1;font-size:.83rem;margin:0}
+.rec-box strong{color:#fff}
+.ask{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.8rem 1.1rem;margin:.8rem 0}
+.ask-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.ask p{font-size:.82rem;color:#4a3828;margin:0}
+.warn{background:#fbe3df;border:1px solid #e6a99f;border-radius:10px;padding:.9rem 1.2rem;margin:1rem 0}
+.warn-t{font-size:.78rem;font-weight:800;color:#a4341f;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#5e2a22;margin:0}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Волна 0 — решения<span class="sb-sub">варианты и рекомендации</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">00</span>Как читать</a>
+<a class="nav-link" href="#operator"><span class="nav-num">01</span>Оператор и управление</a>
+<a class="nav-link" href="#legal"><span class="nav-num">02</span>Юрисдикция и право</a>
+<a class="nav-link" href="#funding"><span class="nav-num">03</span>Модель финансирования</a>
+<a class="nav-link" href="#kyb"><span class="nav-num">04</span>Готовность к KYB</a>
+<a class="nav-link" href="#summary"><span class="nav-num">05</span>Сводка решений</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">00 — Как читать этот документ</div>
+<h1>Волна 0: фундаментальные решения</h1>
+<p class="sec-intro">Это четыре развилки, которые задают форму всему остальному PRD. По каждой: контекст, варианты с плюсами/минусами, моя рекомендация и блок «нужно ваше решение». Финальный выбор — за вами; задача документа — дать из чего выбирать.</p>
+<div class="warn">
+<div class="warn-t">⚠️ Оговорка по правовым вопросам</div>
+<p>Разделы 02 (юрисдикция/ответственность) и частично 03–04 затрагивают право. Это <strong>не юридическая консультация</strong>, а направления и варианты для обсуждения с профильным юристом (платформенная ответственность + RUO/фарма-регуляторика). Перед запуском по этим пунктам обязательна экспертиза квалифицированного юриста в выбранной юрисдикции.</p>
+</div>
+
+<div class="rec-box">
+<div class="rec-t">✅ Зафиксированные решения (Волна 0)</div>
+<p><strong>Оператор:</strong> гибрид «фонд + операционная компания» (целевая модель), Параметрический комитет с публичным changelog.<br>
+<strong>Юрисдикция:</strong> фонд CH/EU + операционная сущность с сильной защитой публикации (US-практика по «мнению»); главный щит — позиционирование; юр-экспертиза до запуска.<br>
+<strong>Финансирование:</strong> MVP на грантах/донатах + целевой B2B-слой «платит решающий» (Carfax); публичный Score всегда бесплатен; без токена и без оплаты от оцениваемых.<br>
+<strong>Идентичность:</strong> многоуровневая (псевдоним → KYB как прогрессивная разблокировка) + discovery-интервью с kill-критериями.</p>
+</div>
+
+<div style="background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.8rem 1.1rem;margin:.8rem 0">
+<div style="font-size:.76rem;font-weight:800;color:#15673f;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem">Под-вопросы закрыты</div>
+<ul style="margin:.2rem 0 0 1.1rem;font-size:.82rem;color:#2a4a38">
+<li><strong>Параметрический комитет:</strong> смешанный, 5–7 мест — независимые техэксперты (большинство) + представитель оператора (меньшинство) + представитель сообщества; ротация; supermajority (квалифицированное большинство) для изменения весов/порогов; публичный changelog.</li>
+<li><strong>Юридический бюджет:</strong> lean — outside counsel на retainer в CH (основная юрисдикция) + US-review, масштабирование по milestone, из грантовой строки.</li>
+<li><strong>Bootstrap-финансирование:</strong> гранты/филантропия + founder/angel (нейтральные деньги не от оцениваемых сторон); B2B-сервисы — позже, согласно решению по финмодели.</li>
+<li><strong>Discovery-интервью:</strong> ведут основатели + domain-адвайзер с доверием в нише (экс-модератор/GB-организатор) — для честных ответов о готовности к KYB.</li>
+</ul>
+</div>
+</section>
+
+<section id="operator">
+<div class="sec-badge">01 — Оператор и управление</div>
+<h2>Кто владеет реестром и кто управляет параметрами</h2>
+<p class="sec-intro">Весь питч стоит на нейтральности. Значит, юридическая оболочка должна делать нейтральность структурной, а не декларативной — особенно в части того, кто устанавливает и меняет веса/штрафы алгоритма.</p>
+
+<h3>Варианты оболочки</h3>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант A</span>Коммерческая компания (C-corp / ООО)</div>
+<p class="pro">+ Быстро, легко привлекать инвестиции, гибко операционно.</p>
+<p class="con">− Прямое противоречие с обещанием нейтральности: «кому принадлежит тот, кто всех оценивает?». Структурный конфликт интересов, который сам документ критикует у S&amp;P.</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант B</span>Некоммерческий фонд / НКО</div>
+<p class="pro">+ Максимальная репутация нейтральности, mission-lock (нельзя продать рейтинг). Модель Wikipedia/OpenSSF, к которым документ и апеллирует.</p>
+<p class="con">− Медленнее в создании, ограничен в привлечении капитала, всё равно нужен источник средств (см. §03).</p>
+</div>
+<div class="opt rec">
+<div class="opt-h"><span class="tag rec">Вариант C — рекомендую</span>Гибрид: фонд владеет протоколом и параметрами + операционная компания строит инфраструктуру по лицензии</div>
+<p class="pro">+ Нейтральность рейтинга (фонд держит алгоритм и не продаётся) + операционная скорость и фандрайз у операционной компании. Проверенный паттерн: Wikimedia, Linux Foundation, Signal Foundation.</p>
+<p class="con">− Сложнее структурно; нужно чётко развести, что контролирует фонд (параметры, методология, нейтральность), а что — оператор (инфра, продукт).</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант D</span>DAO / децентрализованное управление токеном</div>
+<p class="pro">+ Идеологически близко к on-chain-духу, «никто не владеет».</p>
+<p class="con">− Незрелость, правовая неопределённость, медленные решения, риск захвата держателями токена, регуляторный риск — особенно поверх серой ниши. Преждевременно для MVP.</p>
+</div>
+
+<div class="rec-box">
+<div class="rec-t">Рекомендация</div>
+<p>Целевая модель — <strong>C (фонд + операционная компания)</strong>. Для MVP не обязательно строить обе сразу: стартовать можно с одной mission-locked сущности (фонд или PBC) и <strong>опубликованного устава управления параметрами</strong>, эволюционируя к C. Управление параметрами: независимый <strong>Параметрический комитет</strong> (с внешними советниками — аналитическая химия, harm-reduction), публичный changelog изменений весов/штрафов, версионирование алгоритма, правила конфликта интересов. Ни одна сторона рынка не контролирует веса единолично.</p>
+</div>
+
+<div class="ask">
+<div class="ask-t" style="color:#15673f">Решение принято</div>
+<p>Стартуем с одной mission-locked сущности, эволюционируя к гибриду C. Параметрический комитет — <strong>смешанный, 5–7 мест</strong>: независимые техэксперты (большинство) + представитель оператора (меньшинство) + представитель сообщества; ротация; изменения весов/порогов — квалифицированным большинством (supermajority); публичный changelog.</p>
+</div>
+</section>
+
+<section id="legal">
+<div class="sec-badge">02 — Юрисдикция и право</div>
+<h2>Где регистрируемся и как защищаемся от исков</h2>
+<p class="sec-intro">Два главных риска: (1) иск о клевете/ущербе деловой репутации за низкий Score; (2) обвинение в содействии обороту серых/нелегальных продуктов. Хорошая новость — оба управляемы правильным позиционированием, которое в документе уже наполовину заложено.</p>
+
+<h3>Ключевой правовой щит (независимо от юрисдикции)</h3>
+<p>Рейтинговые агентства и площадки отзывов выживают за счёт трёх вещей, которые нужно явно закрепить:</p>
+<table>
+<thead><tr><th>Принцип</th><th>Как реализуем</th></tr></thead>
+<tbody>
+<tr><td>Мнение на основе раскрытой методологии</td><td>Score — это «оценка по открытой формуле», а не «факт о виновности». Методология публична (документ v2 это уже даёт).</td></tr>
+<tr><td>Фактические, проверяемые входные данные</td><td>Каждый фактор опирается на верифицируемый артефакт + on-chain хеш — защита от иска «вы выдумали».</td></tr>
+<tr><td>Право на ответ и исправление</td><td>Механизм апелляций (раздел 07) = процессуальная справедливость, ключевой аргумент защиты.</td></tr>
+<tr><td>Не содействуем сделкам</td><td>«Не маркетплейс, не эскроу» (раздел 01) — сильнейший аргумент против обвинения в facilitation. RUO-формулировки, без медицинских советов.</td></tr>
+</tbody>
+</table>
+
+<h3>Варианты юрисдикции оператора</h3>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант A</span>США</div>
+<p class="pro">+ Сильная защита «мнения» и пользовательского контента (Section 230-подобные нормы), богатая практика по рейтингам/отзывам.</p>
+<p class="con">− Чувствительность FDA/DEA, если систему сочтут содействующей обороту; нужна аккуратная RUO-позиция.</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант B</span>ЕС</div>
+<p class="pro">+ Защита посредников по DSA.</p>
+<p class="con">− Тяжёлый GDPR, «право на забвение» конфликтует с неизменяемостью (нужна off-chain-политика удаления, §05 PRD).</p>
+</div>
+<div class="opt rec">
+<div class="opt-h"><span class="tag rec">Вариант C — рекомендую как базу</span>Швейцария (фонд) + операционная компания в юрисдикции с сильной защитой публикации рейтинга</div>
+<p class="pro">+ Нейтральная репутация, дружелюбность к фондам, сильная privacy-культура, вне ЕС (гибче по «забвению»). Хорошо сочетается с гибридом C из §01.</p>
+<p class="con">− Дороже в администрировании; нужна координация двух юрисдикций.</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант D</span>Офшор / крипто-дружелюбная зона</div>
+<p class="con">− Слабый правовой щит против исков, репутационный риск, плохо сочетается с заявленной нейтральностью. Не рекомендую как основную оболочку.</p>
+</div>
+
+<div class="rec-box">
+<div class="rec-t">Рекомендация</div>
+<p>База — <strong>швейцарский/ЕС-фонд для нейтральности + операционная сущность с сильной защитой публикации (тяготеет к США-практике по «мнению»)</strong>, либо, для простоты MVP, концентрация в одной хорошо понятной юрисдикции. Но <strong>главный щит — не география, а позиционирование</strong>: «оценка-мнение по раскрытой методологии + проверяемые факты + право на ответ + не содействуем сделкам». Это P0-гейт: до запуска — обязательная консультация профильного юриста.</p>
+</div>
+
+<div class="ask">
+<div class="ask-t" style="color:#15673f">Решение принято</div>
+<p>Юрисдикция — <strong>CH (основная) + EU/US-review</strong>. Юр-бюджет — <strong>lean</strong>: outside counsel на retainer в CH + US-review, масштабирование по milestone, из грантовой строки. Жёсткая RUO-позиция и отказ от медицинских рекомендаций — подтверждены.</p>
+</div>
+</section>
+
+<section id="funding">
+<div class="sec-badge">03 — Модель финансирования</div>
+<h2>Кто платит, не нарушая нейтральности</h2>
+<p class="sec-intro">Железное ограничение: <strong>платить не должен тот, кого оценивают</strong> — иначе воспроизводим конфликт S&amp;P, против которого построен весь проект. Но «не берём с оцениваемых» ≠ «нет расходов»: газ L2, хостинг, KYB-провайдер, арбитры — это деньги уже на MVP.</p>
+
+<h3>Варианты источника средств</h3>
+<div class="opt rec">
+<div class="opt-h"><span class="tag rec">Вариант A — рекомендую как целевой</span>«Платит тот, кто принимает решение» (модель Carfax)</div>
+<p>Публичный Score и базовый каталог — <strong>бесплатны навсегда</strong>. Монетизируется только удобство/глубина для <strong>потребителей данных</strong>: премиум-API, bulk-выгрузки, B2B-due-diligence отчёты, аналитика для GB-организаторов/клиник/аудиторов.</p>
+<p class="pro">+ Платит тот, кто принимает решение (покупатель отчёта), а не оцениваемый — нейтральность сохранена. Масштабируемо.</p>
+<p class="con">− Нужно аккуратно развести «публичная правда — бесплатно» и «премиум-удобство — платно», чтобы не нарушить обещание открытости из раздела 02.</p>
+</div>
+<div class="opt rec">
+<div class="opt-h"><span class="tag rec">Вариант B — рекомендую для bootstrap</span>Гранты и пожертвования (harm-reduction, public-health фонды)</div>
+<p class="pro">+ Чистейшая нейтральность; финансирует именно MVP-фазу, когда выручки ещё нет. Модель Wikipedia/OpenSSF.</p>
+<p class="con">− Хрупко и ограничено по масштабу; требует фандрайз-усилий.</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант C</span>Эндаумент/донаты фонда</div>
+<p class="pro">+ Нейтральность.</p>
+<p class="con">− Нужна сильная фандрайз-функция; не покрывает быстрый рост.</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант D</span>Лаборатории-оракулы платят за дистрибуцию статуса Verified Oracle</div>
+<p class="con">− Лаборатории становятся плательщиками → мягкий конфликт (они тоже участники графа). Лучше держать лаборатории партнёрами, а не плательщиками.</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Вариант E</span>Токен / крипто-эмиссия</div>
+<p class="con">− Регуляторный риск поверх серой ниши, спекулятивный захват, конфликт с нейтральностью и правовой позицией. Не рекомендую (по крайней мере для MVP).</p>
+</div>
+
+<div class="rec-box">
+<div class="rec-t">Рекомендация</div>
+<p>MVP — на <strong>грантах/донатах + фонд (B/C)</strong>, чтобы защитить нейтральность на старте. Параллельно проектировать <strong>B2B-слой «платит решающий» (A)</strong> для устойчивости: премиум-API/отчёты для покупателей, клиник, аудиторов — <strong>никогда оцениваемым</strong> и <strong>никогда не гейтить публичный Score</strong>. Явно избегать токена (E) и оплаты от оцениваемых. Держать расходы низкими (хеш-anchoring на дешёвом L2, ручной онбординг на MVP).</p>
+</div>
+
+<div class="ask">
+<div class="ask-t" style="color:#15673f">Решение принято</div>
+<p>Принцип «публичный Score всегда бесплатен, платно только B2B-удобство» — подтверждён. Bootstrap MVP — <strong>гранты/филантропия + founder/angel</strong> (нейтральные деньги не от оцениваемых сторон); B2B-выручка — позже. Допустимые B2B-продукты: API, отчёты, аналитика для «решающей» стороны.</p>
+</div>
+</section>
+
+<section id="kyb">
+<div class="sec-badge">04 — Готовность серого рынка к KYB</div>
+<h2>Проверка ключевого допущения (это research, не кабинетное решение)</h2>
+<p class="sec-intro">Вся анти-Sybil и анти-сговор логика опирается на реальную идентичность. Но ниша ценит анонимность. Если якорные роли откажутся от любой проверяемой идентичности — модель доверия нужно пересобирать. Это нельзя «решить за столом» — нужно проверить на реальных игроках, но проектную страховку можно заложить уже сейчас.</p>
+
+<h3>Что предлагаю сделать</h3>
+<div class="opt">
+<div class="opt-h"><span class="tag">Шаг 1</span>Discovery-интервью (2–3 недели)</div>
+<p>8–12 реальных участников по якорным ролям (серый вендор, лаборатория, GB-организатор, дистрибьютор): готовность к верификации идентичности, какой тип они примут, что является дилбрейкером.</p>
+</div>
+<div class="opt rec">
+<div class="opt-h"><span class="tag rec">Шаг 2 — проектная страховка</span>Многоуровневая идентичность как прогрессивная разблокировка, а не барьер</div>
+<p>Не «KYB или ничего». Псевдонимная, но верифицированная идентичность для community/продавцов на низких тирах; полный KYB — только для B2B-ролей, претендующих на высокие тиры и бейдж. Частично уже заложено (New/Provisional, Unclaimed) — нужно сделать явным принципом.</p>
+<p class="pro">+ Снимает «всё-или-ничего» барьер, сохраняя анти-Sybil там, где ставки выше.</p>
+</div>
+<div class="opt">
+<div class="opt-h"><span class="tag">Шаг 3</span>Kill-критерии</div>
+<p>Заранее договориться: если якорные роли отвергают любую проверяемую идентичность даже ради высокого тира — это сигнал пересобрать анти-Sybil-модель до тяжёлой разработки.</p>
+</div>
+
+<div class="rec-box">
+<div class="rec-t">Рекомендация</div>
+<p>Запустить <strong>лёгкое discovery</strong> и одновременно зафиксировать <strong>многоуровневую идентичность</strong> (псевдоним → полный KYB как прогрессивная разблокировка тиров/бейджа). Так строим, не дожидаясь интервью, но с заранее оговорёнными kill-критериями, если допущение не подтвердится.</p>
+</div>
+
+<div class="ask">
+<div class="ask-t" style="color:#15673f">Решение принято</div>
+<p>Принцип многоуровневой идентичности (псевдоним на низких тирах → KYB для высоких) — принят. Discovery-интервью ведут <strong>основатели + domain-адвайзер с доверием в нише</strong> (экс-модератор/GB-организатор) — для честных ответов о готовности к KYB.</p>
+</div>
+</section>
+
+<section id="summary">
+<div class="sec-badge">05 — Сводка решений</div>
+<h2>Что зафиксировать, чтобы закрыть Волну 0</h2>
+<table>
+<thead><tr><th>Вопрос</th><th>Принятое решение</th><th>Детализация под-вопросов</th></tr></thead>
+<tbody>
+<tr><td>Оператор и управление</td><td>Гибрид: фонд (параметры/нейтральность) + операционная компания; Параметрический комитет с публичным changelog</td><td>Комитет: смешанный 5–7 мест (техэксперты-большинство + оператор-меньшинство + сообщество), ротация, supermajority для изменений</td></tr>
+<tr><td>Юрисдикция и право</td><td>Фонд CH/EU + операционная сущность с сильной защитой публикации; щит — «мнение+факты+право на ответ+не содействуем сделкам»</td><td>Юр-бюджет: lean — outside counsel на retainer в CH + US-review, масштабирование по milestone, из грантовой строки</td></tr>
+<tr><td>Финансирование</td><td>MVP на грантах/донатах; целевой B2B-слой «платит решающий»; публичный Score бесплатен; без токена и без оплаты от оцениваемых</td><td>Bootstrap: гранты/филантропия + founder/angel (нейтральные деньги не от оцениваемых); B2B — позже</td></tr>
+<tr><td>Готовность к KYB</td><td>Discovery-интервью + многоуровневая идентичность (псевдоним→KYB как разблокировка); kill-критерии</td><td>Discovery ведут основатели + domain-адвайзер с доверием в нише (экс-модератор/GB-организатор)</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Документ — набор вариантов и рекомендаций для принятия решений; правовые пункты требуют подтверждения квалифицированным юристом до запуска.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

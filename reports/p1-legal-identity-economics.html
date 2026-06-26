@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — P1: право, идентичность, экономика</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:780px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.fbox{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:#e8935a;line-height:1.7;overflow-x:auto;white-space:pre-wrap}
+.fbox .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ex{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.ex-t{font-size:.74rem;font-weight:800;color:#5b78a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ex p{font-size:.82rem;margin-bottom:.3rem}
+.val{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.72rem;font-weight:700;background:#fef3e8;color:#c06a1a;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>P1 — право/идентичность/экономика<span class="sb-sub">PoP · KYB · custody · DPO · B2B</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">00</span>Контекст и решения</a>
+<a class="nav-link" href="#pop"><span class="nav-num">01</span>Proof-of-personhood (L0)</a>
+<a class="nav-link" href="#kyb"><span class="nav-num">02</span>Покрытие KYB и fallback</a>
+<a class="nav-link" href="#custody"><span class="nav-num">03</span>Chain-of-custody образца</a>
+<a class="nav-link" href="#dpo"><span class="nav-num">04</span>Data-protection режим</a>
+<a class="nav-link" href="#b2b"><span class="nav-num">05</span>B2B-SKU</a>
+<a class="nav-link" href="#next"><span class="nav-num">06</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">00 — Контекст и принятые решения</div>
+<h1>P1: право, идентичность, экономика</h1>
+<p class="sec-intro">Закрывает оставшиеся P1 из аудита полноты: proof-of-personhood, покрытие KYB по юрисдикциям, схема chain-of-custody, data-protection режим (включая состав хешируемой нагрузки) и определение B2B-продуктов. Опирается на решения Волн 0–2.</p>
+<table>
+<thead><tr><th>Развилка</th><th>Принятое решение</th></tr></thead>
+<tbody>
+<tr><td>PoP для L0</td><td>База: уникальность телефона + device/CAPTCHA; сторонний PoP — опциональный апгрейд</td></tr>
+<tr><td>KYB-покрытие</td><td>Допускать вендоров из непокрытых юрисдикций с fallback L1 + вес blind-тестов + потолок доверия</td></tr>
+<tr><td>Chain-of-custody</td><td>Независимый сэмплер = покупатель / GB / аккредитованный аудитор; самозабор вендора ≠ 1.0; подпись на каждом шаге</td></tr>
+<tr><td>Удержание Pₛ-флагов</td><td>На срок наказания (защита третьих лиц/законный интерес), затем tombstone</td></tr>
+<tr><td>B2B-SKU</td><td>Все 4: due-diligence отчёты, мониторинг-API, рыночная аналитика, verification-as-a-service</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="pop">
+<div class="sec-badge">01 — Proof-of-personhood (L0)</div>
+<h2>Анти-Sybil без раскрытия личности</h2>
+<p class="sec-intro">L0 (потребители, community, неформальные продавцы) не проходят KYC, но нужна защита от массовой накрутки одним лицом. PoP даёт «один человек ≈ один аккаунт» без идентификации.</p>
+
+<h4>Слои защиты</h4>
+<table>
+<thead><tr><th>Слой</th><th>Что даёт</th></tr></thead>
+<tbody>
+<tr><td>Уникальность телефона (SMS-OTP)</td><td>Базовый барьер: один номер — один аккаунт; масштаб накрутки ограничен стоимостью номеров</td></tr>
+<tr><td>Device/browser-сигналы + CAPTCHA</td><td>Отсев ботов и массовой автоматизации; детект мультиаккаунтов с одного устройства</td></tr>
+<tr><td>Поведенческие сигналы</td><td>Аномалии регистраций/активности → анти-аномалийный детектор (раздел 06 v2)</td></tr>
+<tr><td>Опционально: сторонний PoP</td><td>Privacy-preserving uniqueness (апгрейд при росте Sybil-давления)</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Честная граница</div>
+<p>Телефон+device — это <em>повышение стоимости</em> Sybil, не абсолютная защита (номера покупаются). Поэтому L0-сигналы и так весят мало: безартефактный отзыв = Vᵢ 0.45, а высоковесовые факторы L0 не поднимает. Сильная анти-Sybil гарантия — только KYC/KYB на L1+. PoP закрывает массовую дешёвую накрутку, остальное — экономикой весов.</p>
+</div>
+</section>
+
+<section id="kyb">
+<div class="sec-badge">02 — Покрытие KYB и fallback</div>
+<h2>Что с вендором, чьё юрлицо не верифицируется</h2>
+<p class="sec-intro">Серые вендоры часто в юрисдикциях со слабой/непрозрачной регистрацией бизнеса. Жёсткое требование KYB отсекло бы значимую часть рынка (риск принятия). Решение — допускать с понижающим fallback.</p>
+
+<h4>Матрица «верифицируемость → путь»</h4>
+<table>
+<thead><tr><th>Ситуация</th><th>Уровень</th><th>Последствия для доверия</th></tr></thead>
+<tbody>
+<tr><td>Юрлицо верифицируется провайдером</td><td>L2 Verified Business</td><td>Полный путь, без понижающего потолка</td></tr>
+<tr><td>Юрлицо не верифицируется, но личность — да</td><td>L1 + «Individual seller»</td><td>Понижающий потолок доверия; собственные декларации весят меньше (Vᵢ базовый), упор на независимые blind-тесты</td></tr>
+<tr><td>Ни юрлицо, ни личность</td><td>L0 / Unclaimed</td><td>Только репутационная заметка, без полного Trust Score</td></tr>
+</tbody>
+</table>
+
+<h4>Fallback-механика</h4>
+<ul>
+<li><strong>Повышенный вес независимых тестов:</strong> для L1-вендора Score держится преимущественно на blind/random-тестах (Vᵢ=1.0), а не на его словах — компенсирует отсутствие KYB.</li>
+<li><strong>Потолок доверия:</strong> до прохождения полного KYB — ограничение верхнего тира (например, не выше Gold), что само мотивирует к апгрейду.</li>
+<li><strong>Путь апгрейда:</strong> как только KYB становится возможен — переход на L2 снимает потолок.</li>
+</ul>
+<div class="rec-box">
+<div class="rec-t">Почему допускать, а не отсекать</div>
+<p>Ценность реестра — покрытие реального рынка, а он во многом в «серых» юрисдикциях. Отсечение по KYB убило бы плотность. Fallback сохраняет участие, но честно сигнализирует пониженную проверенность и компенсирует её независимым тестированием — то есть доверие зарабатывается данными, а не регистрацией.</p>
+</div>
+</section>
+
+<section id="custody">
+<div class="sec-badge">03 — Chain-of-custody образца</div>
+<h2>Кто и как делает тест «независимым»</h2>
+<p class="sec-intro">Vᵢ=1.0 даёт только тест, где образец отобран независимо от вендора и его путь зафиксирован. Здесь — кто считается независимым сэмплером и как документируется цепочка владения.</p>
+
+<h4>Авторизованные независимые сэмплеры</h4>
+<table>
+<thead><tr><th>Сэмплер</th><th>Условие независимости</th></tr></thead>
+<tbody>
+<tr><td>Verified-покупатель</td><td>Отбирает из реально полученной партии; артефакт покупки + custody-запись</td></tr>
+<tr><td>GB-организатор</td><td>Отбирает из общей закупки до распределения; естественный оракул (v2)</td></tr>
+<tr><td>Аккредитованный аудитор</td><td>Профессиональный отбор по протоколу; высшая надёжность custody</td></tr>
+<tr><td class="warn-t">Самозабор вендора</td><td><strong>Никогда не = 1.0</strong> — максимум Vᵢ=0.70 (vendor-sample), это верхняя граница качества, не гарантия</td></tr>
+</tbody>
+</table>
+
+<h4>Схема custody-записи</h4>
+<div class="fbox">CustodyRecord {
+  lot_ref, sampler_id (роль: buyer|GB|auditor),
+  collected_at, sealed_at, seal_id,
+  steps: [ { actor, action: collect|seal|ship|receive, ts, sig_actor } ],
+  lab_id, received_at, sig_lab
+}
+→ хеш записи анкорится в L2; разрыв/отсутствие подписи на шаге → тест НЕ получает 1.0</div>
+<p style="font-size:.78rem;color:#888">Подпись на каждом шаге не даёт сэмплеру или посреднику подменить образец незаметно. Если custody неполна — тест засчитывается как vendor-grade (0.70), а не независимый (1.0).</p>
+<div class="ex">
+<div class="ex-t">Связь с sample-swap</div>
+<p>Если независимый тест по custody противоречит vendor-COA — это сигнал подмены: фактор замораживается, запускается разбор, при подтверждении — Pₛ на вендора (раздел 02 v2), а не на лабораторию.</p>
+</div>
+</section>
+
+<section id="dpo">
+<div class="sec-badge">04 — Data-protection режим</div>
+<h2>Роли, основания, ретеншен, состав хешей</h2>
+<p class="sec-intro">Каркас для DPO: кто контролёр/процессор, на каком основании обрабатываются данные, сколько хранятся и что именно идёт в ончейн-хеши. Финал утверждает DPO по CH/EU+US.</p>
+
+<h4>Роли и основания</h4>
+<table>
+<thead><tr><th>Поток</th><th>Роль реестра</th><th>Основание</th></tr></thead>
+<tbody>
+<tr><td>KYB/KYC-данные</td><td>Контролёр статуса; провайдер — процессор сырья</td><td>Договор + законный интерес (анти-фрод)</td></tr>
+<tr><td>Отзывы/артефакты покупателей</td><td>Контролёр</td><td>Согласие + законный интерес (прозрачность рынка)</td></tr>
+<tr><td>Бизнес-данные (небизнес-неперсон.)</td><td>Контролёр</td><td>Законный интерес + публичность источника (Unclaimed §02 P0)</td></tr>
+<tr><td>Pₛ-флаги мошенничества</td><td>Контролёр</td><td>Законный интерес/защита третьих лиц</td></tr>
+</tbody>
+</table>
+
+<h4>Ретеншен</h4>
+<ul>
+<li><strong>Подтверждённые Pₛ-флаги мошенничества:</strong> удерживаются на <strong>срок наказания</strong> (основание — защита третьих лиц/законный интерес), даже при запросе на удаление; по истечении — tombstone (§06 Волны 2).</li>
+<li><strong>Прочие ПДн:</strong> минимизация, хранение не дольше необходимого; удаление — tombstone.</li>
+<li><strong>DPIA</strong> + карта потоков данных + SCC для трансграничной передачи — обязательные артефакты до запуска.</li>
+</ul>
+
+<h4>Состав хешируемой нагрузки (анонимность)</h4>
+<div class="fbox">В ончейн идут ТОЛЬКО хеши обезличенных нагрузок:
+  anchor = hash( payload || salt )
+  payload НЕ содержит: имён, юрлиц, контактов, real_identity_id
+  payload содержит: ссылочные ID + контрольные значения (score, inputs_hash, algo_version)
+  salt не публичен → защита от перебора/реконструкции
+<span class="c">// цель: по хешу нельзя восстановить личность даже с доп.данными (анонимизация, не псевдонимизация)</span></div>
+<div class="warn">
+<div class="warn-t">Граница для DPO</div>
+<p>Если в payload попадёт идентифицирующее поле — это псевдонимизация, и хеш остаётся ПДн по GDPR. Поэтому состав каждого якоря (lot, score-event, COA, CRL) утверждается DPO с проверкой, что нагрузка действительно анонимна (соль + отсутствие идентификаторов).</p>
+</div>
+</section>
+
+<section id="b2b">
+<div class="sec-badge">05 — B2B-SKU</div>
+<h2>Что продаём «решающим» — и где граница нейтралитета</h2>
+<p class="sec-intro">Финмодель: публичный Score всегда бесплатен; платит «решающая» сторона за удобство, никогда — оцениваемый. Четыре продукта поверх открытых данных.</p>
+
+<table>
+<thead><tr><th>SKU</th><th>Кому</th><th>Что входит</th></tr></thead>
+<tbody>
+<tr><td>Due-diligence отчёты</td><td>Клиники, дистрибьюторы, prescribers</td><td>Глубокая проверка поставщика: история факторов, цепочка, флаги, динамика — для решения о закупке</td></tr>
+<tr><td>Мониторинг-API / вебхуки</td><td>B2B-покупатели, платформы</td><td>Подписка на изменения Score/флагов контрагентов в реальном времени</td></tr>
+<tr><td>Рыночная аналитика</td><td>Исследователи, инвесторы, регуляторы</td><td>Агрегированные тренды ниши (без продажи влияния на конкретный Score)</td></tr>
+<tr><td>Verification-as-a-service</td><td>Маркетплейсы, форумы, площадки</td><td>Интеграция бейджа/проверки в чужие платформы (API + SDK)</td></tr>
+</tbody>
+</table>
+
+<div class="warn">
+<div class="warn-t">Граница нейтралитета (жёсткая)</div>
+<p>Платит <strong>потребитель информации</strong> («решающий»), не <strong>объект оценки</strong>. Ни один B2B-продукт не даёт оцениваемому участнику повлиять на свой Score, позицию или флаги за деньги. Аналитика продаётся только агрегированной. Это структурно исключает конфликт интересов рейтинговых агентств (которым платит оцениваемый).</p>
+</div>
+<div class="rec-box">
+<div class="rec-t">Связь с устойчивостью</div>
+<p>Эти SKU — целевой слой выручки после bootstrap (гранты+founder/angel, Волна 0). В юнит-экономике (§04 закрытия P0) они закрывают переход от грантового runway к самоокупаемости, не нарушая бесплатности публичного Score.</p>
+</div>
+</section>
+
+<section id="next">
+<div class="sec-badge">06 — Что дальше</div>
+<h2>Оставшиеся P1 закрыты</h2>
+<ol>
+<li><strong>PoP</strong> (§01) — телефон+device база, опциональный сторонний апгрейд, честная граница.</li>
+<li><strong>KYB-покрытие</strong> (§02) — допуск с fallback L1 + вес blind-тестов + потолок доверия.</li>
+<li><strong>Chain-of-custody</strong> (§03) — 3 класса сэмплеров, схема записи с подписями, самозабор ≠ 1.0.</li>
+<li><strong>Data-protection</strong> (§04) — роли/основания/ретеншен + состав анонимных хешей для DPO.</li>
+<li><strong>B2B-SKU</strong> (§05) — 4 продукта с жёсткой границей нейтралитета.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Что осталось до исчерпывающего PRD</div>
+<p>Закрыты все P0 и все P1. Остаются <strong>P2-приложения и edge-кейсы</strong> (ER-диаграмма, полный OpenAPI, ранжирование в сегменте, уведомления, lifecycle: смена роли / merge-split / recall / оффбординг, жизненные циклы Steward и оракула) и финальная <strong>сборка единого PRD-документа</strong> из всех волн и закрытий. Зависимости от вас: реальные числа экономики, подпись SME, юрист (ToS/defamation), DPO (DPIA/состав хешей).</p>
+</div>
+<p style="font-size:.78rem;color:#5a5955;margin-top:1rem"><strong>Статус на дату ревизии:</strong> перечисленные выше «следующие шаги» (ER-схема, полный OpenAPI, P2-приложения, сборка единого PRD) впоследствии выполнены — это исторический phase-closure отчёт. Актуальный сводный статус — в <a href="../reports/PRD.html">PRD</a>.</p>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Правовые и идентификационные решения — инженерные каркасы под подтверждение юристом и DPO по CH/EU+US до продакшена.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

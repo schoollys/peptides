@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Integration Map</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.4rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.77rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.diagram{background:#0f0e0d;border-radius:10px;padding:1.1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.74rem;color:#cfcfc7;line-height:1.6;overflow-x:auto;white-space:pre}
+.diagram .o{color:#e8935a}.diagram .g{color:#7fb88a}.diagram .c{color:#8a8a82}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.crit{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.7rem;font-weight:700}
+.c-h{background:#fbe6e6;color:#a33}.c-m{background:#fef0e0;color:#b8731a}.c-l{background:#eef0fb;color:#3b4a8c}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Integration Map<span class="sb-sub">внешние сервисы и flow</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Назначение</a>
+<a class="nav-link" href="#map"><span class="nav-num">02</span>Карта интеграций</a>
+<a class="nav-link" href="#catalog"><span class="nav-num">03</span>Каталог сервисов</a>
+<a class="nav-link" href="#flow"><span class="nav-num">04</span>Где в потоках</a>
+<a class="nav-link" href="#resilience"><span class="nav-num">05</span>Отказоустойчивость</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Архитектурный трек · Integration Map</div>
+<h1>Integration Map</h1>
+<p class="sec-intro">Все внешние сервисы, их роль, критичность и точка встраивания в поток. Дополняет <a href="../reports/architecture-system-design.html">SAD</a> и <a href="../reports/architecture-decision-records.html">ADR</a>. Выбор конкретных вендоров — открытые P1-вопросы (см. реестр допущений).</p>
+</section>
+
+<section id="map">
+<div class="sec-badge">02 — Карта интеграций</div>
+<div class="diagram"><span class="c">// Внешние интеграции вокруг монолита</span>
+
+           <span class="g">SMS/OTP</span>        <span class="g">KYB/KYC провайдер</span>      <span class="g">Email/Push</span>
+          (PoP L0)         (L1–L3)              (нотификации)
+              │                │                    │
+              ▼                ▼                    ▼
+   ┌───────────────────────────────────────────────────────┐
+   │                <span class="o">PeptideTrust (монолит + worker)</span>          │
+   └───────────────────────────────────────────────────────┘
+       │            │              │              │          │
+       ▼            ▼              ▼              ▼          ▼
+   <span class="g">Object</span>      <span class="g">CDN/Edge</span>    <span class="g">KMS/HSM</span>      <span class="g">L2 RPC</span>     <span class="g">Платёж B2B</span>
+   <span class="g">Storage</span>     (read/badge)  (ключи)    (Base/Arb)   (Stripe-like)
+   <span class="c">артефакты</span>                <span class="c">подпись</span>     <span class="c">anchoring</span>   <span class="c">только B2B,</span>
+                                                          <span class="c">не эскроу</span>
+
+   <span class="c">V1+:</span> <span class="g">Перевозчики</span> (chain-of-custody трекинг) · <span class="g">Оракул-лаборатории</span> (PKI, входящие COA)
+</div>
+</section>
+
+<section id="catalog">
+<div class="sec-badge">03 — Каталог сервисов</div>
+<table>
+<thead><tr><th>Сервис</th><th>Роль</th><th>Критичность</th><th>Фаза</th></tr></thead>
+<tbody>
+<tr><td>KYB/KYC провайдер</td><td>Верификация бизнеса/личности (L1–L3); мы храним статус, не сырьё</td><td><span class="crit c-h">высокая</span></td><td>MVP</td></tr>
+<tr><td>SMS/OTP-провайдер</td><td>PoP для L0 (уникальность телефона)</td><td><span class="crit c-m">средняя</span></td><td>MVP</td></tr>
+<tr><td>KMS/HSM</td><td>Хранение/использование приватных ключей; подпись бейджа, COA-верификация</td><td><span class="crit c-h">высокая</span></td><td>MVP</td></tr>
+<tr><td>L2 RPC / нода (Base/Arbitrum)</td><td>Отправка anchoring-транзакций, чтение подтверждений</td><td><span class="crit c-h">высокая</span></td><td>MVP</td></tr>
+<tr><td>CDN / Edge</td><td>Кэш read-пути и бейджа; обслуживание US-аудитории при EU/CH-origin</td><td><span class="crit c-h">высокая</span></td><td>MVP</td></tr>
+<tr><td>Object Storage</td><td>Медиа-артефакты (фото, PDF COA)</td><td><span class="crit c-m">средняя</span></td><td>MVP</td></tr>
+<tr><td>Email/Push-провайдер</td><td>Нотификации, алерты, право-на-ответ переписка</td><td><span class="crit c-m">средняя</span></td><td>MVP</td></tr>
+<tr><td>Оракул-лаборатории</td><td>Входящие подписанные COA (PKI); не «сервис», а аккредитованные участники</td><td><span class="crit c-h">высокая</span></td><td>MVP</td></tr>
+<tr><td>Платёжный провайдер (B2B)</td><td>Оплата B2B-подписок/отчётов; <strong>только</strong> B2B, не эскроу/не сделки</td><td><span class="crit c-l">низкая</span></td><td>V1</td></tr>
+<tr><td>Перевозчики/трекинг</td><td>Данные chain-of-custody (логистика партий)</td><td><span class="crit c-m">средняя</span></td><td>V1</td></tr>
+<tr><td>Observability (логи/метрики/трейс)</td><td>Мониторинг, алертинг, публичный лог инцидентов</td><td><span class="crit c-m">средняя</span></td><td>MVP</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Граница нейтралитета</div>
+<p>Платёжный провайдер обслуживает <strong>только B2B-выручку</strong> (подписки/отчёты для «решающих»). Никаких платежей за сделки участников, эскроу или оплаты за влияние на Score — это вне scope (Scope Document §06).</p>
+</div>
+</section>
+
+<section id="flow">
+<div class="sec-badge">04 — Где интеграции в потоках</div>
+<table>
+<thead><tr><th>Поток</th><th>Задействованные интеграции</th></tr></thead>
+<tbody>
+<tr><td>Онбординг/claim</td><td>SMS/OTP (L0) → KYB/KYC провайдер (L1–L3) → Email (подтверждение)</td></tr>
+<tr><td>Подача COA оракулом</td><td>KMS/HSM (верификация PKI-подписи) → Object Storage (PDF) → L2 (anchoring) → Email/Push (алерты)</td></tr>
+<tr><td>Чтение профиля/каталога</td><td>CDN (кэш) → монолит → (Object Storage для артефактов)</td></tr>
+<tr><td>Рендер бейджа</td><td>CDN → Badge endpoint → KMS/HSM (подпись)</td></tr>
+<tr><td>Пересчёт Score</td><td>Worker → L2 (anchoring) → Email/Push (нотификации)</td></tr>
+<tr><td>B2B-подписка</td><td>Платёжный провайдер → b2b-модуль → вебхуки клиенту</td></tr>
+<tr><td>Custody-трекинг (V1)</td><td>Перевозчики/трекинг → ingestion → scoring (CCF)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="resilience">
+<div class="sec-badge">05 — Отказоустойчивость интеграций</div>
+<table>
+<thead><tr><th>Сервис</th><th>Стратегия при отказе</th></tr></thead>
+<tbody>
+<tr><td>L2 RPC</td><td>Очередь anchoring с ретраями; деградация — отложенный анкоринг, read не страдает; резервный RPC-провайдер</td></tr>
+<tr><td>KYB/KYC</td><td>Онбординг ставится в ожидание (не блокирует read); fallback-провайдер по юрисдикциям</td></tr>
+<tr><td>KMS/HSM</td><td>HA-конфигурация; без подписи — бейджи отдаются из кэша (TTL), новые операции ждут</td></tr>
+<tr><td>CDN</td><td>Origin shielding; деградация на прямой origin при сбое edge</td></tr>
+<tr><td>Email/Push</td><td>Очередь с ретраями; некритично для read-пути</td></tr>
+<tr><td>Платёжный провайдер</td><td>Изолирован; отказ влияет только на B2B-биллинг, не на ядро</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Принцип: ни одна интеграция (кроме БД/кэша) не должна ронять критичный read-путь. Запись/пересчёт/anchoring — асинхронны и переживают временные сбои внешних сервисов через очереди.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

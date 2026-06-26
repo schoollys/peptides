@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Observability Spec</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;min-width:250px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:1000px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.25rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:820px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.76rem}
+thead th{background:#1a1917;color:#eee;padding:6px 9px;text-align:left;font-weight:600;font-size:.67rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:6px 9px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917;font-family:ui-monospace,Menlo,monospace;font-size:.72rem}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Observability<span class="sb-sub">metrics · logs · traces</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#metrics"><span class="nav-num">02</span>Метрики</a>
+<a class="nav-link" href="#logs"><span class="nav-num">03</span>Логи</a>
+<a class="nav-link" href="#traces"><span class="nav-num">04</span>Трейсы</a>
+<a class="nav-link" href="#dashboards"><span class="nav-num">05</span>Дашборды</a>
+<a class="nav-link" href="#alerts"><span class="nav-num">06</span>Алерты</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Транш B · Observability Spec</div>
+<h1>Observability Spec</h1>
+<p class="sec-intro">Конкретный каталог сигналов: какие метрики, логи и трейсы испускаем, какие дашборды строим и при каких порогах алертим. Развивает уровень стратегии из <a href="../reports/architecture-infra-devops.html">Infra &amp; DevOps</a> и связывает с <a href="../reports/ops-runbooks.html">Runbooks</a> (алерт → runbook).</p>
+<div class="rec-box"><div class="rec-t">Принцип</div><p>Три столпа (metrics/logs/traces) с общим <code>trace_id</code>/<code>request_id</code>. Никаких ПДн в сигналах. Каждый алерт ссылается на runbook.</p></div>
+</section>
+
+<section id="metrics">
+<div class="sec-badge">02 — Метрики (RED + бизнес)</div>
+<table>
+<thead><tr><th>Метрика</th><th>Тип</th><th>Зачем</th></tr></thead>
+<tbody>
+<tr><td>http_requests_total{route,method,status}</td><td>counter</td><td>Rate/Errors по эндпоинтам</td></tr>
+<tr><td>http_request_duration{route}</td><td>histogram</td><td>p50/p95/p99 латентность (NFR)</td></tr>
+<tr><td>badge_render_duration / cache_hit_ratio</td><td>histogram/gauge</td><td>Здоровье бейджа/CDN</td></tr>
+<tr><td>score_recompute_duration / queue_depth</td><td>histogram/gauge</td><td>Производительность скоринга</td></tr>
+<tr><td>anchor_pending_age / anchor_failures</td><td>gauge/counter</td><td>Здоровье anchoring (RB-02)</td></tr>
+<tr><td>outbox_pending / webhook_failures</td><td>gauge/counter</td><td>Доставка вебхуков (RB-06)</td></tr>
+<tr><td>kyb_verify_latency / error_rate</td><td>histogram/counter</td><td>Внешний KYB (RB-01)</td></tr>
+<tr><td>signing_errors</td><td>counter</td><td>KMS/HSM (RB-03/08)</td></tr>
+<tr><td>verified_decisions_total</td><td>counter</td><td>North Star (бизнес)</td></tr>
+<tr><td>active_participants / submissions_total</td><td>gauge/counter</td><td>KPI фаз</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="logs">
+<div class="sec-badge">03 — Логи</div>
+<table>
+<thead><tr><th>Аспект</th><th>Правило</th></tr></thead>
+<tbody>
+<tr><td>Формат</td><td>Структурированный JSON</td></tr>
+<tr><td>Обязательные поля</td><td>ts, level, msg, request_id, trace_id, module, route</td></tr>
+<tr><td>Запрещено</td><td>ПДн, shielded-идентичность, секреты, сырые подписи</td></tr>
+<tr><td>Аудит-лог</td><td>Отдельный поток для security-событий (доступ к контуру идентичности, ревокации, изменения весов)</td></tr>
+<tr><td>Уровни</td><td>error/warn/info/debug; debug только в dev</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="traces">
+<div class="sec-badge">04 — Трейсы (distributed tracing)</div>
+<table>
+<thead><tr><th>Span</th><th>Покрывает</th></tr></thead>
+<tbody>
+<tr><td>http.request</td><td>Входящий запрос (root span)</td></tr>
+<tr><td>db.query</td><td>Запросы к PostgreSQL</td></tr>
+<tr><td>scoring.compute</td><td>Пересчёт Score (по факторам)</td></tr>
+<tr><td>propagation.walk</td><td>Обход графа</td></tr>
+<tr><td>integration.kyb / l2 / kms</td><td>Внешние вызовы (для локализации сбоев)</td></tr>
+<tr><td>worker.job</td><td>Асинхронные задачи (batch/outbox/anchor)</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Единый <code>trace_id</code> связывает запрос → БД → внешние вызовы → асинхронный пересчёт.</p>
+</section>
+
+<section id="dashboards">
+<div class="sec-badge">05 — Дашборды</div>
+<table>
+<thead><tr><th>Дашборд</th><th>Панели</th></tr></thead>
+<tbody>
+<tr><td>Read-path SLO</td><td>RPS, error-rate, p95/p99 каталога/профиля/бейджа, cache hit</td></tr>
+<tr><td>Скоринг</td><td>Длительность пересчёта, глубина очереди, batch-прогон, распределение Score</td></tr>
+<tr><td>Интеграции</td><td>KYB/L2/KMS латентность/ошибки, anchoring pending</td></tr>
+<tr><td>Доставка</td><td>outbox pending, webhook success/failure, ретраи</td></tr>
+<tr><td>Бизнес/North Star</td><td>verified decisions, активные участники, подачи, B2B</td></tr>
+<tr><td>Security/аудит</td><td>отказы подписи, доступы к контуру идентичности, ревокации</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="alerts">
+<div class="sec-badge">06 — Алерты (с порогами и runbook)</div>
+<table>
+<thead><tr><th>Алерт</th><th>Порог (стартовый)</th><th>Runbook</th></tr></thead>
+<tbody>
+<tr><td>Read error-rate</td><td>&gt;1% за 5 мин</td><td>RB-04/05</td></tr>
+<tr><td>Read p95</td><td>&gt; NFR-цель за 10 мин</td><td>RB-05</td></tr>
+<tr><td>Anchor pending age</td><td>&gt; 2× интервала</td><td>RB-02</td></tr>
+<tr><td>Webhook failure rate</td><td>&gt;10%</td><td>RB-06</td></tr>
+<tr><td>KYB error-rate</td><td>&gt;20% за 5 мин</td><td>RB-01</td></tr>
+<tr><td>Signing errors</td><td>&gt;0 устойчиво</td><td>RB-03/08</td></tr>
+<tr><td>Score-распределение аномалия</td><td>сдвиг &gt; X σ</td><td>RB-11</td></tr>
+<tr><td>Collusion-detector сигнал</td><td>кластер выявлен</td><td>RB-12</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Связка</div><p>Каждый алерт → конкретный runbook (<a href="../reports/ops-runbooks.html">ops-runbooks.html</a>). Пороги стартовые, калибруются по факту. Метрики бизнеса питаются <a href="../reports/spec-analytics-taxonomy.html">Event Taxonomy</a>.</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

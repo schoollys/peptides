@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Волна 3: продуктовые спецификации</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:780px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.fbox{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:#e8935a;line-height:1.7;overflow-x:auto;white-space:pre-wrap}
+.fbox .c{color:#8a8a82}
+.fbox .m{color:#7fd1b9}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ex{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.ex-t{font-size:.74rem;font-weight:800;color:#5b78a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ex p{font-size:.82rem;margin-bottom:.3rem}
+.val{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.72rem;font-weight:700;background:#fef3e8;color:#c06a1a;white-space:nowrap}
+.meth{display:inline-block;font-family:ui-monospace,monospace;font-size:.7rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:6px}
+.get{background:#dff0e6;color:#15673f}
+.post{background:#fdeede;color:#b84e18}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Волна 3 — продукт<span class="sb-sub">онбординг · каталог · бейдж · API · метрики</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">00</span>Контекст и решения</a>
+<a class="nav-link" href="#onboarding"><span class="nav-num">01</span>Онбординг по ролям</a>
+<a class="nav-link" href="#catalog"><span class="nav-num">02</span>Каталог, профиль, сравнение</a>
+<a class="nav-link" href="#badge"><span class="nav-num">03</span>Live-бейдж</a>
+<a class="nav-link" href="#api"><span class="nav-num">04</span>API (OpenAPI-черновик)</a>
+<a class="nav-link" href="#metrics"><span class="nav-num">05</span>Метрики и критерии фаз</a>
+<a class="nav-link" href="#next"><span class="nav-num">06</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">00 — Контекст и принятые решения</div>
+<h1>Волна 3: продуктовые спецификации</h1>
+<p class="sec-intro">Достраивает продукт поверх ядра (Волна 1) и идентичности/верификации (Волна 2): как участник входит, как устроены каталог/профиль/сравнение, как работает встраиваемый бейдж, какие у системы API-эндпоинты и по каким метрикам мерим успех фаз.</p>
+<table>
+<thead><tr><th>Развилка</th><th>Принятое решение</th></tr></thead>
+<tbody>
+<tr><td>Главная поверхность MVP</td><td>Public read-API + встраиваемый бейдж первыми (дистрибуция через чужие сайты), лёгкий каталог рядом</td></tr>
+<tr><td>Доступ к онбордингу</td><td>Invite/waitlist + модель «claim profile» (реестр предзаполняет Unclaimed-профили, участники их забирают)</td></tr>
+<tr><td>Презентация каталога</td><td>Сегментация по роли/категории, ранжирование внутри сегмента, всегда подпись доминирующего фактора; без глобального лидерборда</td></tr>
+<tr><td>Технология бейджа</td><td>Серверно рендеренный SVG/PNG через подписанный image-endpoint (кешируемый, защищён от подделки, без JS)</td></tr>
+<tr><td>Auth write-эндпоинтов</td><td>API-ключи + подпись payload ключами из PKI Волны 2, rate-limit</td></tr>
+<tr><td>Метрики</td><td>Конкретные KPI-критерии выхода фаз включены (§05)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="onboarding">
+<div class="sec-badge">01 — Онбординг по ролям</div>
+<h2>Claim-profile + waitlist: рост без накрутки и без пустого каталога</h2>
+<p class="sec-intro">Cold-start решается тем, что каталог не пуст с первого дня: реестр предзаполняет <strong>Unclaimed</strong>-профили известных игроков (из публичных данных и community-сигнала), а участник «забирает» свой профиль через верификацию. Waitlist на ранней фазе держит качество когорты и кормит discovery-интервью (Волна 0).</p>
+
+<h4>Состояния профиля</h4>
+<table>
+<thead><tr><th>Состояние</th><th>Что значит</th><th>Score</th></tr></thead>
+<tbody>
+<tr><td>Unclaimed</td><td>Предзаполнен реестром из публичных источников; владелец не подтверждён</td><td>Репутационная заметка, без полного TS, явная пометка «не заявлен»</td></tr>
+<tr><td>Claim pending</td><td>Кто-то заявил права, идёт верификация (§01 Волны 2)</td><td>Заморожен на Unclaimed-уровне</td></tr>
+<tr><td>New / Provisional</td><td>Верификация пройдена, истории мало (раздел 03 v2)</td><td>Provisional-тир: KYB + 1 blind-тест дают временный буст</td></tr>
+<tr><td>Verified active</td><td>Полноценный участник с накопленной историей</td><td>Полный TS по формуле (Волна 1)</td></tr>
+</tbody>
+</table>
+
+<h4>Поток онбординга</h4>
+<div class="fbox">1. Заявка (waitlist) → одобрение когорты
+2. Выбор/поиск своего профиля: «забрать существующий Unclaimed» ИЛИ «создать новый»
+3. Заявление роли → определяется требуемый уровень идентичности (L0–L3, Волна 2)
+4. Верификация через провайдера → claim подтверждён
+5. Выдача namespace-ключа для лотов/подписи (если бизнес-роль, §03 Волны 2)
+6. Профиль → New/Provisional; подсказки «что подать, чтобы выйти из Provisional»
+7. Первый blind/random-тест от оракула → provisional-буст → путь к Verified active</div>
+
+<h4>Что видит «пустой» профиль (анти-обескураживание)</h4>
+<p>New/Provisional показывает не «0 баллов», а <strong>чек-лист прогресса</strong>: какие факторы релевантны его роли (из матрицы §08 Волны 1), что уже подтверждено, что осталось, и оценку «сколько до следующего тира». Это превращает онбординг в понятную игру, а не в наказание за новизну.</p>
+
+<div class="rec-box">
+<div class="rec-t">Почему claim-profile, а не чистый self-serve</div>
+<p>Предзаполненный каталог делает реестр полезным <em>до</em> массового онбординга (покупатель уже что-то находит), создаёт мягкое давление «ваш профиль уже существует — заберите его и управляйте репутацией», и даёт основу для Chain Pull (раздел v2): участника «втягивают» контрагенты, у которых он уже фигурирует как Unclaimed-источник.</p>
+</div>
+</section>
+
+<section id="catalog">
+<div class="sec-badge">02 — Каталог, профиль, сравнение</div>
+<h2>Сегментировано, с подписью фактора, без ложных сравнений</h2>
+<p class="sec-intro">Поскольку «Gold 82» у завода и у курьера означают разное (раздел 03 v2), каталог никогда не строит единый глобальный лидерборд. Сравнивается только сравнимое — внутри роли/сегмента.</p>
+
+<h4>Каталог (список)</h4>
+<ul>
+<li><strong>Сегментация по умолчанию:</strong> по категории/роли (11 категорий, 22 роли — v2). Внутри сегмента — ранжирование по Score.</li>
+<li><strong>Подпись доминирующего фактора</strong> у каждой карточки: «82 — преимущественно качество» (правила выбора фактора — раздел 03 v2).</li>
+<li><strong>Фильтры:</strong> роль, фактор-сила (напр. «сильные по холодовой цепи»), уровень верификации, Verified-Legal сегмент (лицензированные каналы), тир.</li>
+<li><strong>New/Provisional</strong> — отдельная полоса, не вперемешку с топом (раздел 03 v2).</li>
+<li><strong>Unclaimed</strong> помечены явно, с приглашением «забрать профиль».</li>
+</ul>
+
+<h4>Страница профиля (анатомия)</h4>
+<table>
+<thead><tr><th>Блок</th><th>Содержание</th></tr></thead>
+<tbody>
+<tr><td>Шапка</td><td>Псевдоним (Verified-but-shielded), роль, тир, Score + подпись доминирующего фактора, уровень идентичности</td></tr>
+<tr><td>Разбивка факторов</td><td>Fᵢ по релевантным факторам роли с весами — видно, где силён/слаб (прозрачность формулы)</td></tr>
+<tr><td>Доказательная база</td><td>COA/тесты (с пометкой blind/vendor-sample), артефакты, раскрытые источники (или blind-раскрытие)</td></tr>
+<tr><td>История + ончейн</td><td>Журнал событий пересчёта со ссылками на L2-якоря (проверяемость, §05 Волны 2)</td></tr>
+<tr><td>Флаги/штрафы</td><td>Активные Pₛ-флаги, статус апелляций (раздел 07 v2)</td></tr>
+<tr><td>Бейдж</td><td>Код для встраивания (§03)</td></tr>
+</tbody>
+</table>
+
+<h4>Сравнение</h4>
+<p>Инструмент сравнения допускает только участников <strong>одной роли</strong> (или явно сопоставимых ролей). При попытке сравнить разные роли — предупреждение «факторы несопоставимы» и переключение в режим пофакторного, а не итогового сравнения. Сравниваются Fᵢ по общим факторам, а не абстрактные числа Score.</p>
+</section>
+
+<section id="badge">
+<div class="sec-badge">03 — Live-бейдж</div>
+<h2>Подписанный SVG: работает везде, подделать нельзя</h2>
+<p class="sec-intro">Бейдж — главный канал дистрибуции (решение MVP). Серверный рендер картинки, а не JS-виджет: грузится на любом сайте, кешируется, и его нельзя «нарисовать» фальшиво — он всегда отражает текущее состояние реестра.</p>
+
+<h4>Эндпоинт и форматы</h4>
+<div class="fbox"><span class="get">GET</span> /v1/badge/{participant_id}.svg?size=&theme=&sig=
+size:  small | standard | detailed
+theme: light | dark
+sig:   подпись реестра — гарантия, что картинку отдал реестр, а не подделка</div>
+<table>
+<thead><tr><th>Размер</th><th>Содержание</th></tr></thead>
+<tbody>
+<tr><td>small</td><td>Тир-цвет + Score + галочка верификации</td></tr>
+<tr><td>standard</td><td>+ подпись доминирующего фактора («82 — преимущественно качество»)</td></tr>
+<tr><td>detailed</td><td>+ мини-разбивка топ-факторов и дата последнего обновления</td></tr>
+</tbody>
+</table>
+
+<h4>Свойства</h4>
+<ul>
+<li><strong>Защита от подделки:</strong> картинка отдаётся только реестром и подписана; клик ведёт на профиль, где значение проверяемо против ончейна (§05 Волны 2). Скопировать старую картинку можно, но клик разоблачит несоответствие.</li>
+<li><strong>Кеширование:</strong> короткий TTL + ETag; при пересчёте Score — инвалидация. Баланс «свежесть vs нагрузка».</li>
+<li><strong>Отсутствие = красный флаг:</strong> участник без бейджа/профиля в нише, где бейдж стал нормой, выглядит подозрительно (механизм давления v2).</li>
+<li><strong>Тир-гейтинг:</strong> детальный бейдж и расширенные форматы — привилегия более высоких тиров (мотивация роста, v2).</li>
+<li><strong>Аналитика кликов:</strong> клик идёт через <code>/v1/badge/{id}/click</code> → редирект на профиль; владельцу — статистика переходов (ценность встраивания, v2).</li>
+<li><strong>13 сценариев встраивания</strong> по ролям — уже описаны в v2 (карточка товара, профиль вендора, пост инфлюенсера, лендинг лаборатории и т.д.).</li>
+</ul>
+<div class="rec-box">
+<div class="rec-t">Почему SVG, а не JS</div>
+<p>JS-виджет ломается на сайтах с CSP, замедляет страницу и его можно подменить локально. Серверный SVG работает даже там, где JS запрещён, отдаётся из CDN и всегда «живой». Богатую интерактивность (если понадобится) можно добавить опциональным JS-слоем поверх, не делая его обязательным.</p>
+</div>
+</section>
+
+<section id="api">
+<div class="sec-badge">04 — API (OpenAPI-черновик)</div>
+<h2>Публичное чтение открыто, запись — подписана</h2>
+<p class="sec-intro">Нейтральность требует, чтобы чтение было максимально открытым (каталог, профили, проверка хешей), а запись — строго аутентифицированной и подписанной, чтобы в реестр не попадали неподтверждённые данные.</p>
+
+<h4>Публичные read-эндпоинты (без авторизации, rate-limited)</h4>
+<div class="fbox"><span class="get">GET</span> /v1/participants            <span class="c">// каталог: ?role=&category=&factor=&tier=&segment=&q=&page=</span>
+<span class="get">GET</span> /v1/participants/{id}       <span class="c">// профиль: факторы, доказательства, флаги</span>
+<span class="get">GET</span> /v1/participants/{id}/score <span class="c">// Score + доминирующий фактор + тир</span>
+<span class="get">GET</span> /v1/participants/{id}/history <span class="c">// журнал + ссылки на L2-якоря</span>
+<span class="get">GET</span> /v1/compare?ids=            <span class="c">// сравнение в пределах роли</span>
+<span class="get">GET</span> /v1/badge/{id}.svg          <span class="c">// бейдж (§03)</span>
+<span class="get">GET</span> /v1/verify?hash=            <span class="c">// проверка ончейн-якоря (exists, ts, type)</span></div>
+
+<h4>Защищённые write-эндпоинты (API-ключ + подпись payload)</h4>
+<div class="fbox"><span class="post">POST</span> /v1/oracles/{id}/results     <span class="c">// публикация COA/теста, sig ключом лаборатории (§04 Волны 2)</span>
+<span class="post">POST</span> /v1/lots                     <span class="c">// регистрация лота, контр-подпись реестра (§03 Волны 2)</span>
+<span class="post">POST</span> /v1/participants/{id}/submissions <span class="c">// подача данных участником</span>
+<span class="post">POST</span> /v1/artifacts                <span class="c">// verified-buyer артефакт (трекинг/фото/QR)</span>
+<span class="post">POST</span> /v1/disclosures              <span class="c">// раскрытие источника (в т.ч. blind)</span>
+<span class="post">POST</span> /v1/appeals                  <span class="c">// апелляция (раздел 07 v2)</span></div>
+
+<h4>Аутентификация записи</h4>
+<div class="fbox">Authorization: ApiKey {key_id}
+X-Signature: sign(body, private_key)        <span class="c">// ключ из PKI Волны 2</span>
+X-Timestamp: {unix}                          <span class="c">// анти-replay, окно ±5 мин</span>
+<span class="m">// реестр проверяет: ключ активен (CRL §04 Волны 2) + подпись валидна + таймстамп свеж</span></div>
+<table>
+<thead><tr><th>Аспект</th><th>Политика</th></tr></thead>
+<tbody>
+<tr><td>Версионирование</td><td>Префикс <code>/v1</code>; ломающие изменения → <code>/v2</code>; депрекация с уведомлением и окном перехода</td></tr>
+<tr><td>Rate limits</td><td>Read: щедро по IP; Write: по ключу, с приоритетом аккредитованным оракулам; защита от DDoS на бейдж через CDN</td></tr>
+<tr><td>Идемпотентность</td><td>Write принимает <code>Idempotency-Key</code> — повтор не создаёт дубль</td></tr>
+<tr><td>Схемы ответов</td><td>JSON, единый конверт <code>{ data, meta, errors }</code>; ошибки — по RFC 7807 (problem+json)</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Это ранний продуктовый <strong>черновик</strong> поверхности API: эндпоинты и конвенции впоследствии консолидированы (раздельные write → единый <code>/submissions</code>, формат ошибок — кастомный <code>{code, message, details, request_id}</code>, не RFC 7807). Финальный контракт, формат ошибок и конвенции — в <a href="../api/openapi.yaml">openapi.yaml</a>, <a href="../reports/spec-api-reference.html">API Reference</a> и <a href="../reports/spec-api-conventions-errors.html">API Conventions &amp; Errors</a>. Лаборатория без API-возможности подаёт данные через ручной fallback (§04 Волны 2).</p>
+</section>
+
+<section id="metrics">
+<div class="sec-badge">05 — Метрики и критерии выхода фаз</div>
+<h2>Когда фаза считается пройденной</h2>
+<p class="sec-intro">Конкретные, проверяемые пороги — чтобы переход между фазами был решением по данным, а не по ощущению. Числа — стартовые ориентиры под калибровку.</p>
+
+<table>
+<thead><tr><th>Фаза</th><th>Цель</th><th>Критерии выхода (KPI)</th></tr></thead>
+<tbody>
+<tr><td>Фаза 0 — Bootstrap</td><td>Доказать, что данные текут и проверяемы</td><td>≥3 аккредитованных оракула; ≥1 интеграция перевозчика; ончейн-якоря пишутся и верифицируются; ≥20 предзаполненных Unclaimed-профилей</td></tr>
+<tr><td>Фаза 1 — MVP</td><td>Полезность для покупателя и первых участников</td><td>≥15 верифицированных онбордов (claim); ≥50 blind/random-тестов в системе; бейдж встроен на ≥10 внешних сайтах; время разрешения апелляции L1 &lt; целевого SLA; ≥1 публичный кейс пойманного клона COA</td></tr>
+<tr><td>Фаза 2 — Рост</td><td>Сетевые эффекты и плотность</td><td>Покрытие ≥60% активных вендоров в целевой нише; доля verified-buyer артефактов растёт; Chain Pull даёт ≥30% новых онбордов; устойчивость финмодели (Волна 0) подтверждена</td></tr>
+</tbody>
+</table>
+
+<h4>Сквозные продуктовые метрики</h4>
+<ul>
+<li><strong>Доверие данных:</strong> доля Score, опирающихся на независимые (blind/oracle) источники vs самодекларацию.</li>
+<li><strong>Здоровье графа:</strong> глубина верифицированных цепочек (SCIF), доля раскрытых источников.</li>
+<li><strong>Дистрибуция:</strong> встраивания бейджа, клики, конверсия клика в просмотр профиля.</li>
+<li><strong>Справедливость:</strong> доля New/Provisional, дошедших до Verified active; время до первого buster-теста.</li>
+<li><strong>Целостность:</strong> пойманные клоны/фальсификации, время разрешения апелляций, доля отменённых апелляцией флагов.</li>
+</ul>
+<div class="warn">
+<div class="warn-t">Калибровка</div>
+<p>Пороги (15 онбордов, 3 оракула, 60% покрытия и т.д.) — стартовые ориентиры; уточняются на discovery-интервью Волны 0 и по реальной плотности целевой ниши. Главное — каждый переход фазы имеет числовой критерий, а не «кажется, готовы».</p>
+</div>
+</section>
+
+<section id="next">
+<div class="sec-badge">06 — Что дальше</div>
+<h2>Статус Волны 3 и переход к Волне 4</h2>
+<p>Волна 3 закрывает продуктовый слой из отчёта о пробелах:</p>
+<ol>
+<li><strong>Онбординг</strong> (§01) — claim-profile + waitlist, состояния профиля, поток по ролям, «пустой профиль как чек-лист».</li>
+<li><strong>Каталог/профиль/сравнение</strong> (§02) — сегментация, подпись фактора, анатомия профиля, сравнение в пределах роли.</li>
+<li><strong>Live-бейдж</strong> (§03) — подписанный SVG-эндпоинт, форматы, анти-подделка, аналитика, тир-гейтинг.</li>
+<li><strong>API</strong> (§04) — публичные read + защищённые write, auth через PKI Волны 2, версионирование/rate-limits.</li>
+<li><strong>Метрики</strong> (§05) — KPI-критерии выхода фаз 0/1/2 + сквозные метрики.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Следующий блок — Волна 4 (UX, безопасность, операции)</div>
+<p>Остаётся: UX-экраны и флоу (онбординг, профиль, подача данных, апелляция), модель угроз и безопасность (анти-DDoS, ключи, защита приватности), операции (SLA реестра, инцидент-менеджмент, штат модерации апелляций, список внешних зависимостей и их рисков). Также к реализации в v2: детальный механизм отбора независимого арбитра (§07 v2) и финализация под-вопросов Волны 0.</p>
+</div>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">Числовые пороги метрик и параметры API — стартовые ориентиры под калибровку на реальных данных и discovery-интервью.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

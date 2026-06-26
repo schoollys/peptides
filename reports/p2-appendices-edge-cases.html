@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — P2: приложения и edge-кейсы</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:235px;min-width:235px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:940px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:780px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+h4{font-size:.9rem;font-weight:700;margin:1.1rem 0 .4rem;color:#1a1917}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.fbox{background:#0f0e0d;border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.8rem;color:#e8935a;line-height:1.7;overflow-x:auto;white-space:pre-wrap}
+.fbox .c{color:#8a8a82}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.warn{background:#fef7f0;border:1px solid #f5c898;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.warn-t{font-size:.76rem;font-weight:800;color:#b84e18;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.warn p{font-size:.82rem;color:#4a3828;margin:0}
+.ex{background:#fff;border:1px solid #e4e2dc;border-radius:10px;padding:.85rem 1.1rem;margin:1rem 0}
+.ex-t{font-size:.74rem;font-weight:800;color:#5b78a8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.ex p{font-size:.82rem;margin-bottom:.3rem}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>P2 — приложения и edge-кейсы<span class="sb-sub">данные · ранжир · lifecycle · API</span></div>
+<a class="nav-link" href="#ctx"><span class="nav-num">00</span>Контекст и решения</a>
+<a class="nav-link" href="#cadence"><span class="nav-num">01</span>Каденция пересчёта</a>
+<a class="nav-link" href="#ranking"><span class="nav-num">02</span>Ранжирование и тай-брейк</a>
+<a class="nav-link" href="#provisional"><span class="nav-num">03</span>Provisional → полный Score</a>
+<a class="nav-link" href="#lifecycle"><span class="nav-num">04</span>Lifecycle участника</a>
+<a class="nav-link" href="#steward"><span class="nav-num">05</span>Lifecycle Steward/оракула</a>
+<a class="nav-link" href="#data"><span class="nav-num">06</span>ER-модель данных</a>
+<a class="nav-link" href="#api"><span class="nav-num">07</span>OpenAPI-контур</a>
+<a class="nav-link" href="#kybdoc"><span class="nav-num">08</span>KYB doc-matrix</a>
+<a class="nav-link" href="#notif"><span class="nav-num">09</span>Уведомления</a>
+<a class="nav-link" href="#next"><span class="nav-num">10</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="ctx">
+<div class="sec-badge">00 — Контекст и принятые решения</div>
+<h1>P2: приложения и edge-кейсы</h1>
+<p class="sec-intro">Закрывает оставшиеся P2 из аудита полноты: каденция пересчёта, ранжирование/тай-брейк, переход из Provisional, lifecycle участника (смена роли, merge/split, recall, оффбординг), lifecycle Steward/оракула, ER-модель, OpenAPI-контур, KYB doc-matrix, уведомления. После этого — сборка единого PRD.</p>
+<table>
+<thead><tr><th>Развилка</th><th>Принятое решение</th></tr></thead>
+<tbody>
+<tr><td>Каденция пересчёта</td><td>Гибрид: критичные события — сразу, decay — батч раз в сутки</td></tr>
+<tr><td>Тай-брейк ранжирования</td><td>По доказанности (покрытие Vᵢ) → свежесть → детерминированный хеш-порядок</td></tr>
+<tr><td>Provisional → полный</td><td>По доказательствам: KYB + N независимых подтверждений (не по календарю)</td></tr>
+<tr><td>Оффбординг</td><td>Tombstone: исторический Score и подтверждённые Pₛ-флаги публичны, ПДн минимизируются</td></tr>
+<tr><td>Lifecycle Steward/оракула</td><td>Фикс. срок + ротация + снятие по триггерам, прозрачный лог</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="cadence">
+<div class="sec-badge">01 — Каденция пересчёта</div>
+<h2>Когда Score пересчитывается</h2>
+<p class="sec-intro">Гибрид: алерты не должны опаздывать, но полный пересчёт по decay для всех участников каждую секунду — лишняя нагрузка.</p>
+<table>
+<thead><tr><th>Триггер</th><th>Режим</th></tr></thead>
+<tbody>
+<tr><td>Pₛ-флаг (мошенничество, sample-swap, алерт по контрагенту)</td><td><strong>Сразу</strong> (событийный пересчёт + анкоринг)</td></tr>
+<tr><td>Новый независимый тест / артефакт</td><td><strong>Сразу</strong></td></tr>
+<tr><td>Отмена демпфера (продолжение работы с flagged-контрагентом)</td><td><strong>Сразу</strong> (см. v2 §«реакция на алерт»)</td></tr>
+<tr><td>Decay (старение данных, Dᵢ)</td><td>Батч раз в сутки</td></tr>
+<tr><td>Пересчёт пропагации Vᵢ от соседей</td><td>Батч раз в сутки (после стабилизации соседей)</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Почему гибрид</div>
+<p>Критичные негативные события (которые защищают покупателя) применяются мгновенно — это требование безопасности. Плавное старение можно считать батчем: оно предсказуемо и не требует реального времени. Так сохраняется и оперативность алертов, и разумная стоимость инфраструктуры.</p>
+</div>
+</section>
+
+<section id="ranking">
+<div class="sec-badge">02 — Ранжирование и тай-брейк</div>
+<h2>Порядок при равном Score в сегменте</h2>
+<p class="sec-intro">Каталог сегментирован по ролям; внутри сегмента участники сортируются по Score. При равенстве нужен детерминированный и неэксплуатируемый порядок.</p>
+<h4>Каскад тай-брейка</h4>
+<ol>
+<li><strong>Покрытие Vᵢ (доказанность):</strong> выше тот, чей Score подтверждён большим числом независимых верификаций — равный балл, но более доказанный, ценнее.</li>
+<li><strong>Свежесть данных:</strong> при равной доказанности — выше с более свежими подтверждениями.</li>
+<li><strong>Детерминированный хеш-порядок:</strong> при полном равенстве — стабильный псевдослучайный порядок от <code>hash(participant_id || epoch)</code>, исключающий ручной фаворитизм.</li>
+</ol>
+<div class="warn">
+<div class="warn-t">Анти-гейминг</div>
+<p>Тай-брейк по покрытию Vᵢ нельзя накрутить дешёвыми self-сигналами: учитываются только независимые подтверждения (blind/random тесты, verified-покупатели). Хеш-порядок убирает мотив «дожать» позицию манипуляцией на последнем шаге.</p>
+</div>
+</section>
+
+<section id="provisional">
+<div class="sec-badge">03 — Provisional → полный Score</div>
+<h2>Критерий выхода — доказательства, не календарь</h2>
+<p class="sec-intro">New/Provisional участник получает полноценный Trust Score, когда накопил достаточно <em>проверяемых</em> данных, а не просто «прожил» срок.</p>
+<table>
+<thead><tr><th>Условие</th><th>Порог (provisional v0.9, под SME)</th></tr></thead>
+<tbody>
+<tr><td>KYB/KYC статус</td><td>L2 Verified Business (или fallback L1 + потолок — см. P1 §02)</td></tr>
+<tr><td>Независимые подтверждения по ключевым факторам</td><td>≥ N подтверждений (напр. ≥2 независимых источника по доминирующему фактору роли)</td></tr>
+<tr><td>Отсутствие открытых критичных Pₛ-флагов</td><td>Нет активных CRITICAL-флагов</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Почему по доказательствам</div>
+<p>Календарный срок поощряет «отсидеться» без реальных данных и эксплуатируется фабриками новых аккаунтов. Привязка к независимым подтверждениям делает переход функцией доказанного поведения. Конкретное N — параметр под валидацию SME (чек-лист в P0-closure).</p>
+</div>
+</section>
+
+<section id="lifecycle">
+<div class="sec-badge">04 — Lifecycle участника</div>
+<h2>Смена роли, merge/split, recall, оффбординг</h2>
+
+<h4>Смена роли</h4>
+<ul>
+<li>Score <strong>не переносится напрямую</strong> между ролями: веса Wᵢ и доминирующие факторы различаются. История сохраняется и помечается прежней ролью; новая роль стартует с Provisional по своим факторам.</li>
+<li>Факторы, общие для обеих ролей (напр. логистика CCF), могут переноситься как подтверждённые входы с сохранением Dᵢ-старения.</li>
+</ul>
+
+<h4>Merge / Split (объединение / разделение участников)</h4>
+<ul>
+<li><strong>Merge:</strong> при доказанной тождественности (один бизнес под двумя профилями) — объединение с сохранением худшего из активных Pₛ-флагов (нельзя «смыть» негатив через слияние).</li>
+<li><strong>Split:</strong> при разделении бизнеса — новые сущности стартуют как Provisional; подтверждённые флаги наследуются стороной-правопреемником, чтобы исключить уход от ответственности через дробление.</li>
+</ul>
+
+<h4>Recall (отзыв партии/COA)</h4>
+<ul>
+<li>Отзыв партии или COA — событийный триггер: затронутый lot помечается <code>recalled</code>, связанные подтверждения теряют вес, пересчёт сразу.</li>
+<li>Recall логируется публично; повторяющиеся recall повышают Pₛ.</li>
+</ul>
+
+<h4>Оффбординг (уход участника)</h4>
+<table>
+<thead><tr><th>Что</th><th>Судьба</th></tr></thead>
+<tbody>
+<tr><td>Профиль в каталоге</td><td>Помечается «ушёл» (tombstone), скрыт из активной выдачи</td></tr>
+<tr><td>Исторический Score + подтверждённые Pₛ-флаги</td><td>Остаются публичными (защита третьих лиц), привязаны к algo_version</td></tr>
+<tr><td>Персональные данные</td><td>Минимизируются/удаляются по data-protection режиму (P1 §04)</td></tr>
+<tr><td>Ончейн-хеши</td><td>Сохраняются для целостности (неизменяемы)</td></tr>
+</tbody>
+</table>
+<div class="warn">
+<div class="warn-t">Принцип</div>
+<p>Уход не должен быть способом стереть подтверждённый негатив. Поэтому tombstone сохраняет публично значимую историю (Score, фрод-флаги), но снимает лишние ПДн. Это баланс права на забвение и защиты будущих покупателей.</p>
+</div>
+</section>
+
+<section id="steward">
+<div class="sec-badge">05 — Lifecycle Steward / оракула</div>
+<h2>Назначение, срок, ротация, снятие</h2>
+<p class="sec-intro">Steward'ы (участники апелляционных панелей) и Verified-оракулы (лаборатории) — доверенные роли; им нужен прозрачный жизненный цикл во избежание захвата.</p>
+<table>
+<thead><tr><th>Этап</th><th>Механика</th></tr></thead>
+<tbody>
+<tr><td>Назначение</td><td>Steward — из пула участников по критериям (см. v2 §07 арбитраж); оракул — через аккредитацию Root CA (Волна 2)</td></tr>
+<tr><td>Срок</td><td>Фиксированный с ротацией — исключает «вечную» концентрацию влияния</td></tr>
+<tr><td>Снятие по триггерам</td><td>Конфликт интересов, нарушение протокола, неактивность, подтверждённая необъективность</td></tr>
+<tr><td>Отзыв ключей оракула</td><td>CRL / ротация ключей (Волна 2 PKI) при компрометации или деаккредитации</td></tr>
+<tr><td>Прозрачность</td><td>Все назначения/снятия — в публичном логе управления</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Почему срок + триггеры</div>
+<p>Бессрочные доверенные роли тяготеют к захвату и сговору. Срок с ротацией обновляет состав, триггеры снимают недобросовестных досрочно, а публичный лог делает процесс проверяемым. Это согласуется с VRF-отбором панелей и cross-segment принципом из v2.</p>
+</div>
+</section>
+
+<section id="data">
+<div class="sec-badge">06 — ER-модель данных</div>
+<h2>Ключевые сущности и связи</h2>
+<p class="sec-intro">Логическая модель (не финальная схема БД) — основа для PRD-приложения и OpenAPI.</p>
+<div class="fbox">Participant (id, role, status[Provisional|Active|Tombstone], kyb_level, algo_version)
+  └─1:N─ ScoreEvent (id, participant_id, ts, score, dominant_factor, algo_version, anchor_hash)
+  └─1:N─ FactorInput (id, participant_id, factor_code, value, Dᵢ_class, Vᵢ, source_id, ts)
+  └─1:N─ PenaltyFlag (id, participant_id, type, severity[INFO|WARNING|CRITICAL], pₖ, opened_at, status)
+Lot (id, vendor_id, status[active|recalled], lot_qr_key)
+  └─1:N─ CustodyRecord (lot_ref, sampler_id, steps[], lab_id, sig_lab, anchor_hash)
+  └─1:N─ COA (id, lot_ref, lab_id, signed_payload, anchor_hash)
+Source/Oracle (id, type[buyer|GB|auditor|lab], independence_flag, accreditation)
+Counterparty-Link (from_id, to_id, lot_share, blind_flag, λ)   <span class="c">// для пропагации Vᵢ</span>
+Appeal (id, subject_participant, panel[], chair_oracle, decision, cost_bearer)
+Steward (participant_id, term_start, term_end, status)
+GovernanceLog (id, event, actor, ts, anchor_hash)</div>
+<p style="font-size:.78rem;color:#888">Связи поддерживают всё: пропагацию (Counterparty-Link), доказанность (FactorInput.Vᵢ + Source.independence), оффбординг (Participant.status), арбитраж (Appeal) и аудит (GovernanceLog/anchor_hash).</p>
+</section>
+
+<section id="api">
+<div class="sec-badge">07 — OpenAPI-контур</div>
+<h2>Контракт публичного и защищённого API</h2>
+<p class="sec-intro">Расширяет решения Волны 3 (public read + protected write, PKI-аутентификация). Здесь — список эндпоинтов как контур для OpenAPI-спеки.</p>
+<table>
+<thead><tr><th>Метод / путь</th><th>Доступ</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td>GET /v1/participants</td><td>public</td><td>Сегментированный каталог (фильтры: роль, тир, доминирующий фактор)</td></tr>
+<tr><td>GET /v1/participants/{id}</td><td>public</td><td>Профиль: Score, доминирующий фактор, факторы, флаги, статус</td></tr>
+<tr><td>GET /v1/participants/{id}/history</td><td>public</td><td>История Score по algo_version</td></tr>
+<tr><td>GET /v1/badge/{id}.svg</td><td>public</td><td>Подписанный SVG/PNG бейдж (Волна 3)</td></tr>
+<tr><td>POST /v1/submissions</td><td>protected (API-key + подпись)</td><td>Подача данных/артефактов (отзыв, тест, COA)</td></tr>
+<tr><td>POST /v1/claims</td><td>protected</td><td>Claim-profile / онбординг</td></tr>
+<tr><td>POST /v1/appeals</td><td>protected</td><td>Подача апелляции</td></tr>
+<tr><td>POST /v1/b2b/webhooks</td><td>protected (B2B)</td><td>Подписка на изменения Score/флагов (мониторинг-SKU)</td></tr>
+<tr><td>GET /v1/verify/{anchor_hash}</td><td>public</td><td>Проверка ончейн-якоря (целостность)</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Версионирование пути (<code>/v1</code>), rate-limit по ключу, payload-подпись на write — детали в Волне 3. Полная OpenAPI YAML-спека — артефакт PRD-приложения.</p>
+</section>
+
+<section id="kybdoc">
+<div class="sec-badge">08 — KYB doc-matrix</div>
+<h2>Документы по уровню верификации</h2>
+<table>
+<thead><tr><th>Уровень</th><th>Требуемые документы</th></tr></thead>
+<tbody>
+<tr><td>L0</td><td>PoP (телефон+device), e-mail — без документов</td></tr>
+<tr><td>L1 (KYC физлицо)</td><td>Удостоверение личности, подтверждение адреса (через провайдера)</td></tr>
+<tr><td>L2 (KYB бизнес)</td><td>Регистрация юрлица, бенефициары (UBO), полномочия представителя, налоговый ID</td></tr>
+<tr><td>L3 (расширенный)</td><td>Лицензии (для Verified-Legal), сертификаты качества/GMP, страховка/гарантии</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Конкретный перечень по юрисдикциям и обработку через стороннего провайдера утверждает DPO/комплаенс (Волна 2, P1 §02 fallback для непокрытых юрисдикций).</p>
+</section>
+
+<section id="notif">
+<div class="sec-badge">09 — Уведомления</div>
+<h2>События и каналы</h2>
+<table>
+<thead><tr><th>Событие</th><th>Кому</th><th>Канал</th></tr></thead>
+<tbody>
+<tr><td>Алерт по контрагенту (падение Score)</td><td>Участник</td><td>In-app + e-mail (критично)</td></tr>
+<tr><td>Новый Pₛ-флаг / открыт спор</td><td>Участник</td><td>In-app + e-mail</td></tr>
+<tr><td>Решение апелляции</td><td>Стороны спора</td><td>In-app + e-mail</td></tr>
+<tr><td>Изменение Score контрагента</td><td>B2B-подписчик</td><td>Webhook (мониторинг-SKU)</td></tr>
+<tr><td>Истечение свежести данных (decay-порог)</td><td>Участник</td><td>In-app (напоминание обновить)</td></tr>
+<tr><td>Запрос на claim/возражение по Unclaimed</td><td>Участник/реестр</td><td>E-mail</td></tr>
+</tbody>
+</table>
+<p style="font-size:.78rem;color:#888">Напоминания о decay — часть цикла активного давления на подачу данных (мотивация, v2).</p>
+</section>
+
+<section id="next">
+<div class="sec-badge">10 — Что дальше</div>
+<h2>P2 закрыты — остаётся сборка PRD</h2>
+<ol>
+<li><strong>Каденция</strong> (§01) — гибрид: события сразу, decay батчем.</li>
+<li><strong>Ранжирование</strong> (§02) — каскад: покрытие Vᵢ → свежесть → хеш-порядок.</li>
+<li><strong>Provisional → полный</strong> (§03) — по доказательствам (KYB + N подтверждений).</li>
+<li><strong>Lifecycle участника</strong> (§04) — смена роли, merge/split, recall, tombstone-оффбординг.</li>
+<li><strong>Lifecycle Steward/оракула</strong> (§05) — срок + ротация + триггеры снятия.</li>
+<li><strong>ER-модель, OpenAPI-контур, KYB doc-matrix, уведомления</strong> (§06–09) — приложения для PRD.</li>
+</ol>
+<div class="rec-box">
+<div class="rec-t">Готовность к PRD</div>
+<p>Закрыты <strong>все P0, P1 и P2</strong>. Следующий и финальный шаг — <strong>сборка единого PRD-документа</strong>: свести Волны 0–4, закрытия P0/P1/P2 и v2-реестр в один структурированный документ с разделами (видение, роли, алгоритм, идентичность, ончейн, продукт, UX, безопасность, операции, экономика, право, приложения). Открытые внешние зависимости остаются как явные «to be confirmed»: числа экономики, подпись SME, юрист (ToS/defamation), DPO (DPIA/состав хешей).</p>
+</div>
+<p style="font-size:.78rem;color:#5a5955;margin-top:1rem"><strong>Статус на дату ревизии:</strong> описанный «финальный шаг» (сборка единого PRD) впоследствии выполнен — это исторический phase-closure отчёт. Актуальный сводный статус — в <a href="../reports/PRD.html">PRD</a>.</p>
+<p style="font-size:.78rem;color:#888;margin-top:1rem">P2-решения — инженерные/продуктовые каркасы; параметры (N подтверждений, срок Steward, пороги) — под валидацию SME из чек-листа P0-closure.</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>

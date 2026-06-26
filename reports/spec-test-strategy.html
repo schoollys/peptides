@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — Test Strategy</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.2rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.3rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.7rem;text-transform:uppercase}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917}
+.pyr{background:#0f0e0d;border-radius:10px;padding:1.1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.74rem;color:#cfcfc7;line-height:1.6;white-space:pre}
+.pyr .o{color:#e8935a}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>Test Strategy<span class="sb-sub">unit→e2e→load→security</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#pyramid"><span class="nav-num">02</span>Пирамида</a>
+<a class="nav-link" href="#levels"><span class="nav-num">03</span>Уровни тестов</a>
+<a class="nav-link" href="#critical"><span class="nav-num">04</span>Критичные области</a>
+<a class="nav-link" href="#nfr"><span class="nav-num">05</span>NFR / нагрузка</a>
+<a class="nav-link" href="#sec"><span class="nav-num">06</span>Security-тесты</a>
+<a class="nav-link" href="#ci"><span class="nav-num">07</span>CI-гейты и метрики</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Технические спецификации · Test Strategy</div>
+<h1>Test Strategy</h1>
+<p class="sec-intro">План тестирования, привязанный к acceptance criteria (<a href="../reports/prd-user-stories-acceptance.html">User Stories</a>), бизнес-правилам (<a href="../reports/prd-business-rules-edge-cases.html">Business Rules / Edge Cases</a>) и NFR (<a href="../reports/prd-foundations-glossary-nfr-register.html">PRD Foundations</a>).</p>
+</section>
+
+<section id="pyramid">
+<div class="sec-badge">02 — Пирамида тестирования</div>
+<div class="pyr">          <span class="o">/\</span>        e2e / приёмочные (мало, по US-*)
+         <span class="o">/--\</span>       integration (API+БД+очередь)
+        <span class="o">/------\</span>     contract (OpenAPI / вебхуки)
+       <span class="o">/--------\</span>   unit (ядро скоринга — максимум)
+</div>
+<p>Самый плотный слой — unit на скоринг-ядре (детерминированная математика). Сверху — контрактные и интеграционные, затем тонкий слой e2e по ключевым пользовательским путям.</p>
+</section>
+
+<section id="levels">
+<div class="sec-badge">03 — Уровни тестов</div>
+<table>
+<thead><tr><th>Уровень</th><th>Что покрывает</th><th>Привязка</th></tr></thead>
+<tbody>
+<tr><td>Unit</td><td>Fᵢ-нормализации, Dᵢ-decay, Vᵢ-агрегация, Pₛ, доминирующий фактор, демпфер</td><td>Wave 1, BR-SCORE/PROP/DECAY</td></tr>
+<tr><td>Contract</td><td>Соответствие ответов <code>openapi.yaml</code>; формат вебхуков и подписей</td><td>API Reference, Integration Contracts</td></tr>
+<tr><td>Integration</td><td>API↔БД↔очередь↔воркер; идемпотентность; пересчёт по событию</td><td>TDD sequence</td></tr>
+<tr><td>E2E</td><td>Claim→submission→Score→бейдж; апелляция; B2B-подписка</td><td>US-* (MVP/V1)</td></tr>
+<tr><td>Migration</td><td>Forward-only миграции; смена algo_version не ломает историю</td><td>DB Schema §06</td></tr>
+<tr><td>Регрессия скоринга</td><td>Golden-датасеты: эталонные входы→ожидаемый Score по версии</td><td>worked example (Wave 1)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="critical">
+<div class="sec-badge">04 — Критичные области (обязательное покрытие)</div>
+<table>
+<thead><tr><th>Область</th><th>Сценарии</th></tr></thead>
+<tbody>
+<tr><td>Скоринг-ядро</td><td>Граничные Fᵢ (0/100), missing data=0, cap мультиоракула, инвариант ΣWᵢ=1</td></tr>
+<tr><td>Пропагация Vᵢ</td><td>Циклы (отказ), концентрация top_share&gt;0.6, λ_blind, max из независимых источников, конфликт→заморозка</td></tr>
+<tr><td>Демпфер</td><td>30-дн среднее; отмена буфера при работе с флагнутым после алерта (INFO/WARNING/CRITICAL)</td></tr>
+<tr><td>Pₛ</td><td>Произведение, жёсткие потолки тира, retention/expiry, sample-swap</td></tr>
+<tr><td>Идентичность</td><td>PoP L0 (phone+device), KYB fallback + trust ceiling</td></tr>
+<tr><td>Custody/COA</td><td>Неполная цепочка → Vᵢ≠1.0; анти-reuse media_hash; CRL отозванного оракула</td></tr>
+<tr><td>Жизненные циклы</td><td>provisional→active по доказательствам; recall; tombstone (ПДн снят, история жива)</td></tr>
+<tr><td>Edge cases</td><td>Все 17 кейсов из каталога edge cases</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Каждое бизнес-правило → тест</div><p>Правило BR-* без хотя бы одного автотеста считается непокрытым. Edge cases — отдельный обязательный набор.</p></div>
+</section>
+
+<section id="nfr">
+<div class="sec-badge">05 — NFR / нагрузочное тестирование</div>
+<table>
+<thead><tr><th>Тип</th><th>Цель</th></tr></thead>
+<tbody>
+<tr><td>Нагрузочное (read)</td><td>Каталог/профиль/бейдж под целевым RPS, p95 в рамках NFR; проверка кэша/CDN</td></tr>
+<tr><td>Batch-пересчёт</td><td>Суточная пропагация на N участников в окне; деградация графа</td></tr>
+<tr><td>Soak</td><td>Длительная стабильность, отсутствие утечек</td></tr>
+<tr><td>Chaos / отказ интеграций</td><td>Падение KYB/L2/KMS не роняет read-путь (Integration Contracts §05)</td></tr>
+<tr><td>Доступность</td><td>Проверка цели 99.9% read-path; failover</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="sec">
+<div class="sec-badge">06 — Security-тесты</div>
+<ul style="margin-left:1.1rem">
+<li><strong>SAST/DAST/dependency-scan</strong> в CI (Infra &amp; DevOps).</li>
+<li><strong>Подписи и PKI:</strong> отказ при невалидной подписи, отозванном сертификате, replay вебхука.</li>
+<li><strong>Abuse-сценарии</strong> из threat model (STRIDE + 8 нишевых): sybil/PoP, sample-swap, collusion-ring, артефакт-reuse, манипуляция бейджем.</li>
+<li><strong>AuthZ-матрица:</strong> запрет доступа к чужим write-ресурсам.</li>
+<li><strong>Приватность:</strong> shielded-данные не утекают в публичный API/бейдж/логи.</li>
+</ul>
+</section>
+
+<section id="ci">
+<div class="sec-badge">07 — CI-гейты и метрики</div>
+<table>
+<thead><tr><th>Гейт</th><th>Условие</th></tr></thead>
+<tbody>
+<tr><td>Lint + типы</td><td>0 ошибок</td></tr>
+<tr><td>Unit + integration</td><td>Все зелёные; покрытие скоринг-ядра — высокий порог (напр. ≥90%)</td></tr>
+<tr><td>Contract</td><td>Ответы валидны против openapi.yaml</td></tr>
+<tr><td>Регрессия скоринга</td><td>Golden-датасеты совпадают для текущей algo_version</td></tr>
+<tr><td>Security scans</td><td>Нет High/Critical уязвимостей</td></tr>
+<tr><td>Deploy</td><td>Авто на staging; prod — approve + canary + auto-rollback</td></tr>
+</tbody>
+</table>
+<div class="rec-box"><div class="rec-t">Definition of Done</div><p>Фича готова, когда: код + тесты на затронутые BR-* + контракт обновлён (если менялся API) + проходят все CI-гейты + обновлён changelog/algo_version при изменении параметров.</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

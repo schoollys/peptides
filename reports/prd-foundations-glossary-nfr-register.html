@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — PRD Foundations: глоссарий, NFR, реестр допущений</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;min-width:240px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:960px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.8rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.4rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d;line-height:1.2}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.4rem;max-width:800px;line-height:1.7}
+h3{font-size:1.0rem;font-weight:700;margin:1.8rem 0 .7rem;color:#1a1917;border-bottom:1px solid #e4e2dc;padding-bottom:.35rem}
+p{margin-bottom:.8rem;color:#3a3935;font-size:.87rem}
+strong{color:#1a1917}
+ul,ol{margin:.3rem 0 .9rem 1.1rem}
+li{font-size:.84rem;color:#3a3935;margin-bottom:.3rem;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.78rem}
+thead th{background:#1a1917;color:#eee;padding:7px 10px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em}
+tbody tr{border-bottom:1px solid #e8e6df}
+tbody tr:nth-child(even){background:#faf9f7}
+td{padding:7px 10px;vertical-align:top;color:#3a3935}
+td:first-child{font-weight:600;color:#1a1917;white-space:nowrap}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+.pri{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.7rem;font-weight:700}
+.p0{background:#fbe6e6;color:#a33}.p1{background:#fef0e0;color:#b8731a}.p2{background:#eef0fb;color:#3b4a8c}
+.owner{font-size:.72rem;color:#666}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>PRD Foundations<span class="sb-sub">глоссарий · NFR · допущения</span></div>
+<a class="nav-link" href="#gloss"><span class="nav-num">01</span>Канонический глоссарий</a>
+<a class="nav-link" href="#nfr"><span class="nav-num">02</span>Нефункциональные требования</a>
+<a class="nav-link" href="#register"><span class="nav-num">03</span>Реестр допущений и вопросов</a>
+<a class="nav-link" href="#next"><span class="nav-num">04</span>Что дальше</a>
+</nav>
+
+<main class="content">
+
+<section id="gloss">
+<div class="sec-badge">PRD Foundations — сшивающий слой перед сборкой PRD</div>
+<h1>Глоссарий, NFR и реестр допущений</h1>
+<p class="sec-intro">Три «сшивающих» приложения, обеспечивающих связность единого PRD: единый словарь терминов, консолидированные нефункциональные требования и честный реестр открытых вопросов (to-be-confirmed). Рабочее название продукта — <strong>PeptideTrust</strong> (placeholder под возможный ребрендинг).</p>
+
+<h2>01 — Канонический глоссарий</h2>
+<p class="sec-intro">Единственный источник истины по терминам; все остальные документы должны соответствовать этим определениям.</p>
+
+<h3>Алгоритм и оценка</h3>
+<table>
+<thead><tr><th>Термин</th><th>Определение</th></tr></thead>
+<tbody>
+<tr><td>Trust Score (TS)</td><td>Итоговый публичный балл доверия: <code>TS = Σ(Fᵢ·Wᵢ·Dᵢ·Vᵢ)·(1−Pₛ)</code></td></tr>
+<tr><td>Fᵢ</td><td>Factor score (0–100) — внутреннее качество/результат по фактору, отделён от надёжности источника</td></tr>
+<tr><td>Wᵢ</td><td>Вес фактора для роли, ΣWᵢ=1.0</td></tr>
+<tr><td>Dᵢ</td><td>Множитель свежести (decay); 4 класса с экспоненциальным затуханием (полупериоды A:365 B:120 C:45 D:90 дней)</td></tr>
+<tr><td>Vᵢ</td><td>Множитель верификации: <code>0.40 + (Sub/100)·0.55</code>; λ_blind=0.85 для blind-связей; пропагация одношаговая</td></tr>
+<tr><td>Pₛ</td><td>Множитель штрафов: <code>1 − ∏(1−pₖ)</code> с жёсткими потолками тиров</td></tr>
+<tr><td>Доминирующий фактор</td><td>Фактор с наибольшим вкладом (Fᵢ·Wᵢ·Dᵢ·Vᵢ); показывается рядом со Score</td></tr>
+<tr><td>Факторы (9)</td><td>QEF, PCF, SCIF, TRF, FRF, CCF, CVF, CVF-B, RF (см. словарь факторов в v2)</td></tr>
+<tr><td>algo_version</td><td>Монотонный идентификатор набора параметров (веса/банды/штрафы/Dᵢ/Vᵢ); анкорится в L2; forward-only</td></tr>
+</tbody>
+</table>
+
+<h3>Верификация и данные</h3>
+<table>
+<thead><tr><th>Термин</th><th>Определение</th></tr></thead>
+<tbody>
+<tr><td>Оракул (Verified Oracle)</td><td>Аккредитованный источник доказательств (независимая лаборатория) с PKI-подписью</td></tr>
+<tr><td>Естественный оракул</td><td>Участник, по роли отбирающий образец независимо от вендора (GB-организатор, покупатель)</td></tr>
+<tr><td>Blind / shielded disclosure</td><td>Доказать факт без раскрытия личности апстрима; по умолчанию для посредников; λ_blind=0.85</td></tr>
+<tr><td>Chain-of-custody</td><td>Подписанная на каждом шаге цепочка владения образцом; неполнота → тест не = Vᵢ 1.0</td></tr>
+<tr><td>Sample-swap</td><td>Подмена образца вендором; бьёт по Pₛ вендора, не по лаборатории</td></tr>
+<tr><td>Trust-пропагация</td><td>Одношаговый перенос профильного субскора контрагента в Vᵢ (не всего TS)</td></tr>
+<tr><td>Lot-QR</td><td>Криптоключ партии для привязки COA/артефактов к конкретному лоту</td></tr>
+<tr><td>tombstone</td><td>Режим удаления: ПДн снимаются, публично значимая история (Score, фрод-флаги) и ончейн-хеши сохраняются</td></tr>
+</tbody>
+</table>
+
+<h3>Идентичность, роли, управление</h3>
+<table>
+<thead><tr><th>Термин</th><th>Определение</th></tr></thead>
+<tbody>
+<tr><td>KYB / KYC</td><td>Верификация бизнеса / личности; уровни L0–L3</td></tr>
+<tr><td>PoP</td><td>Proof-of-personhood для L0 (телефон+device); анти-Sybil без раскрытия личности</td></tr>
+<tr><td>New / Provisional</td><td>Статус новичка; выход в полный Score по доказательствам (KYB + N независимых подтверждений)</td></tr>
+<tr><td>Unclaimed</td><td>Незаявленный профиль; только нейтральные факты из публичных источников, без негатива/Score</td></tr>
+<tr><td>Verified-Legal</td><td>Сегмент лицензированных каналов (аптеки), отделён фильтром</td></tr>
+<tr><td>Transparent Affiliate</td><td>Инфлюенсер, раскрывший платное партнёрство</td></tr>
+<tr><td>Verified Curator</td><td>Модератор/куратор, интегрировавший реестр; co-branding + Chain Pull-кредит</td></tr>
+<tr><td>Steward</td><td>Участник апелляционной панели; отбор VRF-жеребьёвкой cross-segment; срок+ротация+триггеры снятия</td></tr>
+<tr><td>Chain Pull</td><td>Механизм втягивания контрагентов зарегистрированными участниками («привести и поднять»)</td></tr>
+<tr><td>Live-badge</td><td>Встраиваемый подписанный SVG/PNG-бейдж со Score и аналитикой кликов</td></tr>
+<tr><td>RUO</td><td>Research-use-only — позиционирование (не медицина, не торговля)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="nfr">
+<div class="sec-badge">02 — Нефункциональные требования</div>
+<h2>NFR единым блоком</h2>
+<p class="sec-intro">Консолидация нефункциональных требований из Волн 3–4 в единый блок для PRD. Числовые таргеты — стартовые (provisional), уточняются по нагрузке.</p>
+
+<table>
+<thead><tr><th>Категория</th><th>Требование (старт)</th></tr></thead>
+<tbody>
+<tr><td>Производительность</td><td>Чтение профиля/каталога p95 &lt; 300 мс; бейдж (кэшируемый SVG) p95 &lt; 150 мс</td></tr>
+<tr><td>Доступность</td><td>Публичное read-API и бейдж — целевой uptime 99.9%; деградация только write-путей при инцидентах</td></tr>
+<tr><td>Масштабируемость</td><td>Stateless read-слой за CDN; батч-пересчёт decay масштабируется по числу профилей; событийный пересчёт — очередь</td></tr>
+<tr><td>Безопасность</td><td>EU/CH хостинг; ключи в KMS/HSM; PKI для оракулов/write; anti-DDoS; payload-подпись на write (Волна 4)</td></tr>
+<tr><td>Приватность</td><td>Privacy-by-design; анонимные ончейн-хеши (соль, без идентификаторов); минимизация ПДн; DPIA до запуска</td></tr>
+<tr><td>Целостность</td><td>Ончейн-якоря (L2 Base/Arbitrum) для Score-событий, COA, custody; публичная верификация по anchor_hash</td></tr>
+<tr><td>Наблюдаемость</td><td>Метрики/логи/трейсинг; публичный лог инцидентов и управления; алертинг по аномалиям</td></tr>
+<tr><td>Доступность интерфейса (a11y)</td><td>Каталог/профиль/бейдж — WCAG 2.1 AA как цель; бейдж с alt/контрастом</td></tr>
+<tr><td>Совместимость</td><td>Бейдж как server-rendered image — работает без JS на любом сайте; современные браузеры для веб-UI</td></tr>
+<tr><td>Локализация</td><td>MVP — английский (глобальный RUO-рынок); i18n-готовность архитектуры, локали отложены до V2</td></tr>
+<tr><td>SLA восстановления</td><td>Стартовые цели реакции/восстановления по severity (Волна 4); RPO/RTO уточняются</td></tr>
+</tbody>
+</table>
+<div class="rec-box">
+<div class="rec-t">Принцип</div>
+<p>Read-путь (каталог, профиль, бейдж, верификация) — критичный и должен быть быстрым/высокодоступным даже при деградации write. Это прямо следует из pull-стратегии: ценность для спроса не должна падать из-за проблем на стороне подачи данных.</p>
+</div>
+</section>
+
+<section id="register">
+<div class="sec-badge">03 — Реестр допущений и открытых вопросов</div>
+<h2>To-be-confirmed (честный register)</h2>
+<p class="sec-intro">Все открытые зависимости и провизорные параметры в одном месте. Каждый — с владельцем и приоритетом. В PRD войдёт как живой раздел.</p>
+
+<table>
+<thead><tr><th>Вопрос / допущение</th><th>Приоритет</th><th>Владелец</th></tr></thead>
+<tbody>
+<tr><td>Числовые параметры алгоритма (банды QEF, веса, Pₛ, Dᵢ, Vᵢ, N подтверждений, срок Steward) — провизорные v0.9</td><td><span class="pri p0">P0</span></td><td class="owner">SME-валидация → v1.0</td></tr>
+<tr><td>Юнит-экономика: реальные числа (c_kyb, c_test, e_pm, конверсии) и финмодель тестов</td><td><span class="pri p0">P0</span></td><td class="owner">Финансы/основатели</td></tr>
+<tr><td>ToS / политика клеветы / право на ответ — финальная редакция</td><td><span class="pri p0">P0</span></td><td class="owner">Юрист (CH/EU+US)</td></tr>
+<tr><td>DPIA, карта потоков, SCC, состав хешируемой нагрузки (анонимность)</td><td><span class="pri p0">P0</span></td><td class="owner">DPO</td></tr>
+<tr><td>Покрытие KYB по юрисдикциям + матрица документов через провайдера</td><td><span class="pri p1">P1</span></td><td class="owner">Комплаенс</td></tr>
+<tr><td>Выбор провайдеров: KYB/KYC, L2 (Base/Arbitrum), хостинг EU/CH, KMS/HSM</td><td><span class="pri p1">P1</span></td><td class="owner">Инженерия/комплаенс</td></tr>
+<tr><td>Аккредитация оракулов: критерии, Root CA, ротация/отзыв ключей — операционализация</td><td><span class="pri p1">P1</span></td><td class="owner">Операции</td></tr>
+<tr><td>Целевые числа KPI/OKR по фазам (North Star, покрытие, виральность)</td><td><span class="pri p1">P1</span></td><td class="owner">Продукт</td></tr>
+<tr><td>Финальное название/бренд (PeptideTrust — placeholder)</td><td><span class="pri p2">P2</span></td><td class="owner">Продукт/маркетинг</td></tr>
+<tr><td>Ценообразование B2B-SKU (тиры, прайс)</td><td><span class="pri p2">P2</span></td><td class="owner">Бизнес</td></tr>
+<tr><td>RPO/RTO, нагрузочные таргеты NFR под реальный трафик</td><td><span class="pri p2">P2</span></td><td class="owner">Инженерия/SRE</td></tr>
+</tbody>
+</table>
+<p style="font-size:.8rem;color:#5a5955;margin-top:.6rem"><strong>Закрыто с момента v0.9:</strong> полная OpenAPI YAML-спека создана (<a href="../api/openapi.yaml">openapi.yaml</a>); ER-схема и физическая модель БД готовы (<a href="../reports/architecture-erd-security.html">ERD &amp; Security</a>, <a href="../reports/spec-db-physical-schema.html">DB Physical Schema</a>) — поэтому исключены из открытого реестра.</p>
+<div class="rec-box">
+<div class="rec-t">Зачем это в PRD</div>
+<p>Зрелый PRD не прячет неизвестное, а явно перечисляет допущения с владельцами. Это превращает «дыры» в управляемый бэклог решений и защищает от ложного ощущения завершённости. P0-зависимости (SME, экономика, юрист, DPO) — блокеры продакшена, не MVP-демо.</p>
+</div>
+</section>
+
+<section id="next">
+<div class="sec-badge">04 — Что дальше</div>
+<h2>Сшивающий слой готов → сборка PRD</h2>
+<p>Добавлены три приложения: <strong>глоссарий</strong> (§01), <strong>NFR</strong> (§02), <strong>реестр допущений</strong> (§03). Название зафиксировано как рабочий placeholder. Формат PRD — основной документ + ссылки на детальные приложения (Волны, закрытия), без дублирования.</p>
+<div class="rec-box">
+<div class="rec-t">Финальный шаг</div>
+<p>Теперь можно собирать <strong>единый PRD</strong>: краткий самодостаточный core-документ (видение → требования → архитектура → продукт → операции → метрики → допущения) со ссылками на это приложение, Vision, Волны 0–4, закрытия P0/P1/P2 и v2-реестр как источники глубины.</p>
+</div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

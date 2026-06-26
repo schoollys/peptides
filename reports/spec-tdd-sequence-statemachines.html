@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PeptideTrust — TDD: Sequence &amp; State Machines</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f2f1ee;color:#1a1917;font-size:15px;line-height:1.65}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;min-width:245px;background:#151412;position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.2rem 0 2rem;flex-shrink:0}
+.content{flex:1;padding:2.5rem 2.5rem 6rem;max-width:980px}
+@media(max-width:800px){.sidebar{display:none}.content{padding:1.2rem 1rem 4rem}}
+.sb-logo{color:#e8935a;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.5rem 1.1rem 1rem;border-bottom:1px solid #252320;margin-bottom:.6rem;line-height:1.4}
+.sb-sub{color:#666;font-size:.66rem;text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:3px}
+.nav-link{color:#999;font-size:.77rem;padding:.45rem 1.1rem;text-decoration:none;border-left:3px solid transparent;transition:all .15s;display:flex;gap:.5rem;align-items:center}
+.nav-link:hover,.nav-link.active{color:#fff;background:#1d1b18;border-left-color:#e8935a}
+.nav-num{color:#555;font-size:.66rem;min-width:18px}
+section{margin-bottom:3.2rem;scroll-margin-top:1.5rem}
+.sec-badge{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#e8935a;margin-bottom:.3rem}
+h1{font-size:1.9rem;font-weight:800;margin-bottom:.5rem;color:#0f0e0d;line-height:1.15}
+h2{font-size:1.3rem;font-weight:800;margin-bottom:.3rem;color:#0f0e0d}
+.sec-intro{font-size:.87rem;color:#5a5955;margin-bottom:1.2rem;max-width:800px;line-height:1.7}
+p{margin-bottom:.7rem;color:#3a3935;font-size:.87rem}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.82em;background:#ece9e3;padding:1px 5px;border-radius:4px;color:#7a3b12}
+.diagram{background:#0f0e0d;border-radius:10px;padding:1.1rem 1.2rem;margin:1rem 0;font-family:ui-monospace,Menlo,monospace;font-size:.73rem;color:#cfcfc7;line-height:1.5;overflow-x:auto;white-space:pre}
+.diagram .o{color:#e8935a}.diagram .g{color:#7fb88a}.diagram .b{color:#7fa8d8}.diagram .c{color:#8a8a82}.diagram .r{color:#e08a8a}
+.rec-box{background:#f6faf7;border:1px solid #cfe3d4;border-left:4px solid #15673f;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.rec-t{color:#15673f;font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.rec-box p{font-size:.83rem;margin:0}
+a{color:#b8731a}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="sidebar">
+<div class="sb-logo">PeptideTrust<br>TDD<span class="sb-sub">sequence · state machines</span></div>
+<a class="nav-link" href="#intro"><span class="nav-num">01</span>Обзор</a>
+<a class="nav-link" href="#seq-submit"><span class="nav-num">02</span>Seq: подача+скоринг</a>
+<a class="nav-link" href="#seq-badge"><span class="nav-num">03</span>Seq: рендер бейджа</a>
+<a class="nav-link" href="#seq-appeal"><span class="nav-num">04</span>Seq: апелляция</a>
+<a class="nav-link" href="#seq-prop"><span class="nav-num">05</span>Seq: пропагация (batch)</a>
+<a class="nav-link" href="#sm-participant"><span class="nav-num">06</span>SM: статус участника</a>
+<a class="nav-link" href="#sm-lot"><span class="nav-num">07</span>SM: партия/recall</a>
+<a class="nav-link" href="#sm-appeal"><span class="nav-num">08</span>SM: апелляция</a>
+<a class="nav-link" href="#sm-anchor"><span class="nav-num">09</span>SM: anchoring</a>
+</nav>
+
+<main class="content">
+
+<section id="intro">
+<div class="sec-badge">Технические спецификации · Technical Design Documents</div>
+<h1>TDD: Sequence Diagrams &amp; State Machines</h1>
+<p class="sec-intro">Детализация сложных модулей: последовательности взаимодействий и конечные автоматы жизненных циклов. Дополняет <a href="../reports/architecture-system-design.html">SAD</a> (потоки) и <a href="../reports/prd-business-rules-edge-cases.html">Business Rules</a> (переходы). Диаграммы текстовые (ASCII) — переносимы в любой инструмент.</p>
+</section>
+
+<section id="seq-submit">
+<div class="sec-badge">02 — Sequence: подача данных и пересчёт Score</div>
+<div class="diagram"><span class="b">Оракул</span>   <span class="b">API</span>     <span class="b">ingestion</span>  <span class="b">queue</span>   <span class="b">worker/scoring</span>  <span class="b">L2</span>    <span class="b">notify</span>
+  │       │          │         │          │           │       │
+  │ POST /submissions (X-Sig)  │          │           │       │
+  │──────►│          │         │          │           │       │
+  │       │ verify PKI + idempotency      │           │       │
+  │       │─────────►│         │          │           │       │
+  │       │   validate (BR-*), lot-QR, custody        │       │
+  │       │          │ enqueue │          │           │       │
+  │       │          │────────►│          │           │       │
+  │ 202 queued       │         │          │           │       │
+  │◄──────│          │         │ consume  │           │       │
+  │       │          │         │─────────►│ recompute TS (event, сразу)
+  │       │          │         │          │ anchor hash│       │
+  │       │          │         │          │──────────►│       │
+  │       │          │         │          │ emit score.updated │
+  │       │          │         │          │───────────────────►│ alert
+</div>
+<div class="rec-box"><div class="rec-t">Ключевое</div><p>Write возвращает <code>202</code> сразу; тяжёлый пересчёт и anchoring — асинхронно (ADR-010). Идемпотентность по <code>Idempotency-Key</code> защищает от дублей при ретрае.</p></div>
+</section>
+
+<section id="seq-badge">
+<div class="sec-badge">03 — Sequence: рендер бейджа</div>
+<div class="diagram"><span class="b">Сайт вендора</span>  <span class="b">CDN</span>     <span class="b">Badge endpoint</span>  <span class="b">signing/KMS</span>
+   │            │            │              │
+   │ GET /badge/{id}.svg     │              │
+   │───────────►│ cache hit? │              │
+   │            │──если нет──►│ fetch score  │
+   │            │            │ render SVG   │
+   │            │            │─────────────►│ sign (HSM)
+   │            │            │◄─signed──────│
+   │            │◄─SVG+ETag──│              │
+   │◄─кэш (TTL)─│            │              │
+</div>
+<p style="font-size:.8rem;color:#888">При попытке подмены значения подпись не сойдётся — бейдж невалиден (ADR-006, BR-BADGE-CACHE).</p>
+</section>
+
+<section id="seq-appeal">
+<div class="sec-badge">04 — Sequence: апелляция</div>
+<div class="diagram"><span class="b">Участник</span>  <span class="b">API</span>   <span class="b">appeals</span>   <span class="b">VRF</span>    <span class="b">Steward-pool</span>  <span class="b">chair-oracle</span>
+   │        │       │        │         │             │
+   │ POST /appeals  │        │         │             │
+   │───────►│──────►│ form panel        │             │
+   │        │       │ VRF draw + conflict-screen      │
+   │        │       │───────►│         │             │
+   │        │       │◄──панель (cross-segment)────────│
+   │        │       │ in_review (сбор позиций)        │
+   │        │       │ decision (binding в реестре)    │
+   │        │       │ loser-pays; log + anchor        │
+   │ notify decision│        │         │             │
+   │◄───────────────│        │         │             │
+</div>
+</section>
+
+<section id="seq-prop">
+<div class="sec-badge">05 — Sequence: пересчёт пропагации (суточный batch)</div>
+<div class="diagram"><span class="b">cron</span>   <span class="b">worker</span>   <span class="b">scoring</span>   <span class="b">graph(links)</span>   <span class="b">L2</span>
+  │      │        │          │             │
+  │ tick │        │          │             │
+  │─────►│ load active participants        │
+  │      │───────►│ для каждого: собрать соседей
+  │      │        │─────────►│ исключить циклы (BR-PROP-CYCLE)
+  │      │        │ S_prop = Σ lot_share·sub; λ_blind
+  │      │        │ penalty top_share>0.6; cap 0.85
+  │      │        │ blend base/prop по покрытию
+  │      │        │ apply decay (Dᵢ классы)
+  │      │        │ batch anchor (Merkle)──►│
+  │      │ refresh catalog cache           │
+</div>
+</section>
+
+<section id="sm-participant">
+<div class="sec-badge">06 — State Machine: статус участника</div>
+<div class="diagram"><span class="g">unclaimed</span> ──claim+KYB──► <span class="g">provisional</span> ──(KYB + N незав. подтв., нет CRITICAL)──► <span class="g">active</span>
+    │                          │                                              │
+    │                          │                                  CRITICAL flag│
+    │                          ▼                                              ▼
+    │                    (остаётся provisional                          <span class="r">suspended</span>
+    │                     при недоборе)                                       │
+    │                                                            разрешение/апелляция
+    └────────────────────────── offboard ─────────────────────────► <span class="r">tombstone</span> ◄──┘
+<span class="c">// tombstone: ПДн сняты, история/флаги публичны (BR-OFFBOARD)</span>
+</div>
+<p style="font-size:.8rem">Переход provisional→active — по доказательствам, не по календарю (BR-PROVISIONAL).</p>
+</section>
+
+<section id="sm-lot">
+<div class="sec-badge">07 — State Machine: партия и recall</div>
+<div class="diagram"><span class="g">active</span> ──recall (отзыв партии/COA)──► <span class="r">recalled</span>
+   │                                      │
+   │ COA/тесты привязаны (lot-QR)         │ связанные подтверждения теряют вес
+   │                                      │ пересчёт сразу + Pₛ при повторах
+   ▼                                      ▼
+ учитывается в Score              исключён из положительного вклада (BR-RECALL)
+</div>
+</section>
+
+<section id="sm-appeal">
+<div class="sec-badge">08 — State Machine: апелляция</div>
+<div class="diagram"><span class="g">submitted</span> ──► <span class="g">panel_forming</span> ──(VRF + conflict-screen)──► <span class="g">in_review</span> ──► <span class="g">decided</span>
+     │                                                            │
+     └────────────── withdrawn (отзыв заявителем) ────────────────┘
+<span class="c">// decided: binding в реестре, loser-pays, лог+anchor; правовой путь сохранён</span>
+</div>
+</section>
+
+<section id="sm-anchor">
+<div class="sec-badge">09 — State Machine: anchoring в L2</div>
+<div class="diagram"><span class="g">pending</span> ──submit tx──► (ожидание подтверждения)
+   │                         │
+   │ ошибка/таймаут          │ confirmed
+   ▼                         ▼
+<span class="r">failed</span> ──retry (backoff)──► <span class="g">anchored</span>
+<span class="c">// failed не блокирует read; ретраи с экспоненциальным backoff</span>
+</div>
+<div class="rec-box"><div class="rec-t">Принцип TDD</div><p>Каждый сложный модуль имеет явный автомат состояний и последовательность. Это убирает неоднозначность реализации и связывает код с бизнес-правилами (BR-*) и acceptance criteria (US-*).</p></div>
+</section>
+
+</main>
+</div>
+</body>
+</html>
