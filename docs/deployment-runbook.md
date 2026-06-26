@@ -115,9 +115,17 @@ ANCHOR_PROVIDER=ots   # lib/anchor/provider.ts + lib/anchor/ots-pipeline.ts
 #   Smoke: `npm run ots:selftest`; manual run: `npm run anchor:ots`.
 #   Alternative relayer/notary: ANCHOR_PROVIDER=http ANCHOR_API_URL=… ANCHOR_API_KEY=…
 
-# KYB / PKI — still skeletons; provide creds + finish request/response mapping.
+# PKI — REAL, free, no account. Ed25519 oracle key from a secret env var.
+PKI_PROVIDER=env
+PKI_PRIVATE_KEY=…     # base64 of PKCS#8 PEM — generate with `npm run pki:keygen`
+#   Then publish the matching public key into the DB:
+#     PKI_PRIVATE_KEY=… DATABASE_URL=… npm run pki:sync-oracle
+#   Smoke: `npm run pki:selftest`. Public keys: GET /api/pki/public-keys.
+#   (A managed cloud KMS can replace this later as another PKI_PROVIDER case
+#    without changing the Ed25519 signature format — lib/pki/ed25519.ts.)
+
+# KYB — still a skeleton; provide creds + finish request/response mapping.
 KYB_PROVIDER=http     KYB_API_URL=…   KYB_API_KEY=…        # lib/kyb/provider.ts (Sumsub planned)
-PKI_PROVIDER=managed  # local verify; wire async KMS for signing — lib/pki/provider.ts
 ```
 
 ### 10. Data quality  👤

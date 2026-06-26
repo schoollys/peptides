@@ -15,6 +15,9 @@
     "anchor:ots": "tsx scripts/ots-anchor.ts",
     "ots:selftest": "tsx scripts/ots-selftest.ts",
     "oracle:sign": "tsx scripts/oracle-sign.ts",
+    "pki:keygen": "tsx scripts/pki-keygen.ts",
+    "pki:selftest": "tsx scripts/pki-selftest.ts",
+    "pki:sync-oracle": "tsx scripts/pki-sync-oracle.ts",
     "score:audit": "tsx scripts/score-audit.ts",
     "recompute:all": "tsx scripts/recompute-all.ts"
   },

@@ -1,13 +1,13 @@
 /**
- * Demo oracle signer. Builds a canonical COA payload and signs it with the dev
- * oracle private key (.oracle-dev-key.pem) so you can exercise POST /api/oracle/coa.
+ * Demo oracle signer. Builds a canonical COA payload and signs it with the
+ * configured PKI provider (PKI_PROVIDER=mock → .oracle-dev-key.pem; =env →
+ * PKI_PRIVATE_KEY) so you can exercise POST /api/oracle/coa.
  *
  * Usage: npx tsx scripts/oracle-sign.ts <participantSlug> <factor> <value> [mediaHash]
  * Prints JSON: { "payload": "...", "signature": "..." }
  */
-import { sign as cryptoSign, createPrivateKey, randomUUID } from 'node:crypto'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { randomUUID } from 'node:crypto'
+import { getPkiProvider } from '../lib/pki/ed25519'
 
 const [, , slug, factor, valueStr, mediaHashArg] = process.argv
 if (!slug || !factor || !valueStr) {
@@ -15,7 +15,6 @@ if (!slug || !factor || !valueStr) {
   process.exit(1)
 }
 
-const keyPem = readFileSync(resolve(process.cwd(), '.oracle-dev-key.pem'), 'utf8')
 const payload = JSON.stringify({
   participantSlug: slug,
   factor,
@@ -24,5 +23,5 @@ const payload = JSON.stringify({
   issuedAt: new Date().toISOString(),
 })
 
-const signature = cryptoSign(null, Buffer.from(payload), createPrivateKey(keyPem)).toString('base64')
+const signature = getPkiProvider().sign(payload)
 console.log(JSON.stringify({ payload, signature }))
