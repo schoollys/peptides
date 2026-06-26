@@ -29,6 +29,9 @@ X-Frame-Options, X-Content-Type-Options).
       `/verify` (or `/api/anchors/verify`) → resolves to the score/coa/flag.
 - [ ] **Re-anchor cron:** `curl -H "Authorization: Bearer $CRON_SECRET" \
       "$BASE_URL/api/cron/anchor"` → 200; without the header → 401.
+      With `ANCHOR_PROVIDER=ots` the JSON includes an `ots` block
+      (`stamped`/`upgraded`/`stillPending`/`failed`); a verified hash later shows
+      `proof.status:"anchored"` + a `bitcoinHeight` via `/api/anchors/verify`.
 - [ ] **Compare:** `/compare` loads live data; adding a participant works.
 - [ ] **Observability:** trigger a 5xx / many 429s and confirm events reach Sentry
       (when `SENTRY_DSN` is set).

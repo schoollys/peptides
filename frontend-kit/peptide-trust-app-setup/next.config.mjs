@@ -15,6 +15,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // OpenTimestamps pulls in a heavy CommonJS dependency tree (request/bitcore);
+  // keep it out of the bundle and require it at runtime from node_modules.
+  serverExternalPackages: ['opentimestamps'],
   images: {
     unoptimized: true,
   },

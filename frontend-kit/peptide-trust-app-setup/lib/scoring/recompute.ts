@@ -102,7 +102,7 @@ export async function recomputeParticipantScore(participantId: string): Promise<
        inputs_hash, anchor_hash, anchor_status, computed_at)
     VALUES
       (${participantId}, ${result.score}, ${dominant}, ${isBalanced},
-       ${part.current_algo_version}, ${inputsHash}, ${anchor.anchorHash}, 'anchored', ${computedAt})
+       ${part.current_algo_version}, ${inputsHash}, ${anchor.anchorHash}, ${anchor.status}, ${computedAt})
     RETURNING id
   `
 

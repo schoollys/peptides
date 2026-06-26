@@ -12,6 +12,8 @@
     "db:seed:user": "tsx scripts/seed-user.ts",
     "db:seed:oracle": "tsx scripts/seed-oracle.ts",
     "anchor": "tsx scripts/anchor-events.ts",
+    "anchor:ots": "tsx scripts/ots-anchor.ts",
+    "ots:selftest": "tsx scripts/ots-selftest.ts",
     "oracle:sign": "tsx scripts/oracle-sign.ts",
     "score:audit": "tsx scripts/score-audit.ts",
     "recompute:all": "tsx scripts/recompute-all.ts"
@@ -24,6 +26,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
+    "opentimestamps": "^0.4.9",
     "postgres": "^3.4.5",
     "react": "^19",
     "react-dom": "^19",

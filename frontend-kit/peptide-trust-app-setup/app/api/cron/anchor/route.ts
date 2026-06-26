@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server'
 import { getSql, isDatabaseEnabled } from '@/lib/db'
 import { reanchorAll } from '@/lib/anchor/reanchor'
+import { getAnchorProvider } from '@/lib/anchor/provider'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+// OTS stamping/upgrading makes a network round-trip per hash; give the batch
+// room to run within the platform's function budget.
+export const maxDuration = 60
 
 /**
  * Scheduled re-anchoring job. Wired via vercel.json `crons`; Vercel sends
@@ -28,9 +32,21 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await reanchorAll(getSql())
+    const sql = getSql()
+    // Deterministic backfill: ensures every score/flag has a current anchor_hash.
+    const result = await reanchorAll(sql)
+
+    // Real on-chain step: stamp pending hashes and upgrade confirmed ones.
+    // Loaded lazily so the heavy OpenTimestamps dependency is only pulled in
+    // when this provider is actually configured.
+    let ots: Awaited<ReturnType<typeof import('@/lib/anchor/ots-pipeline').runOtsPipeline>> | undefined
+    if (getAnchorProvider().name === 'ots') {
+      const { runOtsPipeline } = await import('@/lib/anchor/ots-pipeline')
+      ots = await runOtsPipeline(sql)
+    }
+
     return NextResponse.json(
-      { ok: true, ...result },
+      { ok: true, ...result, ...(ots ? { ots } : {}) },
       { headers: { 'Cache-Control': 'no-store' } },
     )
   } catch (err) {

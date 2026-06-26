@@ -107,11 +107,16 @@ Recommended once running >1 instance; otherwise the limiter is per-instance in-m
 ## P2 — after launch / vendor lead-time (start vendor talks early)
 
 ### 9. Real domain vendors  👤
-Skeletons are wired behind env switches (`.env.example`). Provide creds and finish the
-request/response mapping in each provider:
 ```
-KYB_PROVIDER=http     KYB_API_URL=…   KYB_API_KEY=…        # lib/kyb/provider.ts
-ANCHOR_PROVIDER=http  ANCHOR_API_URL=…  ANCHOR_API_KEY=…  ANCHOR_CHAIN=…   # lib/anchor/provider.ts
+# Anchor — REAL, no creds. Bitcoin timestamping via OpenTimestamps.
+ANCHOR_PROVIDER=ots   # lib/anchor/provider.ts + lib/anchor/ots-pipeline.ts
+#   Needs CRON_SECRET (the daily /api/cron/anchor stamps pending hashes and
+#   upgrades them to a confirmed Bitcoin block). Apply migration db/migrations/0006.
+#   Smoke: `npm run ots:selftest`; manual run: `npm run anchor:ots`.
+#   Alternative relayer/notary: ANCHOR_PROVIDER=http ANCHOR_API_URL=… ANCHOR_API_KEY=…
+
+# KYB / PKI — still skeletons; provide creds + finish request/response mapping.
+KYB_PROVIDER=http     KYB_API_URL=…   KYB_API_KEY=…        # lib/kyb/provider.ts (Sumsub planned)
 PKI_PROVIDER=managed  # local verify; wire async KMS for signing — lib/pki/provider.ts
 ```
 

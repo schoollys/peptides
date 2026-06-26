@@ -2,6 +2,14 @@ import 'server-only'
 import { getSql, isDatabaseEnabled } from '@/lib/db'
 import { ALGO_LABEL } from '@/lib/algo-versions'
 
+/** OpenTimestamps proof state for an anchor hash, when one exists. */
+export interface AnchorProofInfo {
+  status: 'pending' | 'anchored' | 'failed'
+  chain: string
+  bitcoinHeight: number | null
+  bitcoinTime: string | null
+}
+
 export type AnchorMatch =
   | {
       kind: 'score'
@@ -11,6 +19,7 @@ export type AnchorMatch =
       score: number
       algoVersion: string
       computedAt: string
+      proof: AnchorProofInfo | null
     }
   | {
       kind: 'coa'
@@ -19,6 +28,7 @@ export type AnchorMatch =
       displayName: string
       labName: string | null
       createdAt: string
+      proof: AnchorProofInfo | null
     }
   | {
       kind: 'flag'
@@ -27,7 +37,29 @@ export type AnchorMatch =
       displayName: string
       flagType: string
       openedAt: string
+      proof: AnchorProofInfo | null
     }
+
+/** Look up the OpenTimestamps proof state for a resolved anchor hash. */
+async function proofFor(
+  sql: ReturnType<typeof getSql>,
+  anchorHash: string,
+): Promise<AnchorProofInfo | null> {
+  const rows = await sql<
+    { status: string; chain: string; bitcoin_height: number | null; bitcoin_time: Date | null }[]
+  >`
+    SELECT status, chain, bitcoin_height, bitcoin_time
+      FROM anchor_proofs WHERE anchor_hash = ${anchorHash} LIMIT 1
+  `
+  const r = rows[0]
+  if (!r) return null
+  return {
+    status: r.status as AnchorProofInfo['status'],
+    chain: r.chain,
+    bitcoinHeight: r.bitcoin_height,
+    bitcoinTime: r.bitcoin_time ? new Date(r.bitcoin_time).toISOString() : null,
+  }
+}
 
 /**
  * Look up an anchor hash across the artifacts that get anchored
@@ -82,6 +114,7 @@ export async function verifyAnchorHash(raw: string): Promise<AnchorMatch | null>
       score: Number(r.score),
       algoVersion: ALGO_LABEL[r.algo_version] ?? String(r.algo_version),
       computedAt: new Date(r.computed_at).toISOString(),
+      proof: await proofFor(sql, r.anchor_hash),
     }
   }
 
@@ -114,6 +147,7 @@ export async function verifyAnchorHash(raw: string): Promise<AnchorMatch | null>
       displayName: r.display_name,
       labName: r.lab_name,
       createdAt: new Date(r.created_at).toISOString(),
+      proof: await proofFor(sql, r.anchor_hash),
     }
   }
 
@@ -143,6 +177,7 @@ export async function verifyAnchorHash(raw: string): Promise<AnchorMatch | null>
       displayName: r.display_name,
       flagType: r.type,
       openedAt: new Date(r.opened_at).toISOString(),
+      proof: await proofFor(sql, r.anchor_hash),
     }
   }
 
