@@ -29,6 +29,10 @@ export interface KybResult {
   /** ISO date the profile is expected to go provisional, when pending */
   estimatedProvisionalAt?: string
   rejectionReason?: string
+  /** External id we passed to the provider — correlates inbound webhooks. */
+  externalUserId?: string
+  /** Short-lived WebSDK/MobileSDK access token (vendors with async flows). */
+  sdkToken?: string
 }
 
 export interface KybProvider {
@@ -127,12 +131,97 @@ export class HttpKybProvider implements KybProvider {
   }
 }
 
+/**
+ * Sumsub KYB vendor. Verification is asynchronous: verify() opens a Sumsub
+ * applicant ("company" flow) and mints a WebSDK access token so the UI can
+ * launch the flow; the case stays `pending` until the applicantReviewed webhook
+ * promotes it (see app/api/kyb/sumsub/webhook). Only the opaque applicant id and
+ * status are kept here — raw KYB data never leaves Sumsub (ADR-007).
+ */
+export class SumsubKybProvider implements KybProvider {
+  readonly name = 'sumsub'
+
+  async verify(input: KybInput): Promise<KybResult> {
+    const { getSumsubConfig, createApplicant, createAccessToken } = await import('./sumsub')
+    const cfg = getSumsubConfig()
+    const externalUserId = input.participantId ?? ref('ext')
+
+    const applicant = await createApplicant(cfg, {
+      externalUserId,
+      company: { companyName: input.legalName, country: input.jurisdiction || undefined },
+      email: input.contact,
+    })
+
+    let sdkToken: string | undefined
+    try {
+      const token = await createAccessToken(cfg, { externalUserId })
+      sdkToken = token.token
+    } catch {
+      // The applicant exists; the UI can mint a token later via
+      // POST /api/kyb/sumsub/access-token. Don't fail the whole submission.
+    }
+
+    return {
+      status: 'pending',
+      grantedLevel: 'L0',
+      providerRef: applicant.id,
+      externalUserId,
+      ...(sdkToken ? { sdkToken } : {}),
+    }
+  }
+}
+
+/**
+ * ComplyCube KYB vendor. Self-serve, with a sandbox provisioned on signup, so
+ * unlike Sumsub it doesn't gate Business Verification behind an enterprise plan.
+ * verify() creates a company-type client + opens a check; the case stays
+ * `pending` until the check.completed webhook promotes it (see
+ * app/api/kyb/complycube/webhook). Only the opaque client id + outcome are kept
+ * here — raw KYB data never leaves ComplyCube (ADR-007).
+ */
+export class ComplyCubeKybProvider implements KybProvider {
+  readonly name = 'complycube'
+
+  async verify(input: KybInput): Promise<KybResult> {
+    const { getComplyCubeConfig, createCompanyClient, createCheck } = await import('./complycube')
+    const cfg = getComplyCubeConfig()
+    const externalUserId = input.participantId ?? ref('ext')
+
+    const client = await createCompanyClient(cfg, {
+      // ComplyCube requires an email on the client; fall back to a synthetic one.
+      email: input.contact && input.contact.includes('@') ? input.contact : `${externalUserId}@kyb.invalid`,
+      company: { name: input.legalName, incorporationCountry: input.jurisdiction || undefined },
+      externalId: externalUserId,
+    })
+
+    try {
+      await createCheck(cfg, client.id)
+    } catch {
+      // The client exists; a check can be retried/opened later. Don't fail the
+      // whole submission over a transient check-creation error.
+    }
+
+    return {
+      status: 'pending',
+      grantedLevel: 'L0',
+      providerRef: client.id,
+      externalUserId,
+    }
+  }
+}
+
 let cached: KybProvider | undefined
 
-/** Returns the configured KYB provider (mock by default; 'http' for a real vendor). */
+/** Returns the configured KYB provider (mock by default; real vendors otherwise). */
 export function getKybProvider(): KybProvider {
   if (cached) return cached
   switch (process.env.KYB_PROVIDER) {
+    case 'complycube':
+      cached = new ComplyCubeKybProvider()
+      break
+    case 'sumsub':
+      cached = new SumsubKybProvider()
+      break
     case 'http':
       cached = new HttpKybProvider()
       break

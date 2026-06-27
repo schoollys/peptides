@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       await sql`
         INSERT INTO claims
           (participant_id, contact, legal_name, jurisdiction, requested_level,
-           granted_level, status, provider_ref, estimated_provisional_at)
+           granted_level, status, provider_ref, external_user_id, estimated_provisional_at)
         VALUES (
           ${input.participantId ?? null},
           ${input.contact ?? input.legalName},
@@ -59,6 +59,7 @@ export async function POST(request: Request) {
           ${result.grantedLevel},
           ${result.status},
           ${result.providerRef},
+          ${result.externalUserId ?? null},
           ${result.estimatedProvisionalAt ?? null}
         )
       `
